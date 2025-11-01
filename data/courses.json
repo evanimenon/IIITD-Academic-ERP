@@ -1,0 +1,2202 @@
+[
+  {
+    "course_name": "Foundations of Biology",
+    "course_code": "FOB",
+    "credits": 4
+  },
+  {
+    "course_name": "Cell Biology and Bio-Chemistry",
+    "course_code": "CBB",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Quantitative Biology",
+    "course_code": "IQB",
+    "credits": 4
+  },
+  {
+    "course_name": "Genetics and Molecular Biology",
+    "course_code": "GMB",
+    "credits": 4
+  },
+  {
+    "course_name": "Practical Bioinformatics",
+    "course_code": "PB",
+    "credits": 4
+  },
+  {
+    "course_name": "Algorithms in Bioinformatics",
+    "course_code": "ABIN",
+    "credits": 4
+  },
+  {
+    "course_name": "Biophysics",
+    "course_code": "BioP",
+    "credits": 4
+  },
+  {
+    "course_name": "Stochastic Simulations in Systems Biology and Biophysics",
+    "course_code": "SSSBB",
+    "credits": 4
+  },
+  {
+    "course_name": "Cell Biology and Bio-Chemistry",
+    "course_code": "CBB",
+    "credits": 4
+  },
+  {
+    "course_name": "Foundations of Modern Biology",
+    "course_code": "FOMB",
+    "credits": 4
+  },
+  {
+    "course_name": "Algorithms in Computational Biology",
+    "course_code": "ACB",
+    "credits": 4
+  },
+  {
+    "course_name": "Chemoinformatics",
+    "course_code": "CHI",
+    "credits": 4
+  },
+  {
+    "course_name": "Biomedical Image processing",
+    "course_code": "BIP",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Mathematical Biology",
+    "course_code": "IMB",
+    "credits": 4
+  },
+  {
+    "course_name": "Network Biology",
+    "course_code": "NB",
+    "credits": 4
+  },
+  {
+    "course_name": "Systems and Synthetic Biology",
+    "course_code": "S&SB",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Computational Neuroscience",
+    "course_code": "ICN",
+    "credits": 4
+  },
+  {
+    "course_name": "Data Sciences for Genomics",
+    "course_code": "DSG",
+    "credits": 4
+  },
+  {
+    "course_name": "Machine Learning for Biomedical Applications",
+    "course_code": "MLBA",
+    "credits": 4
+  },
+  {
+    "course_name": "Big Data Mining in Healthcare",
+    "course_code": "BDMH",
+    "credits": 4
+  },
+  {
+    "course_name": "Computational Gastronomy",
+    "course_code": "CGAS",
+    "credits": 4
+  },
+  {
+    "course_name": "Biostatistics",
+    "course_code": "BioStats",
+    "credits": 4
+  },
+  {
+    "course_name": "Computing for Medicine",
+    "course_code": "CM",
+    "credits": 4
+  },
+  {
+    "course_name": "Computer Aided Drug Design",
+    "course_code": "CADD",
+    "credits": 4
+  },
+  {
+    "course_name": "Communication Skills",
+    "course_code": "COM",
+    "credits": 4
+  },
+  {
+    "course_name": "Technical Communication",
+    "course_code": "TCOM",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Programming",
+    "course_code": "IP",
+    "credits": 4
+  },
+  {
+    "course_name": "Data Structures & Algorithms",
+    "course_code": "DSA",
+    "credits": 4
+  },
+  {
+    "course_name": "Computer Organization",
+    "course_code": "CO",
+    "credits": 4
+  },
+  {
+    "course_name": "Discrete Mathematics",
+    "course_code": "DM",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Intelligent Systems",
+    "course_code": "IIS",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Programming",
+    "course_code": "AP",
+    "credits": 4
+  },
+  {
+    "course_name": "Fundamentals of Database Management System",
+    "course_code": "DBMS",
+    "credits": 4
+  },
+  {
+    "course_name": "Algorithm Design and Analysis",
+    "course_code": "ADA",
+    "credits": 4
+  },
+  {
+    "course_name": "Algorithm Design and Analysis",
+    "course_code": "ALD",
+    "credits": 4
+  },
+  {
+    "course_name": "Operating Systems",
+    "course_code": "OS",
+    "credits": 4
+  },
+  {
+    "course_name": "Computer Networks",
+    "course_code": "CN",
+    "credits": 4
+  },
+  {
+    "course_name": "Network Administration",
+    "course_code": "NAD",
+    "credits": 4
+  },
+  {
+    "course_name": "Modern Algorithm Design",
+    "course_code": "MAD",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Algorithms",
+    "course_code": "AA",
+    "credits": 4
+  },
+  {
+    "course_name": "Theory of Computation",
+    "course_code": "ToC",
+    "credits": 4
+  },
+  {
+    "course_name": "Computer Graphics",
+    "course_code": "CG",
+    "credits": 4
+  },
+  {
+    "course_name": "Digital Image Processing",
+    "course_code": "DIP",
+    "credits": 4
+  },
+  {
+    "course_name": "Statistical Machine Learning",
+    "course_code": "SML",
+    "credits": 4
+  },
+  {
+    "course_name": "Computer Vision",
+    "course_code": "CV",
+    "credits": 4
+  },
+  {
+    "course_name": "Foundations of Computer Security",
+    "course_code": "FCS",
+    "credits": 4
+  },
+  {
+    "course_name": "Network Security",
+    "course_code": "NSC",
+    "credits": 4
+  },
+  {
+    "course_name": "Networks and System Security II",
+    "course_code": "NSS-II",
+    "credits": 4
+  },
+  {
+    "course_name": "Complexity Theory",
+    "course_code": "CMPT",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Biometrics",
+    "course_code": "BIOM",
+    "credits": 4
+  },
+  {
+    "course_name": "Designing Human Centered Systems",
+    "course_code": "DHCS",
+    "credits": 4
+  },
+  {
+    "course_name": "Foundations of Parallel Programming",
+    "course_code": "FPP",
+    "credits": 4
+  },
+  {
+    "course_name": "Program Analysis",
+    "course_code": "PA",
+    "credits": 4
+  },
+  {
+    "course_name": "Decision Procedures",
+    "course_code": "DP",
+    "credits": 4
+  },
+  {
+    "course_name": "Data Mining",
+    "course_code": "DMG",
+    "credits": 4
+  },
+  {
+    "course_name": "Database System Implementation",
+    "course_code": "DBSI",
+    "credits": 4
+  },
+  {
+    "course_name": "Information Retrieval",
+    "course_code": "IR",
+    "credits": 4
+  },
+  {
+    "course_name": "Computer Architecture",
+    "course_code": "CA",
+    "credits": 4
+  },
+  {
+    "course_name": "Bayesian Machine Learning",
+    "course_code": "BML",
+    "credits": 4
+  },
+  {
+    "course_name": "Theories of Deep Learning",
+    "course_code": "TDL",
+    "credits": 4
+  },
+  {
+    "course_name": "Randomized Algorithms",
+    "course_code": "RA",
+    "credits": 4
+  },
+  {
+    "course_name": "Theory of Modern cryptography",
+    "course_code": "TMC",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Graduate Algorithms",
+    "course_code": "GA",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Blockchain and Cryptocurrency",
+    "course_code": "IBC",
+    "credits": 4
+  },
+  {
+    "course_name": "Approximation Algorithms",
+    "course_code": "AAG",
+    "credits": 4
+  },
+  {
+    "course_name": "Distributed Systems: Concepts & Design",
+    "course_code": "DSCD",
+    "credits": 4
+  },
+  {
+    "course_name": "Multi-Agent Systems",
+    "course_code": "MAS",
+    "credits": 4
+  },
+  {
+    "course_name": "Mobile Computing",
+    "course_code": "MC",
+    "credits": 4
+  },
+  {
+    "course_name": "Wireless Networks",
+    "course_code": "WN",
+    "credits": 4
+  },
+  {
+    "course_name": "Applied Cryptography",
+    "course_code": "AC",
+    "credits": 4
+  },
+  {
+    "course_name": "Security Engineering",
+    "course_code": "SE",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Spatial Computing",
+    "course_code": "ISC",
+    "credits": 4
+  },
+  {
+    "course_name": "Natural Language Processing",
+    "course_code": "NLP",
+    "credits": 4
+  },
+  {
+    "course_name": "Big Data Analytics",
+    "course_code": "BDA",
+    "credits": 4
+  },
+  {
+    "course_name": "Data Science",
+    "course_code": "DSc",
+    "credits": 4
+  },
+  {
+    "course_name": "Mining Large Networks",
+    "course_code": "MLN",
+    "credits": 4
+  },
+  {
+    "course_name": "GPU Computing",
+    "course_code": "GPU",
+    "credits": 4
+  },
+  {
+    "course_name": "Probabilistic Graphical Models",
+    "course_code": "PGM",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Computer Vision",
+    "course_code": "ACV",
+    "credits": 4
+  },
+  {
+    "course_name": "Multimedia Computing and Applications",
+    "course_code": "MCA",
+    "credits": 4
+  },
+  {
+    "course_name": "Software Defined Networking",
+    "course_code": "SDN",
+    "credits": 4
+  },
+  {
+    "course_name": "Mobile and Middleware Systems",
+    "course_code": "MMS",
+    "credits": 4
+  },
+  {
+    "course_name": "Virtual Reality",
+    "course_code": "VR",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Media Computing",
+    "course_code": "IMC",
+    "credits": 4
+  },
+  {
+    "course_name": "Speech and Audio Processing",
+    "course_code": "SAP",
+    "credits": 4
+  },
+  {
+    "course_name": "Smart Sensing for Internet of Things (IoT)",
+    "course_code": "SSIoT",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Internet of Things",
+    "course_code": "AIOT",
+    "credits": 4
+  },
+  {
+    "course_name": "Ontology Modeling",
+    "course_code": "OM",
+    "credits": 4
+  },
+  {
+    "course_name": "Systems Analysis, Design and Requirements Engineering",
+    "course_code": "SADRE",
+    "credits": 4
+  },
+  {
+    "course_name": "Software Production Evolution and Maintenance",
+    "course_code": "SPEM",
+    "credits": 4
+  },
+  {
+    "course_name": "Software Development using Open Source",
+    "course_code": "SDOS",
+    "credits": 4
+  },
+  {
+    "course_name": "Program Verification",
+    "course_code": "PV",
+    "credits": 4
+  },
+  {
+    "course_name": "Geometry Processing",
+    "course_code": "GP",
+    "credits": 4
+  },
+  {
+    "course_name": "Object Oriented Programming and Design",
+    "course_code": "OOPD",
+    "credits": 4
+  },
+  {
+    "course_name": "Compilers",
+    "course_code": "CMP",
+    "credits": 4
+  },
+  {
+    "course_name": "Knowledge Graphs in Practice",
+    "course_code": "KG",
+    "credits": 4
+  },
+  {
+    "course_name": "Data Warehouse",
+    "course_code": "DW",
+    "credits": 4
+  },
+  {
+    "course_name": "Data Lifecycle Management",
+    "course_code": "DLM",
+    "credits": 4
+  },
+  {
+    "course_name": "Statistical Computation",
+    "course_code": "SComp",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Quantum Computing",
+    "course_code": "IQC",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Operating Systems",
+    "course_code": "AOS",
+    "credits": 4
+  },
+  {
+    "course_name": "Semantic Web",
+    "course_code": "Sweb",
+    "credits": 4
+  },
+  {
+    "course_name": "Robotics",
+    "course_code": "IRob",
+    "credits": 4
+  },
+  {
+    "course_name": "Social Robotics",
+    "course_code": "SR",
+    "credits": 4
+  },
+  {
+    "course_name": "Communication Networks",
+    "course_code": "COMN",
+    "credits": 4
+  },
+  {
+    "course_name": "Collaborative Filtering",
+    "course_code": "CF",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Machine Learning",
+    "course_code": "AML",
+    "credits": 4
+  },
+  {
+    "course_name": "Artificial Intelligence",
+    "course_code": "AI",
+    "credits": 4
+  },
+  {
+    "course_name": "Privacy and Security in Online Social Media",
+    "course_code": "PSOSM",
+    "credits": 4
+  },
+  {
+    "course_name": "Topics in Adaptive Cybersecurity",
+    "course_code": "TAC",
+    "credits": 4
+  },
+  {
+    "course_name": "Network Science",
+    "course_code": "NS",
+    "credits": 4
+  },
+  {
+    "course_name": "Information Integration and Applications",
+    "course_code": "IIA",
+    "credits": 4
+  },
+  {
+    "course_name": "Trustworthy AI systems",
+    "course_code": "TAIS",
+    "credits": 4
+  },
+  {
+    "course_name": "Affective Computing",
+    "course_code": "AFC",
+    "credits": 4
+  },
+  {
+    "course_name": "Special Topics in Computer Vision",
+    "course_code": "SCV",
+    "credits": 4
+  },
+  {
+    "course_name": "Edge AI",
+    "course_code": "EAI",
+    "credits": 4
+  },
+  {
+    "course_name": "Meta-Learning",
+    "course_code": "MEL",
+    "credits": 4
+  },
+  {
+    "course_name": "Multimedia Security",
+    "course_code": "MS",
+    "credits": 4
+  },
+  {
+    "course_name": "Topics in Software Engineering: AI in SE",
+    "course_code": "TSE",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Topics in Mobile Computing",
+    "course_code": "ATMC",
+    "credits": 4
+  },
+  {
+    "course_name": "Network Anonymity and Privacy",
+    "course_code": "NAP",
+    "credits": 4
+  },
+  {
+    "course_name": "Topics in Cryptanalysis",
+    "course_code": "TC",
+    "credits": 4
+  },
+  {
+    "course_name": "Design Drawing & Visualization",
+    "course_code": "DDV",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to HCI",
+    "course_code": "IHCI",
+    "credits": 4
+  },
+  {
+    "course_name": "Prototyping Interactive Systems",
+    "course_code": "PIS",
+    "credits": 4
+  },
+  {
+    "course_name": "Design Processes and Perspectives",
+    "course_code": "DPP",
+    "credits": 4
+  },
+  {
+    "course_name": "Visual Design & Communication",
+    "course_code": "VDC",
+    "credits": 4
+  },
+  {
+    "course_name": "Human Computer Interaction",
+    "course_code": "HCI",
+    "credits": 4
+  },
+  {
+    "course_name": "Design of Interactive Systems",
+    "course_code": "DIS",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Animation and Graphics",
+    "course_code": "IAG",
+    "credits": 4
+  },
+  {
+    "course_name": "Film Making and Radio Podcasting",
+    "course_code": "FMRP",
+    "credits": 4
+  },
+  {
+    "course_name": "Fundamentals of Audio for Engineers",
+    "course_code": "FAE",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to 2D Animation",
+    "course_code": "I2D",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to 3D Character Animation",
+    "course_code": "I3DA",
+    "credits": 4
+  },
+  {
+    "course_name": "Narratives in Visual Communication",
+    "course_code": "NVC",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced topics in Human Centered Computing (ATHCC)",
+    "course_code": "ATHCC",
+    "credits": 4
+  },
+  {
+    "course_name": "Meta-Learning",
+    "course_code": "MTL",
+    "credits": 4
+  },
+  {
+    "course_name": "Design Futures",
+    "course_code": "DF",
+    "credits": 4
+  },
+  {
+    "course_name": "Game Design and Development",
+    "course_code": "GDD",
+    "credits": 4
+  },
+  {
+    "course_name": "Wearable Applications, Research, Devices, Interactions",
+    "course_code": "WARDI",
+    "credits": 4
+  },
+  {
+    "course_name": "Digital Audio & Video Production Workflow",
+    "course_code": "DAVP",
+    "credits": 4
+  },
+  {
+    "course_name": "Information Systems in Public Health",
+    "course_code": "ISPR",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to 3D Production Design for Animation and Games",
+    "course_code": "I3DD",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to 3D Animation",
+    "course_code": "I3D",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Motion Graphics",
+    "course_code": "IMG",
+    "credits": 4
+  },
+  {
+    "course_name": "Human Centred AI",
+    "course_code": "HCAI",
+    "credits": 4
+  },
+  {
+    "course_name": "Fundamentals of Video for Engineers",
+    "course_code": "FVE",
+    "credits": 4
+  },
+  {
+    "course_name": "Inclusive Design, Universal Design & Accessibility",
+    "course_code": "IDUDA",
+    "credits": 4
+  },
+  {
+    "course_name": "Digital Circuits",
+    "course_code": "DC",
+    "credits": 4
+  },
+  {
+    "course_name": "Basic Electronics",
+    "course_code": "BE",
+    "credits": 4
+  },
+  {
+    "course_name": "Integrated Electronics",
+    "course_code": "IE",
+    "credits": 4
+  },
+  {
+    "course_name": "Circuit Theory and Devices",
+    "course_code": "CTD",
+    "credits": 4
+  },
+  {
+    "course_name": "Fields and Waves",
+    "course_code": "F&W",
+    "credits": 4
+  },
+  {
+    "course_name": "Principles of Communication Systems",
+    "course_code": "PCS",
+    "credits": 4
+  },
+  {
+    "course_name": "Signals and Systems",
+    "course_code": "S&S",
+    "credits": 4
+  },
+  {
+    "course_name": "Embedded Logic Design",
+    "course_code": "ELD",
+    "credits": 4
+  },
+  {
+    "course_name": "Digital VLSI Design",
+    "course_code": "DVD",
+    "credits": 4
+  },
+  {
+    "course_name": "Analog CMOS Circuit Design",
+    "course_code": "CMOS",
+    "credits": 4
+  },
+  {
+    "course_name": "Solid State Devices",
+    "course_code": "SSD",
+    "credits": 4
+  },
+  {
+    "course_name": "RF Circuit Design",
+    "course_code": "RFCD",
+    "credits": 4
+  },
+  {
+    "course_name": "Digital Communication Systems",
+    "course_code": "DCS",
+    "credits": 4
+  },
+  {
+    "course_name": "Mobile Communications",
+    "course_code": "MCOM",
+    "credits": 4
+  },
+  {
+    "course_name": "Digital Signal Processing",
+    "course_code": "DSP",
+    "credits": 4
+  },
+  {
+    "course_name": "Machine Learning",
+    "course_code": "ML",
+    "credits": 4
+  },
+  {
+    "course_name": "Mixed Signal Design",
+    "course_code": "MSD",
+    "credits": 4
+  },
+  {
+    "course_name": "Antennas Theory and Design",
+    "course_code": "ATD",
+    "credits": 4
+  },
+  {
+    "course_name": "Radar Systems",
+    "course_code": "RS",
+    "credits": 4
+  },
+  {
+    "course_name": "Statistical Signal Processing",
+    "course_code": "SSP",
+    "credits": 4
+  },
+  {
+    "course_name": "Probability and Random Process",
+    "course_code": "PRP",
+    "credits": 4
+  },
+  {
+    "course_name": "Digital Hardware Design",
+    "course_code": "DHD",
+    "credits": 4
+  },
+  {
+    "course_name": "VLSI Design Flow",
+    "course_code": "VDF",
+    "credits": 4
+  },
+  {
+    "course_name": "System on Chip Design and Test",
+    "course_code": "SCDT",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Nanoelectronics",
+    "course_code": "INE",
+    "credits": 4
+  },
+  {
+    "course_name": "Intelligent Applications Implementation on Heterogeneous Platforms",
+    "course_code": "IAI",
+    "credits": 4
+  },
+  {
+    "course_name": "Low Voltage Analog Circuit Design",
+    "course_code": "LVACD",
+    "credits": 4
+  },
+  {
+    "course_name": "Integrated Circuit Fabrication",
+    "course_code": "ICF",
+    "credits": 4
+  },
+  {
+    "course_name": "Quantum Materials and Devices",
+    "course_code": "QMD",
+    "credits": 4
+  },
+  {
+    "course_name": "Optical Fiber Networks for Industry 4.0",
+    "course_code": "OFNI",
+    "credits": 4
+  },
+  {
+    "course_name": "Satellite Navigation and Sensor Fusion",
+    "course_code": "SNSF",
+    "credits": 4
+  },
+  {
+    "course_name": "Optical Communications Systems",
+    "course_code": "OCS",
+    "credits": 4
+  },
+  {
+    "course_name": "Optical Networking",
+    "course_code": "ON",
+    "credits": 4
+  },
+  {
+    "course_name": "Wireless Communication Evolution from 3G to 5G",
+    "course_code": "WCE",
+    "credits": 4
+  },
+  {
+    "course_name": "Wireless System Implementation",
+    "course_code": "WSI",
+    "credits": 4
+  },
+  {
+    "course_name": "Principals of Digital Communication System",
+    "course_code": "PDCS",
+    "credits": 4
+  },
+  {
+    "course_name": "Photonics: Fundamentals & Applications",
+    "course_code": "Pho",
+    "credits": 4
+  },
+  {
+    "course_name": "Optical and Wireless Convergence for Beyond 5G Networks and IoT",
+    "course_code": "OWC",
+    "credits": 4
+  },
+  {
+    "course_name": "Deep Learning",
+    "course_code": "DL",
+    "credits": 4
+  },
+  {
+    "course_name": "Compressive Sensing",
+    "course_code": "CS",
+    "credits": 4
+  },
+  {
+    "course_name": "Speech Recognition and Understanding",
+    "course_code": "SRU",
+    "credits": 4
+  },
+  {
+    "course_name": "Transform Learning and Applications",
+    "course_code": "TLA",
+    "credits": 4
+  },
+  {
+    "course_name": "Modeling and Analysis of Random 5G Networks",
+    "course_code": "5GN",
+    "credits": 4
+  },
+  {
+    "course_name": "Data Processing and Management",
+    "course_code": "DPM",
+    "credits": 4
+  },
+  {
+    "course_name": "Reinforcement Learning",
+    "course_code": "RL",
+    "credits": 4
+  },
+  {
+    "course_name": "Linear Systems Theory",
+    "course_code": "LST",
+    "credits": 4
+  },
+  {
+    "course_name": "Optimal Control Systems",
+    "course_code": "OCNS",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Embedded Logic Design",
+    "course_code": "AELD",
+    "credits": 4
+  },
+  {
+    "course_name": "Machine Learning Techniques for Real-time Control",
+    "course_code": "MLRC",
+    "credits": 4
+  },
+  {
+    "course_name": "Nonlinear and Adaptive Control of Robotic Systems",
+    "course_code": "NLR",
+    "credits": 4
+  },
+  {
+    "course_name": "Autonomous Driving",
+    "course_code": "AD",
+    "credits": 4
+  },
+  {
+    "course_name": "Memory Design and Testing",
+    "course_code": "MDT",
+    "credits": 4
+  },
+  {
+    "course_name": "Stochastic Estimation and Control",
+    "course_code": "SEC",
+    "credits": 4
+  },
+  {
+    "course_name": "Macroeconomics",
+    "course_code": "MA",
+    "credits": 4
+  },
+  {
+    "course_name": "Econometrics I",
+    "course_code": "ECO",
+    "credits": 4
+  },
+  {
+    "course_name": "Money and Banking",
+    "course_code": "MB",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Economic Analysis",
+    "course_code": "IEA",
+    "credits": 4
+  },
+  {
+    "course_name": "Microeconomics",
+    "course_code": "ME",
+    "credits": 4
+  },
+  {
+    "course_name": "Game Theory",
+    "course_code": "GMT",
+    "credits": 4
+  },
+  {
+    "course_name": "Industrial Organization",
+    "course_code": "IO",
+    "credits": 4
+  },
+  {
+    "course_name": "Market Design",
+    "course_code": "MD",
+    "credits": 4
+  },
+  {
+    "course_name": "Behavioural Economics",
+    "course_code": "BEco",
+    "credits": 4
+  },
+  {
+    "course_name": "Econometrics II",
+    "course_code": "Econ-2",
+    "credits": 4
+  },
+  {
+    "course_name": "Spatial Statistics and Spatial Econometrics",
+    "course_code": "SSSE",
+    "credits": 4
+  },
+  {
+    "course_name": "Foundations of Finance",
+    "course_code": "FF",
+    "credits": 4
+  },
+  {
+    "course_name": "Valuation and Portfolio Management",
+    "course_code": "VPM",
+    "credits": 4
+  },
+  {
+    "course_name": "Derivatives and Risk Management",
+    "course_code": "DRM",
+    "credits": 4
+  },
+  {
+    "course_name": "Markov Decision Processes",
+    "course_code": "MDP",
+    "credits": 4
+  },
+  {
+    "course_name": "Decision Theory",
+    "course_code": "DT",
+    "credits": 4
+  },
+  {
+    "course_name": "Research Methods",
+    "course_code": "RM",
+    "credits": 4
+  },
+  {
+    "course_name": "Entrepreneurial Communication",
+    "course_code": "EComm",
+    "credits": 4
+  },
+  {
+    "course_name": "Entrepreneurial Khichadi",
+    "course_code": "EK",
+    "credits": 4
+  },
+  {
+    "course_name": "Entrepreneurial Finance",
+    "course_code": "EF",
+    "credits": 4
+  },
+  {
+    "course_name": "Relevance of Intellectual Property for Startups",
+    "course_code": "RIPS",
+    "credits": 4
+  },
+  {
+    "course_name": "New Venture Planning",
+    "course_code": "NVP",
+    "credits": 4
+  },
+  {
+    "course_name": "Creativity, Innovation, and Inventive Problem Solving",
+    "course_code": "CIIPS",
+    "credits": 4
+  },
+  {
+    "course_name": "Healthcare Innovation and Entrepreneurship Essentials",
+    "course_code": "HIEE",
+    "credits": 4
+  },
+  {
+    "course_name": "Environmental Sciences",
+    "course_code": "EVS",
+    "credits": 4
+  },
+  {
+    "course_name": "Ecology, Evolution, and Environment",
+    "course_code": "EEE",
+    "credits": 4
+  },
+  {
+    "course_name": "Effective Supply Chain for E Commerce",
+    "course_code": "ESCM",
+    "credits": 4
+  },
+  {
+    "course_name": "Emerging Issues in IT Management",
+    "course_code": "EIITM",
+    "credits": 4
+  },
+  {
+    "course_name": "Linear Algebra",
+    "course_code": "M-I",
+    "credits": 4
+  },
+  {
+    "course_name": "Probability and Statistics",
+    "course_code": "P&S",
+    "credits": 4
+  },
+  {
+    "course_name": "Multivariate Calculus",
+    "course_code": "M-III",
+    "credits": 4
+  },
+  {
+    "course_name": "Mathematics IV",
+    "course_code": "M-IV",
+    "credits": 4
+  },
+  {
+    "course_name": "Discrete Structures",
+    "course_code": "DS",
+    "credits": 4
+  },
+  {
+    "course_name": "Number Theory",
+    "course_code": "NT",
+    "credits": 4
+  },
+  {
+    "course_name": "Abstract Algebra I",
+    "course_code": "AA-I",
+    "credits": 4
+  },
+  {
+    "course_name": "Real Analysis I",
+    "course_code": "RA-I",
+    "credits": 4
+  },
+  {
+    "course_name": "Numerical Methods",
+    "course_code": "NM",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Mathematical Logic",
+    "course_code": "IML",
+    "credits": 4
+  },
+  {
+    "course_name": "Algebra",
+    "course_code": "ALG",
+    "credits": 4
+  },
+  {
+    "course_name": "Graph Theory",
+    "course_code": "GT",
+    "credits": 4
+  },
+  {
+    "course_name": "Combinatorics and its Applications",
+    "course_code": "CIA",
+    "credits": 4
+  },
+  {
+    "course_name": "Real Analysis-II",
+    "course_code": "RA-II",
+    "credits": 4
+  },
+  {
+    "course_name": "Complex Analysis",
+    "course_code": "CmpA",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Dynamical Systems",
+    "course_code": "IDS",
+    "credits": 4
+  },
+  {
+    "course_name": "Stochastic Processes and Applications",
+    "course_code": "SPA",
+    "credits": 4
+  },
+  {
+    "course_name": "Statistical Inference",
+    "course_code": "SI",
+    "credits": 4
+  },
+  {
+    "course_name": "Scientific Computing",
+    "course_code": "SC",
+    "credits": 4
+  },
+  {
+    "course_name": "Linear Optimization",
+    "course_code": "LO",
+    "credits": 4
+  },
+  {
+    "course_name": "Fluid Mechainics",
+    "course_code": "FM",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Linear Algebra",
+    "course_code": "ALA",
+    "credits": 4
+  },
+  {
+    "course_name": "Algebraic Number Theory",
+    "course_code": "ANT",
+    "credits": 4
+  },
+  {
+    "course_name": "Abstract Algebra II",
+    "course_code": "AA-II",
+    "credits": 4
+  },
+  {
+    "course_name": "Coding Theory",
+    "course_code": "COT",
+    "credits": 4
+  },
+  {
+    "course_name": "Analytic Number Theory",
+    "course_code": "ANNT",
+    "credits": 4
+  },
+  {
+    "course_name": "Combinatorial Optimization",
+    "course_code": "CMO",
+    "credits": 4
+  },
+  {
+    "course_name": "Social Network Analysis",
+    "course_code": "SNA",
+    "credits": 4
+  },
+  {
+    "course_name": "Topics in Number Theory",
+    "course_code": "TNT",
+    "credits": 4
+  },
+  {
+    "course_name": "Concurrent and Learned Data Structures",
+    "course_code": "CLDS",
+    "credits": 4
+  },
+  {
+    "course_name": "Measure and Probability Theory",
+    "course_code": "MPT",
+    "credits": 4
+  },
+  {
+    "course_name": "Applied Optimization Methods for Machine Learning",
+    "course_code": "AOMML",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Functional Analysis",
+    "course_code": "IFA",
+    "credits": 4
+  },
+  {
+    "course_name": "Prototyping Interactive Systems",
+    "course_code": "PIS",
+    "credits": 4
+  },
+  {
+    "course_name": "Calculus in R^N",
+    "course_code": "CRN",
+    "credits": 4
+  },
+  {
+    "course_name": "Finite and Spectral Element Methods",
+    "course_code": "FSEM",
+    "credits": 4
+  },
+  {
+    "course_name": "Ethics in AI",
+    "course_code": "EI",
+    "credits": 4
+  },
+  {
+    "course_name": "Programmable Networking",
+    "course_code": "PN",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to PDE",
+    "course_code": "IPDE",
+    "credits": 4
+  },
+  {
+    "course_name": "Estimation Theory for dynamic systems",
+    "course_code": "ET",
+    "credits": 4
+  },
+  {
+    "course_name": "Computational Methods in Oncology Research",
+    "course_code": "CMOR",
+    "credits": 4
+  },
+  {
+    "course_name": "Parallel Runtimes for Modern Processors",
+    "course_code": "PRMP",
+    "credits": 4
+  },
+  {
+    "course_name": "Quantum Mechanics",
+    "course_code": "QM",
+    "credits": 4
+  },
+  {
+    "course_name": "Point Set Toplogy",
+    "course_code": "PST",
+    "credits": 4
+  },
+  {
+    "course_name": "3D Animation filmmaking",
+    "course_code": "3DAF",
+    "credits": 4
+  },
+  {
+    "course_name": "Point Set Toplogy",
+    "course_code": "PST-2",
+    "credits": 4
+  },
+  {
+    "course_name": "Knowledge Production, Concepts and Context",
+    "course_code": "KPCC",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Riemannian Geometry with Some Applications",
+    "course_code": "IRG",
+    "credits": 4
+  },
+  {
+    "course_name": "Enhancement Technologies and the Body: Beyond the Human Form",
+    "course_code": "ETB",
+    "credits": 4
+  },
+  {
+    "course_name": "Contract Theory",
+    "course_code": "CT",
+    "credits": 4
+  },
+  {
+    "course_name": "Numerical Solutions Differential Equations",
+    "course_code": "NSDE",
+    "credits": 4
+  },
+  {
+    "course_name": "Tomographic Imaging",
+    "course_code": "TI",
+    "credits": 4
+  },
+  {
+    "course_name": "Integral Transforms and their Applications",
+    "course_code": "ITA",
+    "credits": 4
+  },
+  {
+    "course_name": "Cloud Computing",
+    "course_code": "CldC",
+    "credits": 4
+  },
+  {
+    "course_name": "Categorical Data Analysis",
+    "course_code": "CDA",
+    "credits": 4
+  },
+  {
+    "course_name": "Quantum Mechanics",
+    "course_code": "QM",
+    "credits": 4
+  },
+  {
+    "course_name": "Convex Optimization",
+    "course_code": "COO",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to AI in Medical Imaging",
+    "course_code": "IAMI",
+    "credits": 4
+  },
+  {
+    "course_name": "Computational Metagenomics",
+    "course_code": "CoMeG",
+    "credits": 4
+  },
+  {
+    "course_name": "Numerical Partial Differential Equations",
+    "course_code": "NPDE",
+    "credits": 4
+  },
+  {
+    "course_name": "Variational Calculus and their Applications",
+    "course_code": "VCA",
+    "credits": 4
+  },
+  {
+    "course_name": "Ergonomics/Human factors for Design",
+    "course_code": "EFD",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Psychology",
+    "course_code": "Psy",
+    "credits": 4
+  },
+  {
+    "course_name": "Positive Psychology",
+    "course_code": "Ppsy",
+    "credits": 4
+  },
+  {
+    "course_name": "Enhancement Technologies and the Body: Beyond the Human Form",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Non-Classical Logics",
+    "course_code": "NCL",
+    "credits": 4
+  },
+  {
+    "course_name": "Cognitive Psychology",
+    "course_code": "CP",
+    "credits": 4
+  },
+  {
+    "course_name": "Lattices in Computer Science",
+    "course_code": "LCS",
+    "credits": 4
+  },
+  {
+    "course_name": "Social Psychology",
+    "course_code": "SP",
+    "credits": 4
+  },
+  {
+    "course_name": "Human Microbiome Data Science",
+    "course_code": "HMDS",
+    "credits": 4
+  },
+  {
+    "course_name": "Attention and Perception",
+    "course_code": "ATP",
+    "credits": 4
+  },
+  {
+    "course_name": "Usable Security and Privacy",
+    "course_code": "UsS",
+    "credits": 4
+  },
+  {
+    "course_name": "Learning and Memory",
+    "course_code": "LM",
+    "credits": 4
+  },
+  {
+    "course_name": "Interactive Systems",
+    "course_code": "ISy",
+    "credits": 4
+  },
+  {
+    "course_name": "Neuroscience of Decision Making",
+    "course_code": "NDM",
+    "credits": 4
+  },
+  {
+    "course_name": "Information Theory",
+    "course_code": "InT",
+    "credits": 4
+  },
+  {
+    "course_name": "Cognition of Motor Movement",
+    "course_code": "CMM",
+    "credits": 4
+  },
+  {
+    "course_name": "Cognition and Information Processing in Design",
+    "course_code": "CIPD",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Sociology and Anthropology",
+    "course_code": "ISA",
+    "credits": 4
+  },
+  {
+    "course_name": "Foundations of Marketing",
+    "course_code": "FOM",
+    "credits": 4
+  },
+  {
+    "course_name": "Contemporary India: Sociological Perspective",
+    "course_code": "CISP",
+    "credits": 4
+  },
+  {
+    "course_name": "Social Entrepreneurship",
+    "course_code": "SoE",
+    "credits": 4
+  },
+  {
+    "course_name": "Sociology of New Media",
+    "course_code": "SNM",
+    "credits": 4
+  },
+  {
+    "course_name": "Anthropology and Social Media",
+    "course_code": "ASM",
+    "credits": 4
+  },
+  {
+    "course_name": "Japanese Language",
+    "course_code": "JALang",
+    "credits": 4
+  },
+  {
+    "course_name": "Distributed and Federated Machine Learning",
+    "course_code": "DFML",
+    "credits": 4
+  },
+  {
+    "course_name": "Business Anthropology",
+    "course_code": "BA",
+    "credits": 4
+  },
+  {
+    "course_name": "Information Technology And Society",
+    "course_code": "ITS",
+    "credits": 4
+  },
+  {
+    "course_name": "Comprehensive Gender Sensitization",
+    "course_code": "CGS",
+    "credits": 4
+  },
+  {
+    "course_name": "Algorithms under Uncertainty",
+    "course_code": "AUU",
+    "credits": 4
+  },
+  {
+    "course_name": "Organizations An Anthropological Perspective",
+    "course_code": "OAP",
+    "credits": 4
+  },
+  {
+    "course_name": "Advances in Deep Learning",
+    "course_code": "ADL",
+    "credits": 4
+  },
+  {
+    "course_name": "Consumer Culture and Society",
+    "course_code": "CCS",
+    "credits": 4
+  },
+  {
+    "course_name": "Quantum Communication and Networks",
+    "course_code": "QCN",
+    "credits": 4
+  },
+  {
+    "course_name": "Sociological Theory",
+    "course_code": "ST1",
+    "credits": 4
+  },
+  {
+    "course_name": "Digital Processor Design",
+    "course_code": "DPD",
+    "credits": 4
+  },
+  {
+    "course_name": "Science, Technology and Society",
+    "course_code": "STS",
+    "credits": 4
+  },
+  {
+    "course_name": "Key Concepts in Economic Sociology",
+    "course_code": "KCES",
+    "credits": 4
+  },
+  {
+    "course_name": "Motion Design and Graphics",
+    "course_code": "MDG",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Digital Ethnography",
+    "course_code": "IDE",
+    "credits": 4
+  },
+  {
+    "course_name": "User Experience Design of XR",
+    "course_code": "UDXR",
+    "credits": 4
+  },
+  {
+    "course_name": "Causal Inference",
+    "course_code": "CI",
+    "credits": 4
+  },
+  {
+    "course_name": "Urban Sociology",
+    "course_code": "US",
+    "credits": 4
+  },
+  {
+    "course_name": "Digital Social Research",
+    "course_code": "DSR",
+    "credits": 4
+  },
+  {
+    "course_name": "Reading Hegel's Phenomenology of Spiri",
+    "course_code": "RHPS",
+    "credits": 4
+  },
+  {
+    "course_name": "Foundations of Entrepreneurship",
+    "course_code": "FOE",
+    "credits": 4
+  },
+  {
+    "course_name": "Gender and Media",
+    "course_code": "GM",
+    "credits": 4
+  },
+  {
+    "course_name": "Advance Ethnographic Research Methods",
+    "course_code": "AERM",
+    "credits": 4
+  },
+  {
+    "course_name": "Concepts and Methods in Social Movement Research",
+    "course_code": "CMSMR",
+    "credits": 4
+  },
+  {
+    "course_name": "The Business of Artificial Intelligence",
+    "course_code": "BAI",
+    "credits": 4
+  },
+  {
+    "course_name": "Sociology of India: Themes and Perspectives",
+    "course_code": "SoI",
+    "credits": 4
+  },
+  {
+    "course_name": "Design for Artificial Intelligence driven Products",
+    "course_code": "DAIDP",
+    "credits": 4
+  },
+  {
+    "course_name": "Technology and the Future of Work",
+    "course_code": "TFM",
+    "credits": 4
+  },
+  {
+    "course_name": "Nonlinear Dynamics and Chaos (NDC)",
+    "course_code": "NDMA",
+    "credits": 4
+  },
+  {
+    "course_name": "Intersectionality Studies",
+    "course_code": "INST",
+    "credits": 4
+  },
+  {
+    "course_name": "Mechanics of Bodies",
+    "course_code": "MB",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Sociological Theory",
+    "course_code": "AST",
+    "credits": 4
+  },
+  {
+    "course_name": "Topics in Mathematical Logic",
+    "course_code": "TML",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Algebraic Geometry with Applications",
+    "course_code": "IAGA",
+    "credits": 4
+  },
+  {
+    "course_name": "Netwoks and Systems Security I",
+    "course_code": "NSS I",
+    "credits": 4
+  },
+  {
+    "course_name": "Machine Learning in Wireless Communication and Networks",
+    "course_code": "MLWCN D",
+    "credits": 4
+  },
+  {
+    "course_name": "Object Oriented Programming and Design",
+    "course_code": "OOPD",
+    "credits": 4
+  },
+  {
+    "course_name": "Programming for Computational Biology",
+    "course_code": "PCB",
+    "credits": 4
+  },
+  {
+    "course_name": "Critical Thinking and Readings in Social Science",
+    "course_code": "CTRSS",
+    "credits": 4
+  },
+  {
+    "course_name": "Object Oriented Programming and Design",
+    "course_code": "OOPD",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Philosophy",
+    "course_code": "IPHI",
+    "credits": 4
+  },
+  {
+    "course_name": "Applied Fields and Waves",
+    "course_code": "AFW",
+    "credits": 4
+  },
+  {
+    "course_name": "Critical Thinking",
+    "course_code": "CT",
+    "credits": 4
+  },
+  {
+    "course_name": "Topics on Multivariate Analysis",
+    "course_code": "TMA",
+    "credits": 4
+  },
+  {
+    "course_name": "Research Methods in Social Science and Design",
+    "course_code": "RMSSD",
+    "credits": 4
+  },
+  {
+    "course_name": "Neural Engineering and Implantable Devices",
+    "course_code": "NEID",
+    "credits": 4
+  },
+  {
+    "course_name": "Theatre Appreciation",
+    "course_code": "TA",
+    "credits": 4
+  },
+  {
+    "course_name": "Differential Geometry",
+    "course_code": "DG",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction To The Study Of Literature",
+    "course_code": "Lit",
+    "credits": 4
+  },
+  {
+    "course_name": "On the making of anthropological objects",
+    "course_code": "AO",
+    "credits": 4
+  },
+  {
+    "course_name": "Nation and her Narratives",
+    "course_code": "NN",
+    "credits": 4
+  },
+  {
+    "course_name": "Reproducing Kernel Hilbert Spaces with Applications (New)",
+    "course_code": "RKHSA",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Indian Mythology",
+    "course_code": "IIM",
+    "credits": 4
+  },
+  {
+    "course_name": "An Introduction to Quantum Information Theory",
+    "course_code": "QIT",
+    "credits": 4
+  },
+  {
+    "course_name": "Indian Poetry Through the Ages",
+    "course_code": "IPA",
+    "credits": 4
+  },
+  {
+    "course_name": "Graduate Computer Networks",
+    "course_code": "GCN",
+    "credits": 4
+  },
+  {
+    "course_name": "Social and Political Philosophy",
+    "course_code": "SPP",
+    "credits": 4
+  },
+  {
+    "course_name": "Large Language Models",
+    "course_code": "LLM",
+    "credits": 4
+  },
+  {
+    "course_name": "Theory and Practice of Engineering Ethics",
+    "course_code": "TPEE",
+    "credits": 4
+  },
+  {
+    "course_name": "Design Thinking and Innovation",
+    "course_code": "DTI",
+    "credits": 4
+  },
+  {
+    "course_name": "Perspectives of Knowledge",
+    "course_code": "PoK",
+    "credits": 4
+  },
+  {
+    "course_name": "3D Creation for Extended Reality (XR)",
+    "course_code": "3CER",
+    "credits": 4
+  },
+  {
+    "course_name": "Computer, Information Ethics and Society",
+    "course_code": "CIES",
+    "credits": 4
+  },
+  {
+    "course_name": "Physics of Semiconductor Devices",
+    "course_code": "PSD",
+    "credits": 4
+  },
+  {
+    "course_name": "Interaction Design Perspectives Methods",
+    "course_code": "IDPM",
+    "credits": 4
+  },
+  {
+    "course_name": "Tangible User Interfaces",
+    "course_code": "TUI",
+    "credits": 4
+  },
+  {
+    "course_name": "Democracy in India: Principles and Practices",
+    "course_code": "DIPP",
+    "credits": 4
+  },
+  {
+    "course_name": "Electronic System Design",
+    "course_code": "ESD",
+    "credits": 4
+  },
+  {
+    "course_name": "Theories of Ethics",
+    "course_code": "TE",
+    "credits": 4
+  },
+  {
+    "course_name": "Urban Space and Gender",
+    "course_code": "USG",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Writing",
+    "course_code": "AW",
+    "credits": 4
+  },
+  {
+    "course_name": "Systems for AI",
+    "course_code": "SAI",
+    "credits": 4
+  },
+  {
+    "course_name": "Applied Ethics",
+    "course_code": "AE",
+    "credits": 4
+  },
+  {
+    "course_name": "Parameterized Algorithms",
+    "course_code": "PALG",
+    "credits": 4
+  },
+  {
+    "course_name": "New Media and Politics",
+    "course_code": "NMP",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Digital Design and Verification",
+    "course_code": "ADDV",
+    "credits": 4
+  },
+  {
+    "course_name": "Philosophy of Mind",
+    "course_code": "PoM",
+    "credits": 4
+  },
+  {
+    "course_name": "VLSI Design Flow",
+    "course_code": "VDF",
+    "credits": 4
+  },
+  {
+    "course_name": "Experiential Learning",
+    "course_code": "EL",
+    "credits": 4
+  },
+  {
+    "course_name": "Political Anthropology: State, Subject, Power",
+    "course_code": "PASSP",
+    "credits": 4
+  },
+  {
+    "course_name": "State and Subject: Advanced topics in political anthropology",
+    "course_code": "APA",
+    "credits": 4
+  },
+  {
+    "course_name": "Governing AI: History, Theory, Policy (New)",
+    "course_code": "GAI",
+    "credits": 4
+  },
+  {
+    "course_name": "Comparative Politics in Digital Era",
+    "course_code": "CPDE",
+    "credits": 4
+  },
+  {
+    "course_name": "Intelligent Product Design Workshop",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Urban Space and Political Power",
+    "course_code": "USPP",
+    "credits": 4
+  },
+  {
+    "course_name": "Philosophy of Technology",
+    "course_code": "PT",
+    "credits": 4
+  },
+  {
+    "course_name": "Data and Society",
+    "course_code": "D&S",
+    "credits": 4
+  },
+  {
+    "course_name": "Extended Reality in Industry",
+    "course_code": "ERI",
+    "credits": 4
+  },
+  {
+    "course_name": "Politics in Digital Era",
+    "course_code": "PDE",
+    "credits": 4
+  },
+  {
+    "course_name": "Algorithmic techniques for Robot Planning (new)",
+    "course_code": "ARP",
+    "credits": 4
+  },
+  {
+    "course_name": "Logic and Artificial Intelligence",
+    "course_code": "L&AI",
+    "credits": 4
+  },
+  {
+    "course_name": "Probabilistic Methods in Combinatorics",
+    "course_code": "PMC",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Computational Complexity",
+    "course_code": "ICC",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Solid-state Devices (ASD)",
+    "course_code": "ASSD",
+    "credits": 4
+  },
+  {
+    "course_name": "Ubiquitous Computing",
+    "course_code": "UC",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Topics in Partial Differential Equations",
+    "course_code": "ATPD",
+    "credits": 4
+  },
+  {
+    "course_name": "Several Complex Variables",
+    "course_code": "SCV",
+    "credits": 4
+  },
+  {
+    "course_name": "Digital Technologies and Social Entrepreneurship",
+    "course_code": "DTSE",
+    "credits": 4
+  },
+  {
+    "course_name": "Social Innovation, Corporate Social Responsibility and Sustainable Development",
+    "course_code": "SICSRSD",
+    "credits": 4
+  },
+  {
+    "course_name": "Decision Making for Multi-robot Systems",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Explainable AI",
+    "course_code": "EAI",
+    "credits": 4
+  },
+  {
+    "course_name": "Image, Screen, Interface",
+    "course_code": "ISI",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Readings in Moral and Political Philosophy",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Graduate Systems (GS)",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Computer Networks",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Percolation Theory",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Foundations of Biology-I",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Design Research",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Bioinspired Algorithms and Optimal Control",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Measure Theoretic Probability",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Fintech",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "User Experience Design and UI Design",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Advanced Digital Communication",
+    "course_code": "ADC",
+    "credits": 4
+  },
+  {
+    "course_name": "Sociology of Inequality",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Foundations of Biology II",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Robot Intelligence",
+    "course_code": "RI",
+    "credits": 4
+  },
+  {
+    "course_name": "Kant's Critique of Pure Reason",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Networks for AI/ML Systems",
+    "course_code": "NAI",
+    "credits": 4
+  },
+  {
+    "course_name": "Anthropology of Violence â€“ I",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Marketing of Services",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Key Concepts in Political Theory",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Econometrics with Machine Learning",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Large Deep Learning Systems",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Distribution of Sequences in Number Theory",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Introduction to Bioenergetics",
+    "course_code": "",
+    "credits": 4
+  },
+  {
+    "course_name": "Random walk and Brownian motion",
+    "course_code": "",
+    "credits": 4
+  }
+]
