@@ -1,2202 +1,2642 @@
 [
   {
-    "course_name": "Foundations of Biology",
-    "course_code": "FOB",
+    "course_id": "BIO101",
+    "code": "FOB",
+    "title": "Foundations of Biology",
     "credits": 4
   },
   {
-    "course_name": "Cell Biology and Bio-Chemistry",
-    "course_code": "CBB",
+    "course_id": "BIO211",
+    "code": "CBB",
+    "title": "Cell Biology and Bio-Chemistry",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Quantitative Biology",
-    "course_code": "IQB",
+    "course_id": "BIO213",
+    "code": "IQB",
+    "title": "Introduction to Quantitative Biology",
     "credits": 4
   },
   {
-    "course_name": "Genetics and Molecular Biology",
-    "course_code": "GMB",
+    "course_id": "BIO214",
+    "code": "GMB",
+    "title": "Genetics and Molecular Biology",
     "credits": 4
   },
   {
-    "course_name": "Practical Bioinformatics",
-    "course_code": "PB",
+    "course_id": "BIO221",
+    "code": "PB",
+    "title": "Practical Bioinformatics",
     "credits": 4
   },
   {
-    "course_name": "Algorithms in Bioinformatics",
-    "course_code": "ABIN",
+    "course_id": "BIO321",
+    "code": "ABIN",
+    "title": "Algorithms in Bioinformatics",
     "credits": 4
   },
   {
-    "course_name": "Biophysics",
-    "course_code": "BioP",
+    "course_id": "BIO361",
+    "code": "BioP",
+    "title": "Biophysics",
     "credits": 4
   },
   {
-    "course_name": "Stochastic Simulations in Systems Biology and Biophysics",
-    "course_code": "SSSBB",
+    "course_id": "BIO506",
+    "code": "SSSBB",
+    "title": "Stochastic Simulations in Systems Biology and Biophysics",
     "credits": 4
   },
   {
-    "course_name": "Cell Biology and Bio-Chemistry",
-    "course_code": "CBB",
+    "course_id": "BIO511",
+    "code": "CBB",
+    "title": "Cell Biology and Bio-Chemistry",
     "credits": 4
   },
   {
-    "course_name": "Foundations of Modern Biology",
-    "course_code": "FOMB",
+    "course_id": "BIO512",
+    "code": "FOMB",
+    "title": "Foundations of Modern Biology",
     "credits": 4
   },
   {
-    "course_name": "Algorithms in Computational Biology",
-    "course_code": "ACB",
+    "course_id": "BIO522",
+    "code": "ACB",
+    "title": "Algorithms in Computational Biology",
     "credits": 4
   },
   {
-    "course_name": "Chemoinformatics",
-    "course_code": "CHI",
+    "course_id": "BIO523",
+    "code": "CHI",
+    "title": "Chemoinformatics",
     "credits": 4
   },
   {
-    "course_name": "Biomedical Image processing",
-    "course_code": "BIP",
+    "course_id": "BIO524",
+    "code": "BIP",
+    "title": "Biomedical Image processing",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Mathematical Biology",
-    "course_code": "IMB",
+    "course_id": "BIO531",
+    "code": "IMB",
+    "title": "Introduction to Mathematical Biology",
     "credits": 4
   },
   {
-    "course_name": "Network Biology",
-    "course_code": "NB",
+    "course_id": "BIO532",
+    "code": "NB",
+    "title": "Network Biology",
     "credits": 4
   },
   {
-    "course_name": "Systems and Synthetic Biology",
-    "course_code": "S&SB",
+    "course_id": "BIO533",
+    "code": "S&SB",
+    "title": "Systems and Synthetic Biology",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Computational Neuroscience",
-    "course_code": "ICN",
+    "course_id": "BIO534",
+    "code": "ICN",
+    "title": "Introduction to Computational Neuroscience",
     "credits": 4
   },
   {
-    "course_name": "Data Sciences for Genomics",
-    "course_code": "DSG",
+    "course_id": "BIO541",
+    "code": "DSG",
+    "title": "Data Sciences for Genomics",
     "credits": 4
   },
   {
-    "course_name": "Machine Learning for Biomedical Applications",
-    "course_code": "MLBA",
+    "course_id": "BIO542",
+    "code": "MLBA",
+    "title": "Machine Learning for Biomedical Applications",
     "credits": 4
   },
   {
-    "course_name": "Big Data Mining in Healthcare",
-    "course_code": "BDMH",
+    "course_id": "BIO543",
+    "code": "BDMH",
+    "title": "Big Data Mining in Healthcare",
     "credits": 4
   },
   {
-    "course_name": "Computational Gastronomy",
-    "course_code": "CGAS",
+    "course_id": "BIO544",
+    "code": "CGAS",
+    "title": "Computational Gastronomy",
     "credits": 4
   },
   {
-    "course_name": "Biostatistics",
-    "course_code": "BioStats",
+    "course_id": "BIO545",
+    "code": "BioStats",
+    "title": "Biostatistics",
     "credits": 4
   },
   {
-    "course_name": "Computing for Medicine",
-    "course_code": "CM",
+    "course_id": "BIO546/CSE585",
+    "code": "CM",
+    "title": "Computing for Medicine",
     "credits": 4
   },
   {
-    "course_name": "Computer Aided Drug Design",
-    "course_code": "CADD",
+    "course_id": "BIO561",
+    "code": "CADD",
+    "title": "Computer Aided Drug Design",
     "credits": 4
   },
   {
-    "course_name": "Communication Skills",
-    "course_code": "COM",
+    "course_id": "COM101",
+    "code": "COM",
+    "title": "Communication Skills",
     "credits": 4
   },
   {
-    "course_name": "Technical Communication",
-    "course_code": "TCOM",
+    "course_id": "COM301A",
+    "code": "TCOM",
+    "title": "Technical Communication",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Programming",
-    "course_code": "IP",
+    "course_id": "CSE101",
+    "code": "IP",
+    "title": "Introduction to Programming",
     "credits": 4
   },
   {
-    "course_name": "Data Structures & Algorithms",
-    "course_code": "DSA",
+    "course_id": "CSE102",
+    "code": "DSA",
+    "title": "Data Structures & Algorithms",
     "credits": 4
   },
   {
-    "course_name": "Computer Organization",
-    "course_code": "CO",
+    "course_id": "CSE112",
+    "code": "CO",
+    "title": "Computer Organization",
     "credits": 4
   },
   {
-    "course_name": "Discrete Mathematics",
-    "course_code": "DM",
+    "course_id": "CSE121",
+    "code": "DM",
+    "title": "Discrete Mathematics",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Intelligent Systems",
-    "course_code": "IIS",
+    "course_id": "CSE140",
+    "code": "IIS",
+    "title": "Introduction to Intelligent Systems",
     "credits": 4
   },
   {
-    "course_name": "Advanced Programming",
-    "course_code": "AP",
+    "course_id": "CSE201",
+    "code": "AP",
+    "title": "Advanced Programming",
     "credits": 4
   },
   {
-    "course_name": "Fundamentals of Database Management System",
-    "course_code": "DBMS",
+    "course_id": "CSE202",
+    "code": "DBMS",
+    "title": "Fundamentals of Database Management System",
     "credits": 4
   },
   {
-    "course_name": "Algorithm Design and Analysis",
-    "course_code": "ADA",
+    "course_id": "CSE222",
+    "code": "ADA",
+    "title": "Algorithm Design and Analysis",
     "credits": 4
   },
   {
-    "course_name": "Algorithm Design and Analysis",
-    "course_code": "ALD",
+    "course_id": "CSE223",
+    "code": "ALD",
+    "title": "Algorithm Design and Analysis",
     "credits": 4
   },
   {
-    "course_name": "Operating Systems",
-    "course_code": "OS",
+    "course_id": "CSE231",
+    "code": "OS",
+    "title": "Operating Systems",
     "credits": 4
   },
   {
-    "course_name": "Computer Networks",
-    "course_code": "CN",
+    "course_id": "CSE232",
+    "code": "CN",
+    "title": "Computer Networks",
     "credits": 4
   },
   {
-    "course_name": "Network Administration",
-    "course_code": "NAD",
+    "course_id": "CSE233",
+    "code": "NAD",
+    "title": "Network Administration",
     "credits": 4
   },
   {
-    "course_name": "Modern Algorithm Design",
-    "course_code": "MAD",
+    "course_id": "CSE319/CSE519",
+    "code": "MAD",
+    "title": "Modern Algorithm Design",
     "credits": 4
   },
   {
-    "course_name": "Advanced Algorithms",
-    "course_code": "AA",
+    "course_id": "CSE320/CSE520",
+    "code": "AA",
+    "title": "Advanced Algorithms",
     "credits": 4
   },
   {
-    "course_name": "Theory of Computation",
-    "course_code": "ToC",
+    "course_id": "CSE322",
+    "code": "ToC",
+    "title": "Theory of Computation",
     "credits": 4
   },
   {
-    "course_name": "Computer Graphics",
-    "course_code": "CG",
+    "course_id": "CSE333/CSE533",
+    "code": "CG",
+    "title": "Computer Graphics",
     "credits": 4
   },
   {
-    "course_name": "Digital Image Processing",
-    "course_code": "DIP",
+    "course_id": "CSE340/CSE540/ECE340",
+    "code": "DIP",
+    "title": "Digital Image Processing",
     "credits": 4
   },
   {
-    "course_name": "Statistical Machine Learning",
-    "course_code": "SML",
+    "course_id": "CSE342/CSE542/ECE356/ECE556",
+    "code": "SML",
+    "title": "Statistical Machine Learning",
     "credits": 4
   },
   {
-    "course_name": "Computer Vision",
-    "course_code": "CV",
+    "course_id": "CSE344/CSE544/ECE344/ECE544",
+    "code": "CV",
+    "title": "Computer Vision",
     "credits": 4
   },
   {
-    "course_name": "Foundations of Computer Security",
-    "course_code": "FCS",
+    "course_id": "CSE345/CSE545",
+    "code": "FCS",
+    "title": "Foundations of Computer Security",
     "credits": 4
   },
   {
-    "course_name": "Network Security",
-    "course_code": "NSC",
+    "course_id": "CSE350/CSE550",
+    "code": "NSC",
+    "title": "Network Security",
     "credits": 4
   },
   {
-    "course_name": "Networks and System Security II",
-    "course_code": "NSS-II",
+    "course_id": "CSE354/CSE554",
+    "code": "NSS-II",
+    "title": "Networks and System Security II",
     "credits": 4
   },
   {
-    "course_name": "Complexity Theory",
-    "course_code": "CMPT",
+    "course_id": "CSE421/CSE621",
+    "code": "CMPT",
+    "title": "Complexity Theory",
     "credits": 4
   },
   {
-    "course_name": "Advanced Biometrics",
-    "course_code": "BIOM",
+    "course_id": "CSE441/CSE541",
+    "code": "BIOM",
+    "title": "Advanced Biometrics",
     "credits": 4
   },
   {
-    "course_name": "Designing Human Centered Systems",
-    "course_code": "DHCS",
+    "course_id": "CSE501",
+    "code": "DHCS",
+    "title": "Designing Human Centered Systems",
     "credits": 4
   },
   {
-    "course_name": "Foundations of Parallel Programming",
-    "course_code": "FPP",
+    "course_id": "CSE502",
+    "code": "FPP",
+    "title": "Foundations of Parallel Programming",
     "credits": 4
   },
   {
-    "course_name": "Program Analysis",
-    "course_code": "PA",
+    "course_id": "CSE503",
+    "code": "PA",
+    "title": "Program Analysis",
     "credits": 4
   },
   {
-    "course_name": "Decision Procedures",
-    "course_code": "DP",
+    "course_id": "CSE504",
+    "code": "DP",
+    "title": "Decision Procedures",
     "credits": 4
   },
   {
-    "course_name": "Data Mining",
-    "course_code": "DMG",
+    "course_id": "CSE506",
+    "code": "DMG",
+    "title": "Data Mining",
     "credits": 4
   },
   {
-    "course_name": "Database System Implementation",
-    "course_code": "DBSI",
+    "course_id": "CSE507",
+    "code": "DBSI",
+    "title": "Database System Implementation",
     "credits": 4
   },
   {
-    "course_name": "Information Retrieval",
-    "course_code": "IR",
+    "course_id": "CSE508",
+    "code": "IR",
+    "title": "Information Retrieval",
     "credits": 4
   },
   {
-    "course_name": "Computer Architecture",
-    "course_code": "CA",
+    "course_id": "CSE511/ECE511",
+    "code": "CA",
+    "title": "Computer Architecture",
     "credits": 4
   },
   {
-    "course_name": "Bayesian Machine Learning",
-    "course_code": "BML",
+    "course_id": "CSE515/ECE551",
+    "code": "BML",
+    "title": "Bayesian Machine Learning",
     "credits": 4
   },
   {
-    "course_name": "Theories of Deep Learning",
-    "course_code": "TDL",
+    "course_id": "CSE516/ECE559",
+    "code": "TDL",
+    "title": "Theories of Deep Learning",
     "credits": 4
   },
   {
-    "course_name": "Randomized Algorithms",
-    "course_code": "RA",
+    "course_id": "CSE523",
+    "code": "RA",
+    "title": "Randomized Algorithms",
     "credits": 4
   },
   {
-    "course_name": "Theory of Modern cryptography",
-    "course_code": "TMC",
+    "course_id": "CSE524",
+    "code": "TMC",
+    "title": "Theory of Modern cryptography",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Graduate Algorithms",
-    "course_code": "GA",
+    "course_id": "CSE525",
+    "code": "GA",
+    "title": "Introduction to Graduate Algorithms",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Blockchain and Cryptocurrency",
-    "course_code": "IBC",
+    "course_id": "CSE528",
+    "code": "IBC",
+    "title": "Introduction to Blockchain and Cryptocurrency",
     "credits": 4
   },
   {
-    "course_name": "Approximation Algorithms",
-    "course_code": "AAG",
+    "course_id": "CSE529",
+    "code": "AAG",
+    "title": "Approximation Algorithms",
     "credits": 4
   },
   {
-    "course_name": "Distributed Systems: Concepts & Design",
-    "course_code": "DSCD",
+    "course_id": "CSE530",
+    "code": "DSCD",
+    "title": "Distributed Systems: Concepts & Design",
     "credits": 4
   },
   {
-    "course_name": "Multi-Agent Systems",
-    "course_code": "MAS",
+    "course_id": "CSE531",
+    "code": "MAS",
+    "title": "Multi-Agent Systems",
     "credits": 4
   },
   {
-    "course_name": "Mobile Computing",
-    "course_code": "MC",
+    "course_id": "CSE535",
+    "code": "MC",
+    "title": "Mobile Computing",
     "credits": 4
   },
   {
-    "course_name": "Wireless Networks",
-    "course_code": "WN",
+    "course_id": "CSE538/ECE538",
+    "code": "WN",
+    "title": "Wireless Networks",
     "credits": 4
   },
   {
-    "course_name": "Applied Cryptography",
-    "course_code": "AC",
+    "course_id": "CSE546",
+    "code": "AC",
+    "title": "Applied Cryptography",
     "credits": 4
   },
   {
-    "course_name": "Security Engineering",
-    "course_code": "SE",
+    "course_id": "CSE552",
+    "code": "SE",
+    "title": "Security Engineering",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Spatial Computing",
-    "course_code": "ISC",
+    "course_id": "CSE555",
+    "code": "ISC",
+    "title": "Introduction to Spatial Computing",
     "credits": 4
   },
   {
-    "course_name": "Natural Language Processing",
-    "course_code": "NLP",
+    "course_id": "CSE556",
+    "code": "NLP",
+    "title": "Natural Language Processing",
     "credits": 4
   },
   {
-    "course_name": "Big Data Analytics",
-    "course_code": "BDA",
+    "course_id": "CSE557",
+    "code": "BDA",
+    "title": "Big Data Analytics",
     "credits": 4
   },
   {
-    "course_name": "Data Science",
-    "course_code": "DSc",
+    "course_id": "CSE558",
+    "code": "DSc",
+    "title": "Data Science",
     "credits": 4
   },
   {
-    "course_name": "Mining Large Networks",
-    "course_code": "MLN",
+    "course_id": "CSE559",
+    "code": "MLN",
+    "title": "Mining Large Networks",
     "credits": 4
   },
   {
-    "course_name": "GPU Computing",
-    "course_code": "GPU",
+    "course_id": "CSE560",
+    "code": "GPU",
+    "title": "GPU Computing",
     "credits": 4
   },
   {
-    "course_name": "Probabilistic Graphical Models",
-    "course_code": "PGM",
+    "course_id": "CSE561",
+    "code": "PGM",
+    "title": "Probabilistic Graphical Models",
     "credits": 4
   },
   {
-    "course_name": "Advanced Computer Vision",
-    "course_code": "ACV",
+    "course_id": "CSE562",
+    "code": "ACV",
+    "title": "Advanced Computer Vision",
     "credits": 4
   },
   {
-    "course_name": "Multimedia Computing and Applications",
-    "course_code": "MCA",
+    "course_id": "CSE563",
+    "code": "MCA",
+    "title": "Multimedia Computing and Applications",
     "credits": 4
   },
   {
-    "course_name": "Software Defined Networking",
-    "course_code": "SDN",
+    "course_id": "CSE565",
+    "code": "SDN",
+    "title": "Software Defined Networking",
     "credits": 4
   },
   {
-    "course_name": "Mobile and Middleware Systems",
-    "course_code": "MMS",
+    "course_id": "CSE566/DES5MMS",
+    "code": "MMS",
+    "title": "Mobile and Middleware Systems",
     "credits": 4
   },
   {
-    "course_name": "Virtual Reality",
-    "course_code": "VR",
+    "course_id": "CSE570",
+    "code": "VR",
+    "title": "Virtual Reality",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Media Computing",
-    "course_code": "IMC",
+    "course_id": "CSE571",
+    "code": "IMC",
+    "title": "Introduction to Media Computing",
     "credits": 4
   },
   {
-    "course_name": "Speech and Audio Processing",
-    "course_code": "SAP",
+    "course_id": "CSE572/ECE561",
+    "code": "SAP",
+    "title": "Speech and Audio Processing",
     "credits": 4
   },
   {
-    "course_name": "Smart Sensing for Internet of Things (IoT)",
-    "course_code": "SSIoT",
+    "course_id": "CSE576",
+    "code": "SSIoT",
+    "title": "Smart Sensing for Internet of Things (IoT)",
     "credits": 4
   },
   {
-    "course_name": "Advanced Internet of Things",
-    "course_code": "AIOT",
+    "course_id": "CSE577",
+    "code": "AIOT",
+    "title": "Advanced Internet of Things",
     "credits": 4
   },
   {
-    "course_name": "Ontology Modeling",
-    "course_code": "OM",
+    "course_id": "CSE580A",
+    "code": "OM",
+    "title": "Ontology Modeling",
     "credits": 4
   },
   {
-    "course_name": "Systems Analysis, Design and Requirements Engineering",
-    "course_code": "SADRE",
+    "course_id": "CSE581",
+    "code": "SADRE",
+    "title": "Systems Analysis, Design and Requirements Engineering",
     "credits": 4
   },
   {
-    "course_name": "Software Production Evolution and Maintenance",
-    "course_code": "SPEM",
+    "course_id": "CSE582",
+    "code": "SPEM",
+    "title": "Software Production Evolution and Maintenance",
     "credits": 4
   },
   {
-    "course_name": "Software Development using Open Source",
-    "course_code": "SDOS",
+    "course_id": "CSE583",
+    "code": "SDOS",
+    "title": "Software Development using Open Source",
     "credits": 4
   },
   {
-    "course_name": "Program Verification",
-    "course_code": "PV",
+    "course_id": "CSE584",
+    "code": "PV",
+    "title": "Program Verification",
     "credits": 4
   },
   {
-    "course_name": "Geometry Processing",
-    "course_code": "GP",
+    "course_id": "CSE5GP",
+    "code": "GP",
+    "title": "Geometry Processing",
     "credits": 4
   },
   {
-    "course_name": "Object Oriented Programming and Design",
-    "course_code": "OOPD",
+    "course_id": "CSE600A/ECE600A",
+    "code": "OOPD",
+    "title": "Object Oriented Programming and Design",
     "credits": 4
   },
   {
-    "course_name": "Compilers",
-    "course_code": "CMP",
+    "course_id": "CSE601",
+    "code": "CMP",
+    "title": "Compilers",
     "credits": 4
   },
   {
-    "course_name": "Knowledge Graphs in Practice",
-    "course_code": "KG",
+    "course_id": "CSE605A",
+    "code": "KG",
+    "title": "Knowledge Graphs in Practice",
     "credits": 4
   },
   {
-    "course_name": "Data Warehouse",
-    "course_code": "DW",
+    "course_id": "CSE606",
+    "code": "DW",
+    "title": "Data Warehouse",
     "credits": 4
   },
   {
-    "course_name": "Data Lifecycle Management",
-    "course_code": "DLM",
+    "course_id": "CSE606A",
+    "code": "DLM",
+    "title": "Data Lifecycle Management",
     "credits": 4
   },
   {
-    "course_name": "Statistical Computation",
-    "course_code": "SComp",
+    "course_id": "CSE609",
+    "code": "SComp",
+    "title": "Statistical Computation",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Quantum Computing",
-    "course_code": "IQC",
+    "course_id": "CSE622",
+    "code": "IQC",
+    "title": "Introduction to Quantum Computing",
     "credits": 4
   },
   {
-    "course_name": "Advanced Operating Systems",
-    "course_code": "AOS",
+    "course_id": "CSE631",
+    "code": "AOS",
+    "title": "Advanced Operating Systems",
     "credits": 4
   },
   {
-    "course_name": "Semantic Web",
-    "course_code": "Sweb",
+    "course_id": "CSE632",
+    "code": "Sweb",
+    "title": "Semantic Web",
     "credits": 4
   },
   {
-    "course_name": "Robotics",
-    "course_code": "IRob",
+    "course_id": "CSE633/ECE670",
+    "code": "IRob",
+    "title": "Robotics",
     "credits": 4
   },
   {
-    "course_name": "Social Robotics",
-    "course_code": "SR",
+    "course_id": "CSE633A",
+    "code": "SR",
+    "title": "Social Robotics",
     "credits": 4
   },
   {
-    "course_name": "Communication Networks",
-    "course_code": "COMN",
+    "course_id": "CSE636/ECE636",
+    "code": "COMN",
+    "title": "Communication Networks",
     "credits": 4
   },
   {
-    "course_name": "Collaborative Filtering",
-    "course_code": "CF",
+    "course_id": "CSE640",
+    "code": "CF",
+    "title": "Collaborative Filtering",
     "credits": 4
   },
   {
-    "course_name": "Advanced Machine Learning",
-    "course_code": "AML",
+    "course_id": "CSE642",
+    "code": "AML",
+    "title": "Advanced Machine Learning",
     "credits": 4
   },
   {
-    "course_name": "Artificial Intelligence",
-    "course_code": "AI",
+    "course_id": "CSE643",
+    "code": "AI",
+    "title": "Artificial Intelligence",
     "credits": 4
   },
   {
-    "course_name": "Privacy and Security in Online Social Media",
-    "course_code": "PSOSM",
+    "course_id": "CSE645",
+    "code": "PSOSM",
+    "title": "Privacy and Security in Online Social Media",
     "credits": 4
   },
   {
-    "course_name": "Topics in Adaptive Cybersecurity",
-    "course_code": "TAC",
+    "course_id": "CSE651",
+    "code": "TAC",
+    "title": "Topics in Adaptive Cybersecurity",
     "credits": 4
   },
   {
-    "course_name": "Network Science",
-    "course_code": "NS",
+    "course_id": "CSE655",
+    "code": "NS",
+    "title": "Network Science",
     "credits": 4
   },
   {
-    "course_name": "Information Integration and Applications",
-    "course_code": "IIA",
+    "course_id": "CSE656",
+    "code": "IIA",
+    "title": "Information Integration and Applications",
     "credits": 4
   },
   {
-    "course_name": "Trustworthy AI systems",
-    "course_code": "TAIS",
+    "course_id": "CSE660",
+    "code": "TAIS",
+    "title": "Trustworthy AI systems",
     "credits": 4
   },
   {
-    "course_name": "Affective Computing",
-    "course_code": "AFC",
+    "course_id": "CSE661/DES507",
+    "code": "AFC",
+    "title": "Affective Computing",
     "credits": 4
   },
   {
-    "course_name": "Special Topics in Computer Vision",
-    "course_code": "SCV",
+    "course_id": "CSE662A",
+    "code": "SCV",
+    "title": "Special Topics in Computer Vision",
     "credits": 4
   },
   {
-    "course_name": "Edge AI",
-    "course_code": "EAI",
+    "course_id": "CSE663",
+    "code": "EAI",
+    "title": "Edge AI",
     "credits": 4
   },
   {
-    "course_name": "Meta-Learning",
-    "course_code": "MEL",
+    "course_id": "CSE663A",
+    "code": "MEL",
+    "title": "Meta-Learning",
     "credits": 4
   },
   {
-    "course_name": "Multimedia Security",
-    "course_code": "MS",
+    "course_id": "CSE694F/ECE651",
+    "code": "MS",
+    "title": "Multimedia Security",
     "credits": 4
   },
   {
-    "course_name": "Topics in Software Engineering: AI in SE",
-    "course_code": "TSE",
+    "course_id": "CSE701",
+    "code": "TSE",
+    "title": "Topics in Software Engineering: AI in SE",
     "credits": 4
   },
   {
-    "course_name": "Advanced Topics in Mobile Computing",
-    "course_code": "ATMC",
+    "course_id": "CSE734",
+    "code": "ATMC",
+    "title": "Advanced Topics in Mobile Computing",
     "credits": 4
   },
   {
-    "course_name": "Network Anonymity and Privacy",
-    "course_code": "NAP",
+    "course_id": "CSE749",
+    "code": "NAP",
+    "title": "Network Anonymity and Privacy",
     "credits": 4
   },
   {
-    "course_name": "Topics in Cryptanalysis",
-    "course_code": "TC",
+    "course_id": "CSE653",
+    "code": "TC",
+    "title": "Topics in Cryptanalysis",
     "credits": 4
   },
   {
-    "course_name": "Design Drawing & Visualization",
-    "course_code": "DDV",
+    "course_id": "DES101",
+    "code": "DDV",
+    "title": "Design Drawing & Visualization",
     "credits": 4
   },
   {
-    "course_name": "Introduction to HCI",
-    "course_code": "IHCI",
+    "course_id": "DES102",
+    "code": "IHCI",
+    "title": "Introduction to HCI",
     "credits": 4
   },
   {
-    "course_name": "Prototyping Interactive Systems",
-    "course_code": "PIS",
+    "course_id": "DES130",
+    "code": "PIS",
+    "title": "Prototyping Interactive Systems",
     "credits": 4
   },
   {
-    "course_name": "Design Processes and Perspectives",
-    "course_code": "DPP",
+    "course_id": "DES201",
+    "code": "DPP",
+    "title": "Design Processes and Perspectives",
     "credits": 4
   },
   {
-    "course_name": "Visual Design & Communication",
-    "course_code": "VDC",
+    "course_id": "DES202",
+    "code": "VDC",
+    "title": "Visual Design & Communication",
     "credits": 4
   },
   {
-    "course_name": "Human Computer Interaction",
-    "course_code": "HCI",
+    "course_id": "DES204",
+    "code": "HCI",
+    "title": "Human Computer Interaction",
     "credits": 4
   },
   {
-    "course_name": "Design of Interactive Systems",
-    "course_code": "DIS",
+    "course_id": "DES205/DES519",
+    "code": "DIS",
+    "title": "Design of Interactive Systems",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Animation and Graphics",
-    "course_code": "IAG",
+    "course_id": "DES302",
+    "code": "IAG",
+    "title": "Introduction to Animation and Graphics",
     "credits": 4
   },
   {
-    "course_name": "Film Making and Radio Podcasting",
-    "course_code": "FMRP",
+    "course_id": "DES303",
+    "code": "FMRP",
+    "title": "Film Making and Radio Podcasting",
     "credits": 4
   },
   {
-    "course_name": "Fundamentals of Audio for Engineers",
-    "course_code": "FAE",
+    "course_id": "DES501",
+    "code": "FAE",
+    "title": "Fundamentals of Audio for Engineers",
     "credits": 4
   },
   {
-    "course_name": "Introduction to 2D Animation",
-    "course_code": "I2D",
+    "course_id": "DES502",
+    "code": "I2D",
+    "title": "Introduction to 2D Animation",
     "credits": 4
   },
   {
-    "course_name": "Introduction to 3D Character Animation",
-    "course_code": "I3DA",
+    "course_id": "DES503",
+    "code": "I3DA",
+    "title": "Introduction to 3D Character Animation",
     "credits": 4
   },
   {
-    "course_name": "Narratives in Visual Communication",
-    "course_code": "NVC",
+    "course_id": "DES504",
+    "code": "NVC",
+    "title": "Narratives in Visual Communication",
     "credits": 4
   },
   {
-    "course_name": "Advanced topics in Human Centered Computing (ATHCC)",
-    "course_code": "ATHCC",
+    "course_id": "DES506",
+    "code": "ATHCC",
+    "title": "Advanced topics in Human Centered Computing (ATHCC)",
     "credits": 4
   },
   {
-    "course_name": "Meta-Learning",
-    "course_code": "MTL",
+    "course_id": "CSE618",
+    "code": "MTL",
+    "title": "Meta-Learning",
     "credits": 4
   },
   {
-    "course_name": "Design Futures",
-    "course_code": "DF",
+    "course_id": "DES509",
+    "code": "DF",
+    "title": "Design Futures",
     "credits": 4
   },
   {
-    "course_name": "Game Design and Development",
-    "course_code": "GDD",
+    "course_id": "DES512",
+    "code": "GDD",
+    "title": "Game Design and Development",
     "credits": 4
   },
   {
-    "course_name": "Wearable Applications, Research, Devices, Interactions",
-    "course_code": "WARDI",
+    "course_id": "DES513",
+    "code": "WARDI",
+    "title": "Wearable Applications, Research, Devices, Interactions",
     "credits": 4
   },
   {
-    "course_name": "Digital Audio & Video Production Workflow",
-    "course_code": "DAVP",
+    "course_id": "DES514",
+    "code": "DAVP",
+    "title": "Digital Audio & Video Production Workflow",
     "credits": 4
   },
   {
-    "course_name": "Information Systems in Public Health",
-    "course_code": "ISPR",
+    "course_id": "DES515",
+    "code": "ISPR",
+    "title": "Information Systems in Public Health",
     "credits": 4
   },
   {
-    "course_name": "Introduction to 3D Production Design for Animation and Games",
-    "course_code": "I3DD",
+    "course_id": "DES516",
+    "code": "I3DD",
+    "title": "Introduction to 3D Production Design for Animation and Games",
     "credits": 4
   },
   {
-    "course_name": "Introduction to 3D Animation",
-    "course_code": "I3D",
+    "course_id": "DES516s",
+    "code": "I3D",
+    "title": "Introduction to 3D Animation",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Motion Graphics",
-    "course_code": "IMG",
+    "course_id": "DES518",
+    "code": "IMG",
+    "title": "Introduction to Motion Graphics",
     "credits": 4
   },
   {
-    "course_name": "Human Centred AI",
-    "course_code": "HCAI",
+    "course_id": "DES520",
+    "code": "HCAI",
+    "title": "Human Centred AI",
     "credits": 4
   },
   {
-    "course_name": "Fundamentals of Video for Engineers",
-    "course_code": "FVE",
+    "course_id": "DES521",
+    "code": "FVE",
+    "title": "Fundamentals of Video for Engineers",
     "credits": 4
   },
   {
-    "course_name": "Inclusive Design, Universal Design & Accessibility",
-    "course_code": "IDUDA",
+    "course_id": "DES522",
+    "code": "IDUDA",
+    "title": "Inclusive Design, Universal Design & Accessibility",
     "credits": 4
   },
   {
-    "course_name": "Digital Circuits",
-    "course_code": "DC",
+    "course_id": "ECE111",
+    "code": "DC",
+    "title": "Digital Circuits",
     "credits": 4
   },
   {
-    "course_name": "Basic Electronics",
-    "course_code": "BE",
+    "course_id": "ECE113",
+    "code": "BE",
+    "title": "Basic Electronics",
     "credits": 4
   },
   {
-    "course_name": "Integrated Electronics",
-    "course_code": "IE",
+    "course_id": "ECE214",
+    "code": "IE",
+    "title": "Integrated Electronics",
     "credits": 4
   },
   {
-    "course_name": "Circuit Theory and Devices",
-    "course_code": "CTD",
+    "course_id": "ECE215",
+    "code": "CTD",
+    "title": "Circuit Theory and Devices",
     "credits": 4
   },
   {
-    "course_name": "Fields and Waves",
-    "course_code": "F&W",
+    "course_id": "ECE230",
+    "code": "F&W",
+    "title": "Fields and Waves",
     "credits": 4
   },
   {
-    "course_name": "Principles of Communication Systems",
-    "course_code": "PCS",
+    "course_id": "ECE240",
+    "code": "PCS",
+    "title": "Principles of Communication Systems",
     "credits": 4
   },
   {
-    "course_name": "Signals and Systems",
-    "course_code": "S&S",
+    "course_id": "ECE250",
+    "code": "S&S",
+    "title": "Signals and Systems",
     "credits": 4
   },
   {
-    "course_name": "Embedded Logic Design",
-    "course_code": "ELD",
+    "course_id": "ECE270",
+    "code": "ELD",
+    "title": "Embedded Logic Design",
     "credits": 4
   },
   {
-    "course_name": "Digital VLSI Design",
-    "course_code": "DVD",
+    "course_id": "ECE314/ECE514",
+    "code": "DVD",
+    "title": "Digital VLSI Design",
     "credits": 4
   },
   {
-    "course_name": "Analog CMOS Circuit Design",
-    "course_code": "CMOS",
+    "course_id": "ECE315/ECE515",
+    "code": "CMOS",
+    "title": "Analog CMOS Circuit Design",
     "credits": 4
   },
   {
-    "course_name": "Solid State Devices",
-    "course_code": "SSD",
+    "course_id": "ECE318/ECE518",
+    "code": "SSD",
+    "title": "Solid State Devices",
     "credits": 4
   },
   {
-    "course_name": "RF Circuit Design",
-    "course_code": "RFCD",
+    "course_id": "ECE321/ECE521",
+    "code": "RFCD",
+    "title": "RF Circuit Design",
     "credits": 4
   },
   {
-    "course_name": "Digital Communication Systems",
-    "course_code": "DCS",
+    "course_id": "ECE340/ECE540",
+    "code": "DCS",
+    "title": "Digital Communication Systems",
     "credits": 4
   },
   {
-    "course_name": "Mobile Communications",
-    "course_code": "MCOM",
+    "course_id": "ECE343",
+    "code": "MCOM",
+    "title": "Mobile Communications",
     "credits": 4
   },
   {
-    "course_name": "Digital Signal Processing",
-    "course_code": "DSP",
+    "course_id": "ECE351",
+    "code": "DSP",
+    "title": "Digital Signal Processing",
     "credits": 4
   },
   {
-    "course_name": "Machine Learning",
-    "course_code": "ML",
+    "course_id": "ECE363/ECE563/CSE343/543",
+    "code": "ML",
+    "title": "Machine Learning",
     "credits": 4
   },
   {
-    "course_name": "Mixed Signal Design",
-    "course_code": "MSD",
+    "course_id": "ECE412/ECE612",
+    "code": "MSD",
+    "title": "Mixed Signal Design",
     "credits": 4
   },
   {
-    "course_name": "Antennas Theory and Design",
-    "course_code": "ATD",
+    "course_id": "ECE431/ECE631",
+    "code": "ATD",
+    "title": "Antennas Theory and Design",
     "credits": 4
   },
   {
-    "course_name": "Radar Systems",
-    "course_code": "RS",
+    "course_id": "ECE432/ECE632",
+    "code": "RS",
+    "title": "Radar Systems",
     "credits": 4
   },
   {
-    "course_name": "Statistical Signal Processing",
-    "course_code": "SSP",
+    "course_id": "ECE452/ECE552",
+    "code": "SSP",
+    "title": "Statistical Signal Processing",
     "credits": 4
   },
   {
-    "course_name": "Probability and Random Process",
-    "course_code": "PRP",
+    "course_id": "ECE501",
+    "code": "PRP",
+    "title": "Probability and Random Process",
     "credits": 4
   },
   {
-    "course_name": "Digital Hardware Design",
-    "course_code": "DHD",
+    "course_id": "ECE510",
+    "code": "DHD",
+    "title": "Digital Hardware Design",
     "credits": 4
   },
   {
-    "course_name": "VLSI Design Flow",
-    "course_code": "VDF",
+    "course_id": "ECE513",
+    "code": "VDF",
+    "title": "VLSI Design Flow",
     "credits": 4
   },
   {
-    "course_name": "System on Chip Design and Test",
-    "course_code": "SCDT",
+    "course_id": "ECE516",
+    "code": "SCDT",
+    "title": "System on Chip Design and Test",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Nanoelectronics",
-    "course_code": "INE",
+    "course_id": "ECE517",
+    "code": "INE",
+    "title": "Introduction to Nanoelectronics",
     "credits": 4
   },
   {
-    "course_name": "Intelligent Applications Implementation on Heterogeneous Platforms",
-    "course_code": "IAI",
+    "course_id": "ECE519",
+    "code": "IAI",
+    "title": "Intelligent Applications Implementation on Heterogeneous Platforms",
     "credits": 4
   },
   {
-    "course_name": "Low Voltage Analog Circuit Design",
-    "course_code": "LVACD",
+    "course_id": "ECE520",
+    "code": "LVACD",
+    "title": "Low Voltage Analog Circuit Design",
     "credits": 4
   },
   {
-    "course_name": "Integrated Circuit Fabrication",
-    "course_code": "ICF",
+    "course_id": "ECE522",
+    "code": "ICF",
+    "title": "Integrated Circuit Fabrication",
     "credits": 4
   },
   {
-    "course_name": "Quantum Materials and Devices",
-    "course_code": "QMD",
+    "course_id": "ECE524",
+    "code": "QMD",
+    "title": "Quantum Materials and Devices",
     "credits": 4
   },
   {
-    "course_name": "Optical Fiber Networks for Industry 4.0",
-    "course_code": "OFNI",
+    "course_id": "ECE532",
+    "code": "OFNI",
+    "title": "Optical Fiber Networks for Industry 4.0",
     "credits": 4
   },
   {
-    "course_name": "Satellite Navigation and Sensor Fusion",
-    "course_code": "SNSF",
+    "course_id": "ECE533",
+    "code": "SNSF",
+    "title": "Satellite Navigation and Sensor Fusion",
     "credits": 4
   },
   {
-    "course_name": "Optical Communications Systems",
-    "course_code": "OCS",
+    "course_id": "ECE534",
+    "code": "OCS",
+    "title": "Optical Communications Systems",
     "credits": 4
   },
   {
-    "course_name": "Optical Networking",
-    "course_code": "ON",
+    "course_id": "ECE536s",
+    "code": "ON",
+    "title": "Optical Networking",
     "credits": 4
   },
   {
-    "course_name": "Wireless Communication Evolution from 3G to 5G",
-    "course_code": "WCE",
+    "course_id": "ECE537",
+    "code": "WCE",
+    "title": "Wireless Communication Evolution from 3G to 5G",
     "credits": 4
   },
   {
-    "course_name": "Wireless System Implementation",
-    "course_code": "WSI",
+    "course_id": "ECE539",
+    "code": "WSI",
+    "title": "Wireless System Implementation",
     "credits": 4
   },
   {
-    "course_name": "Principals of Digital Communication System",
-    "course_code": "PDCS",
+    "course_id": "ECE543",
+    "code": "PDCS",
+    "title": "Principals of Digital Communication System",
     "credits": 4
   },
   {
-    "course_name": "Photonics: Fundamentals & Applications",
-    "course_code": "Pho",
+    "course_id": "ECE545",
+    "code": "Pho",
+    "title": "Photonics: Fundamentals & Applications",
     "credits": 4
   },
   {
-    "course_name": "Optical and Wireless Convergence for Beyond 5G Networks and IoT",
-    "course_code": "OWC",
+    "course_id": "ECE546",
+    "code": "OWC",
+    "title": "Optical and Wireless Convergence for Beyond 5G Networks and IoT",
     "credits": 4
   },
   {
-    "course_name": "Deep Learning",
-    "course_code": "DL",
+    "course_id": "ECE553 / CSE641",
+    "code": "DL",
+    "title": "Deep Learning",
     "credits": 4
   },
   {
-    "course_name": "Compressive Sensing",
-    "course_code": "CS",
+    "course_id": "ECE554",
+    "code": "CS",
+    "title": "Compressive Sensing",
     "credits": 4
   },
   {
-    "course_name": "Speech Recognition and Understanding",
-    "course_code": "SRU",
+    "course_id": "ECE557",
+    "code": "SRU",
+    "title": "Speech Recognition and Understanding",
     "credits": 4
   },
   {
-    "course_name": "Transform Learning and Applications",
-    "course_code": "TLA",
+    "course_id": "ECE558",
+    "code": "TLA",
+    "title": "Transform Learning and Applications",
     "credits": 4
   },
   {
-    "course_name": "Modeling and Analysis of Random 5G Networks",
-    "course_code": "5GN",
+    "course_id": "ECE55G",
+    "code": "5GN",
+    "title": "Modeling and Analysis of Random 5G Networks",
     "credits": 4
   },
   {
-    "course_name": "Data Processing and Management",
-    "course_code": "DPM",
+    "course_id": "ECE560",
+    "code": "DPM",
+    "title": "Data Processing and Management",
     "credits": 4
   },
   {
-    "course_name": "Reinforcement Learning",
-    "course_code": "RL",
+    "course_id": "ECE564/CSE564",
+    "code": "RL",
+    "title": "Reinforcement Learning",
     "credits": 4
   },
   {
-    "course_name": "Linear Systems Theory",
-    "course_code": "LST",
+    "course_id": "ECE570",
+    "code": "LST",
+    "title": "Linear Systems Theory",
     "credits": 4
   },
   {
-    "course_name": "Optimal Control Systems",
-    "course_code": "OCNS",
+    "course_id": "ECE571",
+    "code": "OCNS",
+    "title": "Optimal Control Systems",
     "credits": 4
   },
   {
-    "course_name": "Advanced Embedded Logic Design",
-    "course_code": "AELD",
+    "course_id": "ECE573",
+    "code": "AELD",
+    "title": "Advanced Embedded Logic Design",
     "credits": 4
   },
   {
-    "course_name": "Machine Learning Techniques for Real-time Control",
-    "course_code": "MLRC",
+    "course_id": "ECE577",
+    "code": "MLRC",
+    "title": "Machine Learning Techniques for Real-time Control",
     "credits": 4
   },
   {
-    "course_name": "Nonlinear and Adaptive Control of Robotic Systems",
-    "course_code": "NLR",
+    "course_id": "ECE579",
+    "code": "NLR",
+    "title": "Nonlinear and Adaptive Control of Robotic Systems",
     "credits": 4
   },
   {
-    "course_name": "Autonomous Driving",
-    "course_code": "AD",
+    "course_id": "ECE581",
+    "code": "AD",
+    "title": "Autonomous Driving",
     "credits": 4
   },
   {
-    "course_name": "Memory Design and Testing",
-    "course_code": "MDT",
+    "course_id": "ECE611",
+    "code": "MDT",
+    "title": "Memory Design and Testing",
     "credits": 4
   },
   {
-    "course_name": "Stochastic Estimation and Control",
-    "course_code": "SEC",
+    "course_id": "ECE672",
+    "code": "SEC",
+    "title": "Stochastic Estimation and Control",
     "credits": 4
   },
   {
-    "course_name": "Macroeconomics",
-    "course_code": "MA",
+    "course_id": "ECO333",
+    "code": "MA",
+    "title": "Macroeconomics",
     "credits": 4
   },
   {
-    "course_name": "Econometrics I",
-    "course_code": "ECO",
+    "course_id": "ECO221",
+    "code": "ECO",
+    "title": "Econometrics I",
     "credits": 4
   },
   {
-    "course_name": "Money and Banking",
-    "course_code": "MB",
+    "course_id": "ECO223",
+    "code": "MB",
+    "title": "Money and Banking",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Economic Analysis",
-    "course_code": "IEA",
+    "course_id": "ECO301",
+    "code": "IEA",
+    "title": "Introduction to Economic Analysis",
     "credits": 4
   },
   {
-    "course_name": "Microeconomics",
-    "course_code": "ME",
+    "course_id": "ECO301",
+    "code": "ME",
+    "title": "Microeconomics",
     "credits": 4
   },
   {
-    "course_name": "Game Theory",
-    "course_code": "GMT",
+    "course_id": "ECO311/ECO511",
+    "code": "GMT",
+    "title": "Game Theory",
     "credits": 4
   },
   {
-    "course_name": "Industrial Organization",
-    "course_code": "IO",
+    "course_id": "ECO312/ECO512",
+    "code": "IO",
+    "title": "Industrial Organization",
     "credits": 4
   },
   {
-    "course_name": "Market Design",
-    "course_code": "MD",
+    "course_id": "ECO313",
+    "code": "MD",
+    "title": "Market Design",
     "credits": 4
   },
   {
-    "course_name": "Behavioural Economics",
-    "course_code": "BEco",
+    "course_id": "ECO314",
+    "code": "BEco",
+    "title": "Behavioural Economics",
     "credits": 4
   },
   {
-    "course_name": "Econometrics II",
-    "course_code": "Econ-2",
+    "course_id": "ECO322/ECO522",
+    "code": "Econ-2",
+    "title": "Econometrics II",
     "credits": 4
   },
   {
-    "course_name": "Spatial Statistics and Spatial Econometrics",
-    "course_code": "SSSE",
+    "course_id": "ECO324/ECO524",
+    "code": "SSSE",
+    "title": "Spatial Statistics and Spatial Econometrics",
     "credits": 4
   },
   {
-    "course_name": "Foundations of Finance",
-    "course_code": "FF",
+    "course_id": "ECO331",
+    "code": "FF",
+    "title": "Foundations of Finance",
     "credits": 4
   },
   {
-    "course_name": "Valuation and Portfolio Management",
-    "course_code": "VPM",
+    "course_id": "ECO332",
+    "code": "VPM",
+    "title": "Valuation and Portfolio Management",
     "credits": 4
   },
   {
-    "course_name": "Derivatives and Risk Management",
-    "course_code": "DRM",
+    "course_id": "ECO333",
+    "code": "DRM",
+    "title": "Derivatives and Risk Management",
     "credits": 4
   },
   {
-    "course_name": "Markov Decision Processes",
-    "course_code": "MDP",
+    "course_id": "ECO341/ECO541",
+    "code": "MDP",
+    "title": "Markov Decision Processes",
     "credits": 4
   },
   {
-    "course_name": "Decision Theory",
-    "course_code": "DT",
+    "course_id": "ECO503",
+    "code": "DT",
+    "title": "Decision Theory",
     "credits": 4
   },
   {
-    "course_name": "Research Methods",
-    "course_code": "RM",
+    "course_id": "ENG599s",
+    "code": "RM",
+    "title": "Research Methods",
     "credits": 4
   },
   {
-    "course_name": "Entrepreneurial Communication",
-    "course_code": "EComm",
+    "course_id": "ENT411",
+    "code": "EComm",
+    "title": "Entrepreneurial Communication",
     "credits": 4
   },
   {
-    "course_name": "Entrepreneurial Khichadi",
-    "course_code": "EK",
+    "course_id": "ENT412",
+    "code": "EK",
+    "title": "Entrepreneurial Khichadi",
     "credits": 4
   },
   {
-    "course_name": "Entrepreneurial Finance",
-    "course_code": "EF",
+    "course_id": "ENT413",
+    "code": "EF",
+    "title": "Entrepreneurial Finance",
     "credits": 4
   },
   {
-    "course_name": "Relevance of Intellectual Property for Startups",
-    "course_code": "RIPS",
+    "course_id": "ENT414",
+    "code": "RIPS",
+    "title": "Relevance of Intellectual Property for Startups",
     "credits": 4
   },
   {
-    "course_name": "New Venture Planning",
-    "course_code": "NVP",
+    "course_id": "ENT415",
+    "code": "NVP",
+    "title": "New Venture Planning",
     "credits": 4
   },
   {
-    "course_name": "Creativity, Innovation, and Inventive Problem Solving",
-    "course_code": "CIIPS",
+    "course_id": "ENT416/ENT516",
+    "code": "CIIPS",
+    "title": "Creativity, Innovation, and Inventive Problem Solving",
     "credits": 4
   },
   {
-    "course_name": "Healthcare Innovation and Entrepreneurship Essentials",
-    "course_code": "HIEE",
+    "course_id": "ENT421/BIO571",
+    "code": "HIEE",
+    "title": "Healthcare Innovation and Entrepreneurship Essentials",
     "credits": 4
   },
   {
-    "course_name": "Environmental Sciences",
-    "course_code": "EVS",
+    "course_id": "ESC205",
+    "code": "EVS",
+    "title": "Environmental Sciences",
     "credits": 4
   },
   {
-    "course_name": "Ecology, Evolution, and Environment",
-    "course_code": "EEE",
+    "course_id": "ESC207A",
+    "code": "EEE",
+    "title": "Ecology, Evolution, and Environment",
     "credits": 4
   },
   {
-    "course_name": "Effective Supply Chain for E Commerce",
-    "course_code": "ESCM",
+    "course_id": "MGT310",
+    "code": "ESCM",
+    "title": "Effective Supply Chain for E Commerce",
     "credits": 4
   },
   {
-    "course_name": "Emerging Issues in IT Management",
-    "course_code": "EIITM",
+    "course_id": "MGT311",
+    "code": "EIITM",
+    "title": "Emerging Issues in IT Management",
     "credits": 4
   },
   {
-    "course_name": "Linear Algebra",
-    "course_code": "M-I",
+    "course_id": "MTH100",
+    "code": "M-I",
+    "title": "Linear Algebra",
     "credits": 4
   },
   {
-    "course_name": "Probability and Statistics",
-    "course_code": "P&S",
+    "course_id": "MTH201",
+    "code": "P&S",
+    "title": "Probability and Statistics",
     "credits": 4
   },
   {
-    "course_name": "Multivariate Calculus",
-    "course_code": "M-III",
+    "course_id": "MTH203",
+    "code": "M-III",
+    "title": "Multivariate Calculus",
     "credits": 4
   },
   {
-    "course_name": "Mathematics IV",
-    "course_code": "M-IV",
+    "course_id": "MTH204",
+    "code": "M-IV",
+    "title": "Mathematics IV",
     "credits": 4
   },
   {
-    "course_name": "Discrete Structures",
-    "course_code": "DS",
+    "course_id": "MTH210",
+    "code": "DS",
+    "title": "Discrete Structures",
     "credits": 4
   },
   {
-    "course_name": "Number Theory",
-    "course_code": "NT",
+    "course_id": "MTH211",
+    "code": "NT",
+    "title": "Number Theory",
     "credits": 4
   },
   {
-    "course_name": "Abstract Algebra I",
-    "course_code": "AA-I",
+    "course_id": "MTH212",
+    "code": "AA-I",
+    "title": "Abstract Algebra I",
     "credits": 4
   },
   {
-    "course_name": "Real Analysis I",
-    "course_code": "RA-I",
+    "course_id": "MTH240",
+    "code": "RA-I",
+    "title": "Real Analysis I",
     "credits": 4
   },
   {
-    "course_name": "Numerical Methods",
-    "course_code": "NM",
+    "course_id": "MTH270",
+    "code": "NM",
+    "title": "Numerical Methods",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Mathematical Logic",
-    "course_code": "IML",
+    "course_id": "MTH300",
+    "code": "IML",
+    "title": "Introduction to Mathematical Logic",
     "credits": 4
   },
   {
-    "course_name": "Algebra",
-    "course_code": "ALG",
+    "course_id": "MTH302",
+    "code": "ALG",
+    "title": "Algebra",
     "credits": 4
   },
   {
-    "course_name": "Graph Theory",
-    "course_code": "GT",
+    "course_id": "MTH310 / MTH520",
+    "code": "GT",
+    "title": "Graph Theory",
     "credits": 4
   },
   {
-    "course_name": "Combinatorics and its Applications",
-    "course_code": "CIA",
+    "course_id": "MTH311",
+    "code": "CIA",
+    "title": "Combinatorics and its Applications",
     "credits": 4
   },
   {
-    "course_name": "Real Analysis-II",
-    "course_code": "RA-II",
+    "course_id": "MTH340",
+    "code": "RA-II",
+    "title": "Real Analysis-II",
     "credits": 4
   },
   {
-    "course_name": "Complex Analysis",
-    "course_code": "CmpA",
+    "course_id": "MTH341 / MTH541",
+    "code": "CmpA",
+    "title": "Complex Analysis",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Dynamical Systems",
-    "course_code": "IDS",
+    "course_id": "MTH343/MTH543",
+    "code": "IDS",
+    "title": "Introduction to Dynamical Systems",
     "credits": 4
   },
   {
-    "course_name": "Stochastic Processes and Applications",
-    "course_code": "SPA",
+    "course_id": "MTH371",
+    "code": "SPA",
+    "title": "Stochastic Processes and Applications",
     "credits": 4
   },
   {
-    "course_name": "Statistical Inference",
-    "course_code": "SI",
+    "course_id": "MTH372",
+    "code": "SI",
+    "title": "Statistical Inference",
     "credits": 4
   },
   {
-    "course_name": "Scientific Computing",
-    "course_code": "SC",
+    "course_id": "MTH373",
+    "code": "SC",
+    "title": "Scientific Computing",
     "credits": 4
   },
   {
-    "course_name": "Linear Optimization",
-    "course_code": "LO",
+    "course_id": "MTH374/MTH574",
+    "code": "LO",
+    "title": "Linear Optimization",
     "credits": 4
   },
   {
-    "course_name": "Fluid Mechainics",
-    "course_code": "FM",
+    "course_id": "MTH375/MTH575",
+    "code": "FM",
+    "title": "Fluid Mechainics",
     "credits": 4
   },
   {
-    "course_name": "Advanced Linear Algebra",
-    "course_code": "ALA",
+    "course_id": "MTH510",
+    "code": "ALA",
+    "title": "Advanced Linear Algebra",
     "credits": 4
   },
   {
-    "course_name": "Algebraic Number Theory",
-    "course_code": "ANT",
+    "course_id": "MTH512",
+    "code": "ANT",
+    "title": "Algebraic Number Theory",
     "credits": 4
   },
   {
-    "course_name": "Abstract Algebra II",
-    "course_code": "AA-II",
+    "course_id": "MTH513",
+    "code": "AA-II",
+    "title": "Abstract Algebra II",
     "credits": 4
   },
   {
-    "course_name": "Coding Theory",
-    "course_code": "COT",
+    "course_id": "MTH514",
+    "code": "COT",
+    "title": "Coding Theory",
     "credits": 4
   },
   {
-    "course_name": "Analytic Number Theory",
-    "course_code": "ANNT",
+    "course_id": "MTH516",
+    "code": "ANNT",
+    "title": "Analytic Number Theory",
     "credits": 4
   },
   {
-    "course_name": "Combinatorial Optimization",
-    "course_code": "CMO",
+    "course_id": "MTH517",
+    "code": "CMO",
+    "title": "Combinatorial Optimization",
     "credits": 4
   },
   {
-    "course_name": "Social Network Analysis",
-    "course_code": "SNA",
+    "course_id": "CSE568",
+    "code": "SNA",
+    "title": "Social Network Analysis",
     "credits": 4
   },
   {
-    "course_name": "Topics in Number Theory",
-    "course_code": "TNT",
+    "course_id": "MTH518",
+    "code": "TNT",
+    "title": "Topics in Number Theory",
     "credits": 4
   },
   {
-    "course_name": "Concurrent and Learned Data Structures",
-    "course_code": "CLDS",
+    "course_id": "CSE518",
+    "code": "CLDS",
+    "title": "Concurrent and Learned Data Structures",
     "credits": 4
   },
   {
-    "course_name": "Measure and Probability Theory",
-    "course_code": "MPT",
+    "course_id": "MTH535",
+    "code": "MPT",
+    "title": "Measure and Probability Theory",
     "credits": 4
   },
   {
-    "course_name": "Applied Optimization Methods for Machine Learning",
-    "course_code": "AOMML",
+    "course_id": "ECE666 / CSE517",
+    "code": "AOMML",
+    "title": "Applied Optimization Methods for Machine Learning",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Functional Analysis",
-    "course_code": "IFA",
+    "course_id": "MTH542",
+    "code": "IFA",
+    "title": "Introduction to Functional Analysis",
     "credits": 4
   },
   {
-    "course_name": "Prototyping Interactive Systems",
-    "course_code": "PIS",
+    "course_id": "DES206",
+    "code": "PIS",
+    "title": "Prototyping Interactive Systems",
     "credits": 4
   },
   {
-    "course_name": "Calculus in R^N",
-    "course_code": "CRN",
+    "course_id": "MTH544",
+    "code": "CRN",
+    "title": "Calculus in R^N",
     "credits": 4
   },
   {
-    "course_name": "Finite and Spectral Element Methods",
-    "course_code": "FSEM",
+    "course_id": "MTH545",
+    "code": "FSEM",
+    "title": "Finite and Spectral Element Methods",
     "credits": 4
   },
   {
-    "course_name": "Ethics in AI",
-    "course_code": "EI",
+    "course_id": "SSH325/SSH525",
+    "code": "EI",
+    "title": "Ethics in AI",
     "credits": 4
   },
   {
-    "course_name": "Programmable Networking",
-    "course_code": "PN",
+    "course_id": "CSE567",
+    "code": "PN",
+    "title": "Programmable Networking",
     "credits": 4
   },
   {
-    "course_name": "Introduction to PDE",
-    "course_code": "IPDE",
+    "course_id": "MTH550",
+    "code": "IPDE",
+    "title": "Introduction to PDE",
     "credits": 4
   },
   {
-    "course_name": "Estimation Theory for dynamic systems",
-    "course_code": "ET",
+    "course_id": "ECE5et",
+    "code": "ET",
+    "title": "Estimation Theory for dynamic systems",
     "credits": 4
   },
   {
-    "course_name": "Computational Methods in Oncology Research",
-    "course_code": "CMOR",
+    "course_id": "BIO5XX",
+    "code": "CMOR",
+    "title": "Computational Methods in Oncology Research",
     "credits": 4
   },
   {
-    "course_name": "Parallel Runtimes for Modern Processors",
-    "course_code": "PRMP",
+    "course_id": "CSE513",
+    "code": "PRMP",
+    "title": "Parallel Runtimes for Modern Processors",
     "credits": 4
   },
   {
-    "course_name": "Quantum Mechanics",
-    "course_code": "QM",
+    "course_id": "ECE525",
+    "code": "QM",
+    "title": "Quantum Mechanics",
     "credits": 4
   },
   {
-    "course_name": "Point Set Toplogy",
-    "course_code": "PST",
+    "course_id": "MTH562",
+    "code": "PST",
+    "title": "Point Set Toplogy",
     "credits": 4
   },
   {
-    "course_name": "3D Animation filmmaking",
-    "course_code": "3DAF",
+    "course_id": "DES305",
+    "code": "3DAF",
+    "title": "3D Animation filmmaking",
     "credits": 4
   },
   {
-    "course_name": "Point Set Toplogy",
-    "course_code": "PST-2",
+    "course_id": "MTH562A",
+    "code": "PST-2",
+    "title": "Point Set Toplogy",
     "credits": 4
   },
   {
-    "course_name": "Knowledge Production, Concepts and Context",
-    "course_code": "KPCC",
+    "course_id": "SSH700",
+    "code": "KPCC",
+    "title": "Knowledge Production, Concepts and Context",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Riemannian Geometry with Some Applications",
-    "course_code": "IRG",
+    "course_id": "MTH564A",
+    "code": "IRG",
+    "title": "Introduction to Riemannian Geometry with Some Applications",
     "credits": 4
   },
   {
-    "course_name": "Enhancement Technologies and the Body: Beyond the Human Form",
-    "course_code": "ETB",
+    "course_id": "SOC513",
+    "code": "ETB",
+    "title": "Enhancement Technologies and the Body: Beyond the Human Form",
     "credits": 4
   },
   {
-    "course_name": "Contract Theory",
-    "course_code": "CT",
+    "course_id": "ECO502",
+    "code": "CT",
+    "title": "Contract Theory",
     "credits": 4
   },
   {
-    "course_name": "Numerical Solutions Differential Equations",
-    "course_code": "NSDE",
+    "course_id": "MTH570",
+    "code": "NSDE",
+    "title": "Numerical Solutions Differential Equations",
     "credits": 4
   },
   {
-    "course_name": "Tomographic Imaging",
-    "course_code": "TI",
+    "course_id": "ECE565",
+    "code": "TI",
+    "title": "Tomographic Imaging",
     "credits": 4
   },
   {
-    "course_name": "Integral Transforms and their Applications",
-    "course_code": "ITA",
+    "course_id": "MTH571",
+    "code": "ITA",
+    "title": "Integral Transforms and their Applications",
     "credits": 4
   },
   {
-    "course_name": "Cloud Computing",
-    "course_code": "CldC",
+    "course_id": "CSE569",
+    "code": "CldC",
+    "title": "Cloud Computing",
     "credits": 4
   },
   {
-    "course_name": "Categorical Data Analysis",
-    "course_code": "CDA",
+    "course_id": "MTH576",
+    "code": "CDA",
+    "title": "Categorical Data Analysis",
     "credits": 4
   },
   {
-    "course_name": "Quantum Mechanics",
-    "course_code": "QM",
+    "course_id": "ECE525",
+    "code": "QM",
+    "title": "Quantum Mechanics",
     "credits": 4
   },
   {
-    "course_name": "Convex Optimization",
-    "course_code": "COO",
+    "course_id": "MTH577",
+    "code": "COO",
+    "title": "Convex Optimization",
     "credits": 4
   },
   {
-    "course_name": "Introduction to AI in Medical Imaging",
-    "course_code": "IAMI",
+    "course_id": "ECE667A",
+    "code": "IAMI",
+    "title": "Introduction to AI in Medical Imaging",
     "credits": 4
   },
   {
-    "course_name": "Computational Metagenomics",
-    "course_code": "CoMeG",
+    "course_id": "BIO549",
+    "code": "CoMeG",
+    "title": "Computational Metagenomics",
     "credits": 4
   },
   {
-    "course_name": "Numerical Partial Differential Equations",
-    "course_code": "NPDE",
+    "course_id": "MTH598",
+    "code": "NPDE",
+    "title": "Numerical Partial Differential Equations",
     "credits": 4
   },
   {
-    "course_name": "Variational Calculus and their Applications",
-    "course_code": "VCA",
+    "course_id": "MTH599",
+    "code": "VCA",
+    "title": "Variational Calculus and their Applications",
     "credits": 4
   },
   {
-    "course_name": "Ergonomics/Human factors for Design",
-    "course_code": "EFD",
+    "course_id": "DES524",
+    "code": "EFD",
+    "title": "Ergonomics/Human factors for Design",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Psychology",
-    "course_code": "Psy",
+    "course_id": "PSY201",
+    "code": "Psy",
+    "title": "Introduction to Psychology",
     "credits": 4
   },
   {
-    "course_name": "Positive Psychology",
-    "course_code": "Ppsy",
+    "course_id": "PSY202",
+    "code": "Ppsy",
+    "title": "Positive Psychology",
     "credits": 4
   },
   {
-    "course_name": "Enhancement Technologies and the Body: Beyond the Human Form",
-    "course_code": "",
+    "course_id": "SOC513",
+    "code": "",
+    "title": "Enhancement Technologies and the Body: Beyond the Human Form",
     "credits": 4
   },
   {
-    "course_name": "Non-Classical Logics",
-    "course_code": "NCL",
+    "course_id": "MTH504A",
+    "code": "NCL",
+    "title": "Non-Classical Logics",
     "credits": 4
   },
   {
-    "course_name": "Cognitive Psychology",
-    "course_code": "CP",
+    "course_id": "PSY301",
+    "code": "CP",
+    "title": "Cognitive Psychology",
     "credits": 4
   },
   {
-    "course_name": "Lattices in Computer Science",
-    "course_code": "LCS",
+    "course_id": "CSE526",
+    "code": "LCS",
+    "title": "Lattices in Computer Science",
     "credits": 4
   },
   {
-    "course_name": "Social Psychology",
-    "course_code": "SP",
+    "course_id": "PSY302",
+    "code": "SP",
+    "title": "Social Psychology",
     "credits": 4
   },
   {
-    "course_name": "Human Microbiome Data Science",
-    "course_code": "HMDS",
+    "course_id": "BIO548",
+    "code": "HMDS",
+    "title": "Human Microbiome Data Science",
     "credits": 4
   },
   {
-    "course_name": "Attention and Perception",
-    "course_code": "ATP",
+    "course_id": "PSY305/PSY505",
+    "code": "ATP",
+    "title": "Attention and Perception",
     "credits": 4
   },
   {
-    "course_name": "Usable Security and Privacy",
-    "course_code": "UsS",
+    "course_id": "CSE347/CSE547/DES525/DES306",
+    "code": "UsS",
+    "title": "Usable Security and Privacy",
     "credits": 4
   },
   {
-    "course_name": "Learning and Memory",
-    "course_code": "LM",
+    "course_id": "PSY306/506",
+    "code": "LM",
+    "title": "Learning and Memory",
     "credits": 4
   },
   {
-    "course_name": "Interactive Systems",
-    "course_code": "ISy",
+    "course_id": "CSE573",
+    "code": "ISy",
+    "title": "Interactive Systems",
     "credits": 4
   },
   {
-    "course_name": "Neuroscience of Decision Making",
-    "course_code": "NDM",
+    "course_id": "PSY307/507",
+    "code": "NDM",
+    "title": "Neuroscience of Decision Making",
     "credits": 4
   },
   {
-    "course_name": "Information Theory",
-    "course_code": "InT",
+    "course_id": "ECE634",
+    "code": "InT",
+    "title": "Information Theory",
     "credits": 4
   },
   {
-    "course_name": "Cognition of Motor Movement",
-    "course_code": "CMM",
+    "course_id": "PSY308/PSY508",
+    "code": "CMM",
+    "title": "Cognition of Motor Movement",
     "credits": 4
   },
   {
-    "course_name": "Cognition and Information Processing in Design",
-    "course_code": "CIPD",
+    "course_id": "DES523",
+    "code": "CIPD",
+    "title": "Cognition and Information Processing in Design",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Sociology and Anthropology",
-    "course_code": "ISA",
+    "course_id": "SOC101",
+    "code": "ISA",
+    "title": "Introduction to Sociology and Anthropology",
     "credits": 4
   },
   {
-    "course_name": "Foundations of Marketing",
-    "course_code": "FOM",
+    "course_id": "ENTxxx",
+    "code": "FOM",
+    "title": "Foundations of Marketing",
     "credits": 4
   },
   {
-    "course_name": "Contemporary India: Sociological Perspective",
-    "course_code": "CISP",
+    "course_id": "SOC202",
+    "code": "CISP",
+    "title": "Contemporary India: Sociological Perspective",
     "credits": 4
   },
   {
-    "course_name": "Social Entrepreneurship",
-    "course_code": "SoE",
+    "course_id": "ENT202/ ENT404",
+    "code": "SoE",
+    "title": "Social Entrepreneurship",
     "credits": 4
   },
   {
-    "course_name": "Sociology of New Media",
-    "course_code": "SNM",
+    "course_id": "SOC204",
+    "code": "SNM",
+    "title": "Sociology of New Media",
     "credits": 4
   },
   {
-    "course_name": "Anthropology and Social Media",
-    "course_code": "ASM",
+    "course_id": "SOC205",
+    "code": "ASM",
+    "title": "Anthropology and Social Media",
     "credits": 4
   },
   {
-    "course_name": "Japanese Language",
-    "course_code": "JALang",
+    "course_id": "SSH326",
+    "code": "JALang",
+    "title": "Japanese Language",
     "credits": 4
   },
   {
-    "course_name": "Distributed and Federated Machine Learning",
-    "course_code": "DFML",
+    "course_id": "CSE665A",
+    "code": "DFML",
+    "title": "Distributed and Federated Machine Learning",
     "credits": 4
   },
   {
-    "course_name": "Business Anthropology",
-    "course_code": "BA",
+    "course_id": "SOC206",
+    "code": "BA",
+    "title": "Business Anthropology",
     "credits": 4
   },
   {
-    "course_name": "Information Technology And Society",
-    "course_code": "ITS",
+    "course_id": "SOC207",
+    "code": "ITS",
+    "title": "Information Technology And Society",
     "credits": 4
   },
   {
-    "course_name": "Comprehensive Gender Sensitization",
-    "course_code": "CGS",
+    "course_id": "SSH225A",
+    "code": "CGS",
+    "title": "Comprehensive Gender Sensitization",
     "credits": 4
   },
   {
-    "course_name": "Algorithms under Uncertainty",
-    "course_code": "AUU",
+    "course_id": "CSE586",
+    "code": "AUU",
+    "title": "Algorithms under Uncertainty",
     "credits": 4
   },
   {
-    "course_name": "Organizations An Anthropological Perspective",
-    "course_code": "OAP",
+    "course_id": "SOC208",
+    "code": "OAP",
+    "title": "Organizations An Anthropological Perspective",
     "credits": 4
   },
   {
-    "course_name": "Advances in Deep Learning",
-    "course_code": "ADL",
+    "course_id": "ECE677/CSE677",
+    "code": "ADL",
+    "title": "Advances in Deep Learning",
     "credits": 4
   },
   {
-    "course_name": "Consumer Culture and Society",
-    "course_code": "CCS",
+    "course_id": "SOC209",
+    "code": "CCS",
+    "title": "Consumer Culture and Society",
     "credits": 4
   },
   {
-    "course_name": "Quantum Communication and Networks",
-    "course_code": "QCN",
+    "course_id": "ECE530",
+    "code": "QCN",
+    "title": "Quantum Communication and Networks",
     "credits": 4
   },
   {
-    "course_name": "Sociological Theory",
-    "course_code": "ST1",
+    "course_id": "SOC210",
+    "code": "ST1",
+    "title": "Sociological Theory",
     "credits": 4
   },
   {
-    "course_name": "Digital Processor Design",
-    "course_code": "DPD",
+    "course_id": "ECE523A",
+    "code": "DPD",
+    "title": "Digital Processor Design",
     "credits": 4
   },
   {
-    "course_name": "Science, Technology and Society",
-    "course_code": "STS",
+    "course_id": "SOC211",
+    "code": "STS",
+    "title": "Science, Technology and Society",
     "credits": 4
   },
   {
-    "course_name": "Key Concepts in Economic Sociology",
-    "course_code": "KCES",
+    "course_id": "SOC212",
+    "code": "KCES",
+    "title": "Key Concepts in Economic Sociology",
     "credits": 4
   },
   {
-    "course_name": "Motion Design and Graphics",
-    "course_code": "MDG",
+    "course_id": "DES526/DES307",
+    "code": "MDG",
+    "title": "Motion Design and Graphics",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Digital Ethnography",
-    "course_code": "IDE",
+    "course_id": "SOC213",
+    "code": "IDE",
+    "title": "Introduction to Digital Ethnography",
     "credits": 4
   },
   {
-    "course_name": "User Experience Design of XR",
-    "course_code": "UDXR",
+    "course_id": "DES527",
+    "code": "UDXR",
+    "title": "User Experience Design of XR",
     "credits": 4
   },
   {
-    "course_name": "Causal Inference",
-    "course_code": "CI",
+    "course_id": "ECO323/ECO523",
+    "code": "CI",
+    "title": "Causal Inference",
     "credits": 4
   },
   {
-    "course_name": "Urban Sociology",
-    "course_code": "US",
+    "course_id": "SOC302/SOC507",
+    "code": "US",
+    "title": "Urban Sociology",
     "credits": 4
   },
   {
-    "course_name": "Digital Social Research",
-    "course_code": "DSR",
+    "course_id": "SOC307",
+    "code": "DSR",
+    "title": "Digital Social Research",
     "credits": 4
   },
   {
-    "course_name": "Reading Hegel's Phenomenology of Spiri",
-    "course_code": "RHPS",
+    "course_id": "SSH526/SSH726",
+    "code": "RHPS",
+    "title": "Reading Hegel's Phenomenology of Spiri",
     "credits": 4
   },
   {
-    "course_name": "Foundations of Entrepreneurship",
-    "course_code": "FOE",
+    "course_id": "ENT201/ENT405",
+    "code": "FOE",
+    "title": "Foundations of Entrepreneurship",
     "credits": 4
   },
   {
-    "course_name": "Gender and Media",
-    "course_code": "GM",
+    "course_id": "SOC308/SOC514",
+    "code": "GM",
+    "title": "Gender and Media",
     "credits": 4
   },
   {
-    "course_name": "Advance Ethnographic Research Methods",
-    "course_code": "AERM",
+    "course_id": "SOC311/SOC501",
+    "code": "AERM",
+    "title": "Advance Ethnographic Research Methods",
     "credits": 4
   },
   {
-    "course_name": "Concepts and Methods in Social Movement Research",
-    "course_code": "CMSMR",
+    "course_id": "SSH327A/SSH527A",
+    "code": "CMSMR",
+    "title": "Concepts and Methods in Social Movement Research",
     "credits": 4
   },
   {
-    "course_name": "The Business of Artificial Intelligence",
-    "course_code": "BAI",
+    "course_id": "DES530",
+    "code": "BAI",
+    "title": "The Business of Artificial Intelligence",
     "credits": 4
   },
   {
-    "course_name": "Sociology of India: Themes and Perspectives",
-    "course_code": "SoI",
+    "course_id": "SOC313/SOC503",
+    "code": "SoI",
+    "title": "Sociology of India: Themes and Perspectives",
     "credits": 4
   },
   {
-    "course_name": "Design for Artificial Intelligence driven Products",
-    "course_code": "DAIDP",
+    "course_id": "DES529",
+    "code": "DAIDP",
+    "title": "Design for Artificial Intelligence driven Products",
     "credits": 4
   },
   {
-    "course_name": "Technology and the Future of Work",
-    "course_code": "TFM",
+    "course_id": "SOC314/SOC512",
+    "code": "TFM",
+    "title": "Technology and the Future of Work",
     "credits": 4
   },
   {
-    "course_name": "Nonlinear Dynamics and Chaos (NDC)",
-    "course_code": "NDMA",
+    "course_id": "MTH359/559",
+    "code": "NDMA",
+    "title": "Nonlinear Dynamics and Chaos (NDC)",
     "credits": 4
   },
   {
-    "course_name": "Intersectionality Studies",
-    "course_code": "INST",
+    "course_id": "SOC315/SOC511",
+    "code": "INST",
+    "title": "Intersectionality Studies",
     "credits": 4
   },
   {
-    "course_name": "Mechanics of Bodies",
-    "course_code": "MB",
+    "course_id": "MTH376",
+    "code": "MB",
+    "title": "Mechanics of Bodies",
     "credits": 4
   },
   {
-    "course_name": "Advanced Sociological Theory",
-    "course_code": "AST",
+    "course_id": "SOC502",
+    "code": "AST",
+    "title": "Advanced Sociological Theory",
     "credits": 4
   },
   {
-    "course_name": "Topics in Mathematical Logic",
-    "course_code": "TML",
+    "course_id": "MTH506",
+    "code": "TML",
+    "title": "Topics in Mathematical Logic",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Algebraic Geometry with Applications",
-    "course_code": "IAGA",
+    "course_id": "MTH561",
+    "code": "IAGA",
+    "title": "Introduction to Algebraic Geometry with Applications",
     "credits": 4
   },
   {
-    "course_name": "Netwoks and Systems Security I",
-    "course_code": "NSS I",
+    "course_id": "CSE553",
+    "code": "NSS I",
+    "title": "Netwoks and Systems Security I",
     "credits": 4
   },
   {
-    "course_name": "Machine Learning in Wireless Communication and Networks",
-    "course_code": "MLWCN D",
+    "course_id": "ECE564A",
+    "code": "MLWCN D",
+    "title": "Machine Learning in Wireless Communication and Networks",
     "credits": 4
   },
   {
-    "course_name": "Object Oriented Programming and Design",
-    "course_code": "OOPD",
+    "course_id": "CSE600/ECE600/ECE600A",
+    "code": "OOPD",
+    "title": "Object Oriented Programming and Design",
     "credits": 4
   },
   {
-    "course_name": "Programming for Computational Biology",
-    "course_code": "PCB",
+    "course_id": "BIO551A",
+    "code": "PCB",
+    "title": "Programming for Computational Biology",
     "credits": 4
   },
   {
-    "course_name": "Critical Thinking and Readings in Social Science",
-    "course_code": "CTRSS",
+    "course_id": "SSH101",
+    "code": "CTRSS",
+    "title": "Critical Thinking and Readings in Social Science",
     "credits": 4
   },
   {
-    "course_name": "Object Oriented Programming and Design",
-    "course_code": "OOPD",
+    "course_id": "ECE600A",
+    "code": "OOPD",
+    "title": "Object Oriented Programming and Design",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Philosophy",
-    "course_code": "IPHI",
+    "course_id": "SSH121",
+    "code": "IPHI",
+    "title": "Introduction to Philosophy",
     "credits": 4
   },
   {
-    "course_name": "Applied Fields and Waves",
-    "course_code": "AFW",
+    "course_id": "ECE331/ECE531",
+    "code": "AFW",
+    "title": "Applied Fields and Waves",
     "credits": 4
   },
   {
-    "course_name": "Critical Thinking",
-    "course_code": "CT",
+    "course_id": "SSH124",
+    "code": "CT",
+    "title": "Critical Thinking",
     "credits": 4
   },
   {
-    "course_name": "Topics on Multivariate Analysis",
-    "course_code": "TMA",
+    "course_id": "MTH578A",
+    "code": "TMA",
+    "title": "Topics on Multivariate Analysis",
     "credits": 4
   },
   {
-    "course_name": "Research Methods in Social Science and Design",
-    "course_code": "RMSSD",
+    "course_id": "SSH201",
+    "code": "RMSSD",
+    "title": "Research Methods in Social Science and Design",
     "credits": 4
   },
   {
-    "course_name": "Neural Engineering and Implantable Devices",
-    "course_code": "NEID",
+    "course_id": "ECE366/ECE566",
+    "code": "NEID",
+    "title": "Neural Engineering and Implantable Devices",
     "credits": 4
   },
   {
-    "course_name": "Theatre Appreciation",
-    "course_code": "TA",
+    "course_id": "SSH211",
+    "code": "TA",
+    "title": "Theatre Appreciation",
     "credits": 4
   },
   {
-    "course_name": "Differential Geometry",
-    "course_code": "DG",
+    "course_id": "MTH563",
+    "code": "DG",
+    "title": "Differential Geometry",
     "credits": 4
   },
   {
-    "course_name": "Introduction To The Study Of Literature",
-    "course_code": "Lit",
+    "course_id": "SSH214",
+    "code": "Lit",
+    "title": "Introduction To The Study Of Literature",
     "credits": 4
   },
   {
-    "course_name": "On the making of anthropological objects",
-    "course_code": "AO",
+    "course_id": "SOC504/SOC701",
+    "code": "AO",
+    "title": "On the making of anthropological objects",
     "credits": 4
   },
   {
-    "course_name": "Nation and her Narratives",
-    "course_code": "NN",
+    "course_id": "SSH215",
+    "code": "NN",
+    "title": "Nation and her Narratives",
     "credits": 4
   },
   {
-    "course_name": "Reproducing Kernel Hilbert Spaces with Applications (New)",
-    "course_code": "RKHSA",
+    "course_id": "MTH550",
+    "code": "RKHSA",
+    "title": "Reproducing Kernel Hilbert Spaces with Applications (New)",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Indian Mythology",
-    "course_code": "IIM",
+    "course_id": "SSH216",
+    "code": "IIM",
+    "title": "Introduction to Indian Mythology",
     "credits": 4
   },
   {
-    "course_name": "An Introduction to Quantum Information Theory",
-    "course_code": "QIT",
+    "course_id": "MTH551",
+    "code": "QIT",
+    "title": "An Introduction to Quantum Information Theory",
     "credits": 4
   },
   {
-    "course_name": "Indian Poetry Through the Ages",
-    "course_code": "IPA",
+    "course_id": "SSH217",
+    "code": "IPA",
+    "title": "Indian Poetry Through the Ages",
     "credits": 4
   },
   {
-    "course_name": "Graduate Computer Networks",
-    "course_code": "GCN",
+    "course_id": "CSE637",
+    "code": "GCN",
+    "title": "Graduate Computer Networks",
     "credits": 4
   },
   {
-    "course_name": "Social and Political Philosophy",
-    "course_code": "SPP",
+    "course_id": "SSH221",
+    "code": "SPP",
+    "title": "Social and Political Philosophy",
     "credits": 4
   },
   {
-    "course_name": "Large Language Models",
-    "course_code": "LLM",
+    "course_id": "CSE665",
+    "code": "LLM",
+    "title": "Large Language Models",
     "credits": 4
   },
   {
-    "course_name": "Theory and Practice of Engineering Ethics",
-    "course_code": "TPEE",
+    "course_id": "SSH222",
+    "code": "TPEE",
+    "title": "Theory and Practice of Engineering Ethics",
     "credits": 4
   },
   {
-    "course_name": "Design Thinking and Innovation",
-    "course_code": "DTI",
+    "course_id": "ENT302",
+    "code": "DTI",
+    "title": "Design Thinking and Innovation",
     "credits": 4
   },
   {
-    "course_name": "Perspectives of Knowledge",
-    "course_code": "PoK",
+    "course_id": "SSH223",
+    "code": "PoK",
+    "title": "Perspectives of Knowledge",
     "credits": 4
   },
   {
-    "course_name": "3D Creation for Extended Reality (XR)",
-    "course_code": "3CER",
+    "course_id": "DES532A",
+    "code": "3CER",
+    "title": "3D Creation for Extended Reality (XR)",
     "credits": 4
   },
   {
-    "course_name": "Computer, Information Ethics and Society",
-    "course_code": "CIES",
+    "course_id": "SSH224",
+    "code": "CIES",
+    "title": "Computer, Information Ethics and Society",
     "credits": 4
   },
   {
-    "course_name": "Physics of Semiconductor Devices",
-    "course_code": "PSD",
+    "course_id": "ECE210/ECE310",
+    "code": "PSD",
+    "title": "Physics of Semiconductor Devices",
     "credits": 4
   },
   {
-    "course_name": "Interaction Design Perspectives Methods",
-    "course_code": "IDPM",
+    "course_id": "DES533",
+    "code": "IDPM",
+    "title": "Interaction Design Perspectives Methods",
     "credits": 4
   },
   {
-    "course_name": "Tangible User Interfaces",
-    "course_code": "TUI",
+    "course_id": "DES531",
+    "code": "TUI",
+    "title": "Tangible User Interfaces",
     "credits": 4
   },
   {
-    "course_name": "Democracy in India: Principles and Practices",
-    "course_code": "DIPP",
+    "course_id": "SSH261",
+    "code": "DIPP",
+    "title": "Democracy in India: Principles and Practices",
     "credits": 4
   },
   {
-    "course_name": "Electronic System Design",
-    "course_code": "ESD",
+    "course_id": "ECE211",
+    "code": "ESD",
+    "title": "Electronic System Design",
     "credits": 4
   },
   {
-    "course_name": "Theories of Ethics",
-    "course_code": "TE",
+    "course_id": "SSH300",
+    "code": "TE",
+    "title": "Theories of Ethics",
     "credits": 4
   },
   {
-    "course_name": "Urban Space and Gender",
-    "course_code": "USG",
+    "course_id": "SOC719A",
+    "code": "USG",
+    "title": "Urban Space and Gender",
     "credits": 4
   },
   {
-    "course_name": "Advanced Writing",
-    "course_code": "AW",
+    "course_id": "SSH311",
+    "code": "AW",
+    "title": "Advanced Writing",
     "credits": 4
   },
   {
-    "course_name": "Systems for AI",
-    "course_code": "SAI",
+    "course_id": "CSE634A",
+    "code": "SAI",
+    "title": "Systems for AI",
     "credits": 4
   },
   {
-    "course_name": "Applied Ethics",
-    "course_code": "AE",
+    "course_id": "SSH321/521",
+    "code": "AE",
+    "title": "Applied Ethics",
     "credits": 4
   },
   {
-    "course_name": "Parameterized Algorithms",
-    "course_code": "PALG",
+    "course_id": "CSE619",
+    "code": "PALG",
+    "title": "Parameterized Algorithms",
     "credits": 4
   },
   {
-    "course_name": "New Media and Politics",
-    "course_code": "NMP",
+    "course_id": "SSH323",
+    "code": "NMP",
+    "title": "New Media and Politics",
     "credits": 4
   },
   {
-    "course_name": "Advanced Digital Design and Verification",
-    "course_code": "ADDV",
+    "course_id": "ECE527",
+    "code": "ADDV",
+    "title": "Advanced Digital Design and Verification",
     "credits": 4
   },
   {
-    "course_name": "Philosophy of Mind",
-    "course_code": "PoM",
+    "course_id": "SSH324",
+    "code": "PoM",
+    "title": "Philosophy of Mind",
     "credits": 4
   },
   {
-    "course_name": "VLSI Design Flow",
-    "course_code": "VDF",
+    "course_id": "ECE513/ECE313",
+    "code": "VDF",
+    "title": "VLSI Design Flow",
     "credits": 4
   },
   {
-    "course_name": "Experiential Learning",
-    "course_code": "EL",
+    "course_id": "ENT303A",
+    "code": "EL",
+    "title": "Experiential Learning",
     "credits": 4
   },
   {
-    "course_name": "Political Anthropology: State, Subject, Power",
-    "course_code": "PASSP",
+    "course_id": "SOC216",
+    "code": "PASSP",
+    "title": "Political Anthropology: State, Subject, Power",
     "credits": 4
   },
   {
-    "course_name": "State and Subject: Advanced topics in political anthropology",
-    "course_code": "APA",
+    "course_id": "SOC702/505",
+    "code": "APA",
+    "title": "State and Subject: Advanced topics in political anthropology",
     "credits": 4
   },
   {
-    "course_name": "Governing AI: History, Theory, Policy (New)",
-    "course_code": "GAI",
+    "course_id": "SSH341/SSH541",
+    "code": "GAI",
+    "title": "Governing AI: History, Theory, Policy (New)",
     "credits": 4
   },
   {
-    "course_name": "Comparative Politics in Digital Era",
-    "course_code": "CPDE",
+    "course_id": "SSH361",
+    "code": "CPDE",
+    "title": "Comparative Politics in Digital Era",
     "credits": 4
   },
   {
-    "course_name": "Intelligent Product Design Workshop",
-    "course_code": "",
+    "course_id": "ECE323/EVE323/ECE526",
+    "code": "",
+    "title": "Intelligent Product Design Workshop",
     "credits": 4
   },
   {
-    "course_name": "Urban Space and Political Power",
-    "course_code": "USPP",
+    "course_id": "SSH362/SSH562",
+    "code": "USPP",
+    "title": "Urban Space and Political Power",
     "credits": 4
   },
   {
-    "course_name": "Philosophy of Technology",
-    "course_code": "PT",
+    "course_id": "SSH3PT",
+    "code": "PT",
+    "title": "Philosophy of Technology",
     "credits": 4
   },
   {
-    "course_name": "Data and Society",
-    "course_code": "D&S",
+    "course_id": "SSH711",
+    "code": "D&S",
+    "title": "Data and Society",
     "credits": 4
   },
   {
-    "course_name": "Extended Reality in Industry",
-    "course_code": "ERI",
+    "course_id": "DES534",
+    "code": "ERI",
+    "title": "Extended Reality in Industry",
     "credits": 4
   },
   {
-    "course_name": "Politics in Digital Era",
-    "course_code": "PDE",
+    "course_id": "SSH240",
+    "code": "PDE",
+    "title": "Politics in Digital Era",
     "credits": 4
   },
   {
-    "course_name": "Algorithmic techniques for Robot Planning (new)",
-    "course_code": "ARP",
+    "course_id": "CSE634",
+    "code": "ARP",
+    "title": "Algorithmic techniques for Robot Planning (new)",
     "credits": 4
   },
   {
-    "course_name": "Logic and Artificial Intelligence",
-    "course_code": "L&AI",
+    "course_id": "MTH501",
+    "code": "L&AI",
+    "title": "Logic and Artificial Intelligence",
     "credits": 4
   },
   {
-    "course_name": "Probabilistic Methods in Combinatorics",
-    "course_code": "PMC",
+    "course_id": "MTH523/CSE623",
+    "code": "PMC",
+    "title": "Probabilistic Methods in Combinatorics",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Computational Complexity",
-    "course_code": "ICC",
+    "course_id": "CSE624A",
+    "code": "ICC",
+    "title": "Introduction to Computational Complexity",
     "credits": 4
   },
   {
-    "course_name": "Advanced Solid-state Devices (ASD)",
-    "course_code": "ASSD",
+    "course_id": "ECE613",
+    "code": "ASSD",
+    "title": "Advanced Solid-state Devices (ASD)",
     "credits": 4
   },
   {
-    "course_name": "Ubiquitous Computing",
-    "course_code": "UC",
+    "course_id": "DES535",
+    "code": "UC",
+    "title": "Ubiquitous Computing",
     "credits": 4
   },
   {
-    "course_name": "Advanced Topics in Partial Differential Equations",
-    "course_code": "ATPD",
+    "course_id": "MTH548",
+    "code": "ATPD",
+    "title": "Advanced Topics in Partial Differential Equations",
     "credits": 4
   },
   {
-    "course_name": "Several Complex Variables",
-    "course_code": "SCV",
+    "course_id": "MTH547",
+    "code": "SCV",
+    "title": "Several Complex Variables",
     "credits": 4
   },
   {
-    "course_name": "Digital Technologies and Social Entrepreneurship",
-    "course_code": "DTSE",
+    "course_id": "ENT304",
+    "code": "DTSE",
+    "title": "Digital Technologies and Social Entrepreneurship",
     "credits": 4
   },
   {
-    "course_name": "Social Innovation, Corporate Social Responsibility and Sustainable Development",
-    "course_code": "SICSRSD",
+    "course_id": "ENT305",
+    "code": "SICSRSD",
+    "title": "Social Innovation, Corporate Social Responsibility and Sustainable Development",
     "credits": 4
   },
   {
-    "course_name": "Decision Making for Multi-robot Systems",
-    "course_code": "",
+    "course_id": "CSE667",
+    "code": "",
+    "title": "Decision Making for Multi-robot Systems",
     "credits": 4
   },
   {
-    "course_name": "Explainable AI",
-    "course_code": "EAI",
+    "course_id": "CSE615",
+    "code": "EAI",
+    "title": "Explainable AI",
     "credits": 4
   },
   {
-    "course_name": "Image, Screen, Interface",
-    "course_code": "ISI",
+    "course_id": "SOC309/509",
+    "code": "ISI",
+    "title": "Image, Screen, Interface",
     "credits": 4
   },
   {
-    "course_name": "Advanced Readings in Moral and Political Philosophy",
-    "course_code": "",
+    "course_id": "SSH721",
+    "code": "",
+    "title": "Advanced Readings in Moral and Political Philosophy",
     "credits": 4
   },
   {
-    "course_name": "Graduate Systems (GS)",
-    "course_code": "",
+    "course_id": "CSE638",
+    "code": "",
+    "title": "Graduate Systems (GS)",
     "credits": 4
   },
   {
-    "course_name": "Advanced Computer Networks",
-    "course_code": "",
+    "course_id": "CSE666",
+    "code": "",
+    "title": "Advanced Computer Networks",
     "credits": 4
   },
   {
-    "course_name": "Percolation Theory",
-    "course_code": "",
+    "course_id": "MTH579",
+    "code": "",
+    "title": "Percolation Theory",
     "credits": 4
   },
   {
-    "course_name": "Foundations of Biology-I",
-    "course_code": "",
+    "course_id": "BIO102",
+    "code": "",
+    "title": "Foundations of Biology-I",
     "credits": 4
   },
   {
-    "course_name": "Design Research",
-    "course_code": "",
+    "course_id": "DES536",
+    "code": "",
+    "title": "Design Research",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Bioinspired Algorithms and Optimal Control",
-    "course_code": "",
+    "course_id": "BIO525",
+    "code": "",
+    "title": "Introduction to Bioinspired Algorithms and Optimal Control",
     "credits": 4
   },
   {
-    "course_name": "Measure Theoretic Probability",
-    "course_code": "",
+    "course_id": "MTH 580A",
+    "code": "",
+    "title": "Measure Theoretic Probability",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Fintech",
-    "course_code": "",
+    "course_id": "ENT306",
+    "code": "",
+    "title": "Introduction to Fintech",
     "credits": 4
   },
   {
-    "course_name": "User Experience Design and UI Design",
-    "course_code": "",
+    "course_id": "DES537A",
+    "code": "",
+    "title": "User Experience Design and UI Design",
     "credits": 4
   },
   {
-    "course_name": "Advanced Digital Communication",
-    "course_code": "ADC",
+    "course_id": "ECE548",
+    "code": "ADC",
+    "title": "Advanced Digital Communication",
     "credits": 4
   },
   {
-    "course_name": "Sociology of Inequality",
-    "course_code": "",
+    "course_id": "SOC214",
+    "code": "",
+    "title": "Sociology of Inequality",
     "credits": 4
   },
   {
-    "course_name": "Foundations of Biology II",
-    "course_code": "",
+    "course_id": "BIO201",
+    "code": "",
+    "title": "Foundations of Biology II",
     "credits": 4
   },
   {
-    "course_name": "Robot Intelligence",
-    "course_code": "RI",
+    "course_id": "CSE588",
+    "code": "RI",
+    "title": "Robot Intelligence",
     "credits": 4
   },
   {
-    "course_name": "Kant's Critique of Pure Reason",
-    "course_code": "",
+    "course_id": "SSH728",
+    "code": "",
+    "title": "Kant's Critique of Pure Reason",
     "credits": 4
   },
   {
-    "course_name": "Networks for AI/ML Systems",
-    "course_code": "NAI",
+    "course_id": "CSE587",
+    "code": "NAI",
+    "title": "Networks for AI/ML Systems",
     "credits": 4
   },
   {
-    "course_name": "Anthropology of Violence â€“ I",
-    "course_code": "",
+    "course_id": "SOC306/506",
+    "code": "",
+    "title": "Anthropology of Violence â€“ I",
     "credits": 4
   },
   {
-    "course_name": "Marketing of Services",
-    "course_code": "",
+    "course_id": "ENT307",
+    "code": "",
+    "title": "Marketing of Services",
     "credits": 4
   },
   {
-    "course_name": "Key Concepts in Political Theory",
-    "course_code": "",
+    "course_id": "SSH5743",
+    "code": "",
+    "title": "Key Concepts in Political Theory",
     "credits": 4
   },
   {
-    "course_name": "Econometrics with Machine Learning",
-    "course_code": "",
+    "course_id": "ECO325/525",
+    "code": "",
+    "title": "Econometrics with Machine Learning",
     "credits": 4
   },
   {
-    "course_name": "Large Deep Learning Systems",
-    "course_code": "",
+    "course_id": "CSE589",
+    "code": "",
+    "title": "Large Deep Learning Systems",
     "credits": 4
   },
   {
-    "course_name": "Distribution of Sequences in Number Theory",
-    "course_code": "",
+    "course_id": "MTH519A",
+    "code": "",
+    "title": "Distribution of Sequences in Number Theory",
     "credits": 4
   },
   {
-    "course_name": "Introduction to Bioenergetics",
-    "course_code": "",
+    "course_id": "BIO513",
+    "code": "",
+    "title": "Introduction to Bioenergetics",
     "credits": 4
   },
   {
-    "course_name": "Random walk and Brownian motion",
-    "course_code": "",
+    "course_id": "MTH536",
+    "code": "",
+    "title": "Random walk and Brownian motion",
     "credits": 4
   }
 ]
