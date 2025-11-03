@@ -29,9 +29,17 @@ public class LoginPage extends JFrame {
             System.setProperty("swing.aatext", "true");
         }
 
-        static Font regular(float sz) { return REG.deriveFont(sz); }
-        static Font semibold(float sz) { return SEMI.deriveFont(sz); }
-        static Font bold(float sz) { return BOLD.deriveFont(sz); }
+        static Font regular(float sz) {
+            return REG.deriveFont(sz);
+        }
+
+        static Font semibold(float sz) {
+            return SEMI.deriveFont(sz);
+        }
+
+        static Font bold(float sz) {
+            return BOLD.deriveFont(sz);
+        }
 
         private static Font load(String cp) {
             try (var in = LoginPage.class.getResourceAsStream(cp)) {
@@ -56,7 +64,10 @@ public class LoginPage extends JFrame {
     }
 
     public static void main(String[] args) {
-        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignored) {
+        }
         // ▶ Ensure Inter is loaded & applied globally
         FontKit.init();
         SwingUtilities.invokeLater(() -> new LoginPage().setVisible(true));
@@ -79,7 +90,8 @@ public class LoginPage extends JFrame {
         JPanel body = card.getBody();
         body.setLayout(new GridBagLayout());
         GridBagConstraints gc = new GridBagConstraints();
-        gc.gridx = 0; gc.gridy = 0;
+        gc.gridx = 0;
+        gc.gridy = 0;
         gc.insets = new Insets(8, 18, 0, 18);
         gc.fill = GridBagConstraints.HORIZONTAL;
         gc.weightx = 1;
@@ -133,10 +145,14 @@ public class LoginPage extends JFrame {
         gc.weightx = 0;
         RoundedButton signIn = new RoundedButton("Sign in");
         signIn.setFont(FontKit.bold(18f));
-        signIn.addActionListener(e ->
-                JOptionPane.showMessageDialog(this,
-                        "You clicked Sign in\n\nUsername: " + username.getText(),
-                        "Demo", JOptionPane.INFORMATION_MESSAGE));
+        signIn.addActionListener(e -> {
+            //replace with real auth later
+            SwingUtilities.invokeLater(() -> {
+                new Dashboard("Student 123").setVisible(true);
+                dispose(); // close login window
+            });
+        });
+
         body.add(signIn, gc);
     }
 
@@ -149,7 +165,8 @@ public class LoginPage extends JFrame {
 
     private static ImageIcon loadScaled(String path, int w, int h) {
         try (InputStream in = LoginPage.class.getResourceAsStream(path)) {
-            if (in == null) return null;
+            if (in == null)
+                return null;
             Image img = ImageIO.read(in).getScaledInstance(w, h, Image.SCALE_SMOOTH);
             return new ImageIcon(img);
         } catch (Exception e) {
@@ -163,16 +180,21 @@ public class LoginPage extends JFrame {
 
         BackgroundPanel(String cpPath) {
             try (InputStream in = LoginPage.class.getResourceAsStream(cpPath)) {
-                if (in != null) bg = ImageIO.read(in);
-            } catch (Exception ignored) {}
+                if (in != null)
+                    bg = ImageIO.read(in);
+            } catch (Exception ignored) {
+            }
         }
 
-        @Override protected void paintComponent(Graphics g) {
+        @Override
+        protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            if (bg == null) return;
+            if (bg == null)
+                return;
             int pw = getWidth(), ph = getHeight();
             int iw = bg.getWidth(null), ih = bg.getHeight(null);
-            if (iw <= 0 || ih <= 0) return;
+            if (iw <= 0 || ih <= 0)
+                return;
             double scale = Math.max(pw / (double) iw, ph / (double) ih);
             int dw = (int) (iw * scale), dh = (int) (ih * scale);
             int dx = (pw - dw) / 2, dy = (ph - dh) / 2;
@@ -186,17 +208,25 @@ public class LoginPage extends JFrame {
         private final JPanel body = new JPanel();
 
         LoginCard(int w, int h) {
-            prefW = w; prefH = h;
+            prefW = w;
+            prefH = h;
             setLayout(new GridBagLayout());
             body.setOpaque(false);
             add(body, new GridBagConstraints());
             setOpaque(false);
         }
 
-        JPanel getBody() { return body; }
-        @Override public Dimension getPreferredSize() { return new Dimension(prefW, prefH); }
+        JPanel getBody() {
+            return body;
+        }
 
-        @Override protected void paintComponent(Graphics g) {
+        @Override
+        public Dimension getPreferredSize() {
+            return new Dimension(prefW, prefH);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             int arc = 26, pad = 16;
@@ -225,12 +255,20 @@ public class LoginPage extends JFrame {
             setBorder(new EmptyBorder(12, 16, 12, 16));
             setFont(FontKit.regular(16f)); // Inter Regular
             addFocusListener(new FocusAdapter() {
-                @Override public void focusGained(FocusEvent e) { repaint(); }
-                @Override public void focusLost(FocusEvent e) { repaint(); }
+                @Override
+                public void focusGained(FocusEvent e) {
+                    repaint();
+                }
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    repaint();
+                }
             });
         }
 
-        @Override protected void paintComponent(Graphics g) {
+        @Override
+        protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(new Color(0xD9, 0xD9, 0xD9)); // #D9D9D9
@@ -244,7 +282,7 @@ public class LoginPage extends JFrame {
                 g3.setColor(new Color(140, 148, 160));
                 g3.setFont(getFont());
                 Insets ins = getInsets();
-                g3.drawString(placeholder, ins.left, getHeight()/2 + getFont().getSize()/2 - 3);
+                g3.drawString(placeholder, ins.left, getHeight() / 2 + getFont().getSize() / 2 - 3);
                 g3.dispose();
             }
         }
@@ -261,12 +299,20 @@ public class LoginPage extends JFrame {
             setBorder(new EmptyBorder(12, 16, 12, 16));
             setFont(FontKit.regular(16f)); // Inter Regular
             addFocusListener(new FocusAdapter() {
-                @Override public void focusGained(FocusEvent e) { repaint(); }
-                @Override public void focusLost(FocusEvent e) { repaint(); }
+                @Override
+                public void focusGained(FocusEvent e) {
+                    repaint();
+                }
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    repaint();
+                }
             });
         }
 
-        @Override protected void paintComponent(Graphics g) {
+        @Override
+        protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(new Color(0xD9, 0xD9, 0xD9)); // #D9D9D9
@@ -280,7 +326,7 @@ public class LoginPage extends JFrame {
                 g3.setColor(new Color(140, 148, 160));
                 g3.setFont(getFont());
                 Insets ins = getInsets();
-                g3.drawString(placeholder, ins.left, getHeight()/2 + getFont().getSize()/2 - 3);
+                g3.drawString(placeholder, ins.left, getHeight() / 2 + getFont().getSize() / 2 - 3);
                 g3.dispose();
             }
         }
@@ -303,7 +349,8 @@ public class LoginPage extends JFrame {
             setRolloverEnabled(true);
         }
 
-        @Override protected void paintComponent(Graphics g) {
+        @Override
+        protected void paintComponent(Graphics g) {
             boolean isHover = getModel().isRollover();
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
