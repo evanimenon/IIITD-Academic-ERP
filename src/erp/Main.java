@@ -1,7 +1,7 @@
 package erp;
 
 import javax.swing.*;
-import erp.ui.LoginPage;
+import erp.ui.auth.LoginPage;
 
 public class Main {
     public static void main(String[] args) {
