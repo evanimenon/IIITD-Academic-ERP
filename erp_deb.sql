@@ -11,7 +11,7 @@ USE erp_db;
 -- ────────────────────────────────────────────────────────────────────────────
 -- USERS (external) NOTE:
 -- Your auth DB exists separately. We keep a FK only for INSTRUCTORS since
--- those IDs are BIGINTs matching auth_db.users_auth.user_id in your screenshots.
+-- those IDs are BIGINTs matching auth_db.users_auth.user_id.
 -- Students use alphanumeric IDs → do NOT FK them to auth_db.
 -- ────────────────────────────────────────────────────────────────────────────
 
@@ -29,7 +29,7 @@ CREATE TABLE students (
 -- INSTRUCTORS (FK to auth_db.users_auth.user_id)
 CREATE TABLE instructors (
   instructor_id   BIGINT       NOT NULL,
-  department      VARCHAR(16)  NOT NULL,
+  department      VARCHAR(32)  NOT NULL,
   instructor_name VARCHAR(128) NOT NULL,
   PRIMARY KEY (instructor_id),
   CONSTRAINT fk_instructor_auth
@@ -109,9 +109,13 @@ CREATE TABLE settings (
 -- ────────────────────────────────────────────────────────────────────────────
 -- CSV IMPORTS  (expects CSVs in same directory; first row = headers)
 -- If secure_file_priv blocks loads, run the mysql client with --local-infile=1
+-- Example:
+--   mysql --local-infile=1 -u root -p erp_db < erp_db.sql
 -- ────────────────────────────────────────────────────────────────────────────
 SET SESSION sql_log_bin = 0;
-SET GLOBAL local_infile = 1;
+
+-- You may need:
+-- SET GLOBAL local_infile = 1;
 
 LOAD DATA LOCAL INFILE 'students.csv'
 INTO TABLE students

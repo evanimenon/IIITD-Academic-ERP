@@ -9,6 +9,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 // --- Font utilities ---------------------------------------------------------
 
@@ -18,7 +20,7 @@ public class LoginPage extends JFrame {
         private static Font REG, SEMI, BOLD;
 
         public static void init() {
-            REG = load("/fonts/Inter-Regular.ttf");
+            REG  = load("/fonts/Inter-Regular.ttf");
             SEMI = load("/fonts/Inter-SemiBold.ttf");
             BOLD = load("/fonts/Inter-Bold.ttf");
 
@@ -29,22 +31,15 @@ public class LoginPage extends JFrame {
             System.setProperty("swing.aatext", "true");
         }
 
-        static Font regular(float sz) {
-            return REG.deriveFont(sz);
-        }
-
-        static Font semibold(float sz) {
-            return SEMI.deriveFont(sz);
-        }
-
-        static Font bold(float sz) {
-            return BOLD.deriveFont(sz);
-        }
+        static Font regular(float sz)  { return REG.deriveFont(sz); }
+        static Font semibold(float sz) { return SEMI.deriveFont(sz); }
+        static Font bold(float sz)     { return BOLD.deriveFont(sz); }
 
         private static Font load(String cp) {
-            try (var in = LoginPage.class.getResourceAsStream(cp)) {
+            try (var in = openResource(cp)) {
+                if (in == null) throw new IllegalStateException("font missing: " + cp);
                 var f = Font.createFont(Font.TRUETYPE_FONT, in);
-                java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(f);
+                GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(f);
                 return f;
             } catch (Exception e) {
                 return new Font("SansSerif", Font.PLAIN, 14);
@@ -52,7 +47,7 @@ public class LoginPage extends JFrame {
         }
 
         private static void setUIFont(Font f) {
-            var keys = javax.swing.UIManager.getDefaults().keys();
+            var keys = UIManager.getDefaults().keys();
             while (keys.hasMoreElements()) {
                 Object k = keys.nextElement();
                 Object v = UIManager.get(k);
@@ -63,7 +58,13 @@ public class LoginPage extends JFrame {
         }
     }
 
-    // (Removed the extra main() — entrypoint is erp.Main)
+    // Keep your original main, but ensure DB is initialized when running this directly.
+    public static void main(String[] args) {
+        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
+        FontKit.init();                  // Inter everywhere
+        erp.db.DatabaseConnection.init(); // DB pools so direct run works too
+        SwingUtilities.invokeLater(() -> new LoginPage().setVisible(true));
+    }
 
     public LoginPage() {
         setTitle("IIITD ERP – Sign in");
@@ -71,6 +72,8 @@ public class LoginPage extends JFrame {
         setMinimumSize(new Dimension(1100, 720));
         setLocationRelativeTo(null);
 
+        // IMPORTANT: pass a classpath-friendly path like "/bg_login.png"
+        // The BackgroundPanel now also supports filesystem paths transparently.
         BackgroundPanel bg = new BackgroundPanel("/bg_login.png");
         bg.setLayout(new GridBagLayout());
         setContentPane(bg);
@@ -137,15 +140,44 @@ public class LoginPage extends JFrame {
         gc.weightx = 0;
         RoundedButton signIn = new RoundedButton("Sign in");
         signIn.setFont(FontKit.bold(18f));
-        signIn.addActionListener(e -> {
-            // replace with real auth later
-            SwingUtilities.invokeLater(() -> {
-                new Dashboard("Student 123").setVisible(true);
-                dispose(); // close login window
-            });
-        });
-        // Allow pressing Enter to submit
         getRootPane().setDefaultButton(signIn);
+
+        // REAL AUTH: bcrypt + DB via AuthService (non-blocking)
+        signIn.addActionListener(e -> {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            signIn.setEnabled(false);
+
+            new Thread(() -> {
+                String user = username.getText().trim();
+                char[] pw = password.getPassword();
+                String pwStr = new String(pw);
+                java.util.Arrays.fill(pw, '\0');
+
+                try {
+                    var session = new erp.auth.AuthService().login(user, pwStr);
+
+                    SwingUtilities.invokeLater(() -> {
+                        // Keep your Dashboard — just pass signed-in context
+                        new Dashboard(session.username() + " • " + session.role()).setVisible(true);
+                        dispose();
+                    });
+                } catch (erp.auth.AuthService.AuthException ex) {
+                    SwingUtilities.invokeLater(() ->
+                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Sign in failed", JOptionPane.ERROR_MESSAGE)
+                    );
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    SwingUtilities.invokeLater(() ->
+                        JOptionPane.showMessageDialog(this, "Login error. Check DB connection and credentials.", "Error", JOptionPane.ERROR_MESSAGE)
+                    );
+                } finally {
+                    SwingUtilities.invokeLater(() -> {
+                        signIn.setEnabled(true);
+                        setCursor(Cursor.getDefaultCursor());
+                    });
+                }
+            }, "login-thread").start();
+        });
 
         body.add(signIn, gc);
     }
@@ -157,10 +189,35 @@ public class LoginPage extends JFrame {
         return l;
     }
 
+    // --- Robust resource open helper: tries classpath, then filesystem
+    private static InputStream openResource(String path) {
+        try {
+            // 1) classpath (absolute)
+            InputStream in = LoginPage.class.getResourceAsStream(path);
+            if (in != null) return in;
+
+            // 2) classpath (strip leading '/')
+            String p2 = path.startsWith("/") ? path.substring(1) : path;
+            in = LoginPage.class.getClassLoader().getResourceAsStream(p2);
+            if (in != null) return in;
+
+            // 3) filesystem (absolute or relative)
+            Path fs = Path.of(path);
+            if (Files.exists(fs)) return Files.newInputStream(fs);
+
+            // 4) common fallback if someone passed just "bg_login.png"
+            Path fallback = Path.of("src", "resources", p2);
+            if (Files.exists(fallback)) return Files.newInputStream(fallback);
+
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private static ImageIcon loadScaled(String path, int w, int h) {
-        try (InputStream in = LoginPage.class.getResourceAsStream(path)) {
-            if (in == null)
-                return null;
+        try (InputStream in = openResource(path)) {
+            if (in == null) return null;
             Image img = ImageIO.read(in).getScaledInstance(w, h, Image.SCALE_SMOOTH);
             return new ImageIcon(img);
         } catch (Exception e) {
@@ -172,23 +229,20 @@ public class LoginPage extends JFrame {
     static class BackgroundPanel extends JPanel {
         private Image bg;
 
-        BackgroundPanel(String cpPath) {
-            try (InputStream in = LoginPage.class.getResourceAsStream(cpPath)) {
-                if (in != null)
-                    bg = ImageIO.read(in);
-            } catch (Exception ignored) {
-            }
+        BackgroundPanel(String path) {
+            try (InputStream in = openResource(path)) {
+                if (in != null) bg = ImageIO.read(in);
+            } catch (Exception ignored) {}
+            setOpaque(true);
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            if (bg == null)
-                return;
+            if (bg == null) return;
             int pw = getWidth(), ph = getHeight();
             int iw = bg.getWidth(null), ih = bg.getHeight(null);
-            if (iw <= 0 || ih <= 0)
-                return;
+            if (iw <= 0 || ih <= 0) return;
             double scale = Math.max(pw / (double) iw, ph / (double) ih);
             int dw = (int) (iw * scale), dh = (int) (ih * scale);
             int dx = (pw - dw) / 2, dy = (ph - dh) / 2;
@@ -210,14 +264,9 @@ public class LoginPage extends JFrame {
             setOpaque(false);
         }
 
-        JPanel getBody() {
-            return body;
-        }
+        JPanel getBody() { return body; }
 
-        @Override
-        public Dimension getPreferredSize() {
-            return new Dimension(prefW, prefH);
-        }
+        @Override public Dimension getPreferredSize() { return new Dimension(prefW, prefH); }
 
         @Override
         protected void paintComponent(Graphics g) {
@@ -249,15 +298,8 @@ public class LoginPage extends JFrame {
             setBorder(new EmptyBorder(12, 16, 12, 16));
             setFont(FontKit.regular(16f)); // Inter Regular
             addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                    repaint();
-                }
-
-                @Override
-                public void focusLost(FocusEvent e) {
-                    repaint();
-                }
+                @Override public void focusGained(FocusEvent e) { repaint(); }
+                @Override public void focusLost(FocusEvent e)   { repaint(); }
             });
         }
 
@@ -293,15 +335,8 @@ public class LoginPage extends JFrame {
             setBorder(new EmptyBorder(12, 16, 12, 16));
             setFont(FontKit.regular(16f)); // Inter Regular
             addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                    repaint();
-                }
-
-                @Override
-                public void focusLost(FocusEvent e) {
-                    repaint();
-                }
+                @Override public void focusGained(FocusEvent e) { repaint(); }
+                @Override public void focusLost(FocusEvent e)   { repaint(); }
             });
         }
 

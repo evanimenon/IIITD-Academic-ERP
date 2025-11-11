@@ -1,3 +1,18 @@
 # AP-Project
 
-<img width="1496" height="967" alt="Screenshot 2025-11-03 at 23 34 32" src="https://github.com/user-attachments/assets/fc2e0b01-dced-48c4-b1c0-a1e988e0c774" />
+
+
+# compile (from project root)
+find src -name "*.java" > sources.txt
+javac -cp "src:lib/*" -d out @sources.txt
+
+# run importer
+java -cp "out:lib/*" erp.tools.ImportUsersCsv ./auth_db.csv
+
+# run
+java -cp "out:lib/*:src/resources" erp.Main
+
+# demo
+Admin	admin1	admin@123
+Instructor	inst1 (or sambuddho, payel, etc.)	inst@123
+Student	stu1 / stu2	stud@123
