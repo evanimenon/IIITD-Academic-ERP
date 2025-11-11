@@ -1,96 +1,180 @@
-CREATE DATABASE IF NOT EXISTS erp_db;
+-- bootstrap.sql — ERP DB (portable, CSV-driven)
+-- MySQL 8.x recommended
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP DATABASE IF EXISTS erp_db;
+CREATE DATABASE erp_db CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 USE erp_db;
 
--- STUDENTS (link to auth_db users_auth.user_id)
+-- ────────────────────────────────────────────────────────────────────────────
+-- USERS (external) NOTE:
+-- Your auth DB exists separately. We keep a FK only for INSTRUCTORS since
+-- those IDs are BIGINTs matching auth_db.users_auth.user_id in your screenshots.
+-- Students use alphanumeric IDs → do NOT FK them to auth_db.
+-- ────────────────────────────────────────────────────────────────────────────
+
+-- STUDENTS  (IDs like 'aadi24001', etc.)
 CREATE TABLE students (
-  student_id BIGINT PRIMARY KEY,
-  roll_no VARCHAR(32) NOT NULL UNIQUE,
-  program VARCHAR(64) NOT NULL,
-  year SMALLINT NOT NULL,
-  FOREIGN KEY (student_id) REFERENCES auth_db.users_auth(user_id)
-);
+  student_id VARCHAR(64)  NOT NULL,
+  roll_no    VARCHAR(32)  NOT NULL,
+  full_name  VARCHAR(128) NULL,
+  program    VARCHAR(64)  NOT NULL,
+  year       SMALLINT     NOT NULL,
+  PRIMARY KEY (student_id),
+  UNIQUE KEY uq_students_roll (roll_no)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- INSTRUCTORS (link to auth_db)
+-- INSTRUCTORS (FK to auth_db.users_auth.user_id)
 CREATE TABLE instructors (
-  instructor_id BIGINT PRIMARY KEY,
-  department VARCHAR(64) NOT NULL,
-  FOREIGN KEY (instructor_id) REFERENCES auth_db.users_auth(user_id)
-);
+  instructor_id   BIGINT       NOT NULL,
+  department      VARCHAR(16)  NOT NULL,
+  instructor_name VARCHAR(128) NOT NULL,
+  PRIMARY KEY (instructor_id),
+  CONSTRAINT fk_instructor_auth
+    FOREIGN KEY (instructor_id)
+    REFERENCES auth_db.users_auth(user_id)
+    ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- COURSES (IIIT-style list)
+-- COURSES (course_id like 'BIO101'; code = acronym like 'FOB')
 CREATE TABLE courses (
-  course_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  code VARCHAR(16) NOT NULL UNIQUE,
-  title VARCHAR(128) NOT NULL,
-  credits DECIMAL(3,1) NOT NULL
-);
+  course_id VARCHAR(32)  NOT NULL,
+  code      VARCHAR(16)  NOT NULL,
+  title     VARCHAR(256) NOT NULL,
+  credits   INT          NOT NULL,
+  PRIMARY KEY (course_id),
+  KEY idx_courses_code (code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- SECTIONS (each course taught by an instructor)
+-- SECTIONS
 CREATE TABLE sections (
-  section_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  course_id BIGINT NOT NULL,
-  instructor_id BIGINT NOT NULL,
-  day_time VARCHAR(64) NOT NULL,
-  room VARCHAR(32) NOT NULL,
-  capacity INT NOT NULL,
-  semester VARCHAR(16) NOT NULL,
-  year SMALLINT NOT NULL,
-  FOREIGN KEY (course_id) REFERENCES courses(course_id),
-  FOREIGN KEY (instructor_id) REFERENCES instructors(instructor_id)
-);
+  section_id    INT NOT NULL AUTO_INCREMENT,
+  course_id     VARCHAR(32) NOT NULL,
+  instructor_id BIGINT      NOT NULL,
+  day_time      VARCHAR(64) NOT NULL,
+  room          VARCHAR(32) DEFAULT NULL,
+  capacity      INT         NOT NULL,
+  semester      VARCHAR(32) NOT NULL,
+  year          INT         NOT NULL,
+  PRIMARY KEY (section_id),
+  KEY fk_section_course     (course_id),
+  KEY fk_section_instructor (instructor_id),
+  CONSTRAINT fk_section_course
+    FOREIGN KEY (course_id)     REFERENCES courses(course_id)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT fk_section_instructor
+    FOREIGN KEY (instructor_id) REFERENCES instructors(instructor_id)
+    ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Example instructors (these IDs MUST match users in auth_db)
--- Assume: admin1=1, inst1=2, inst2=3, stu1=4, stu2=5, stu3=6
-INSERT INTO instructors VALUES
-(2, 'CSE'),
-(3, 'CSE');
-
--- SECTIONS for Spring 2026
-INSERT INTO sections(course_id, instructor_id, day_time, room, capacity, semester, year) VALUES
-(1, 2, 'Mon/Wed 10:00-11:30', 'R101', 40, 'Spring', 2026), -- DSA by inst1
-(2, 3, 'Tue/Thu 09:00-10:30', 'R202', 40, 'Spring', 2026), -- IP by inst2
-(3, 2, 'Mon/Wed 14:00-15:30', 'R105', 35, 'Spring', 2026), -- OS by inst1
-(4, 3, 'Tue/Thu 12:00-13:30', 'R301', 35, 'Spring', 2026), -- DBMS by inst2
-(5, 2, 'Fri 10:00-12:00', 'R210', 50, 'Spring', 2026),     -- Discrete Math
-(6, 3, 'Wed 16:00-17:00', 'R120', 60, 'Spring', 2026);     -- Communication Skills
-
--- STUDENTS (link to auth_db users_auth.user_id)
-INSERT INTO students VALUES
-(4, 'MT202501', 'B.Tech CSE', 1),
-(5, 'MT202502', 'B.Tech CSE', 1),
-(6, 'MT202503', 'B.Tech CSE', 1);
-
--- ENROLLMENTS (students registering for courses)
+-- ENROLLMENTS
 CREATE TABLE enrollments (
-  enrollment_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  student_id BIGINT NOT NULL,
-  section_id BIGINT NOT NULL,
-  status ENUM('REGISTERED','DROPPED','COMPLETED') DEFAULT 'REGISTERED',
-  UNIQUE (student_id, section_id),
-  FOREIGN KEY (student_id) REFERENCES students(student_id),
-  FOREIGN KEY (section_id) REFERENCES sections(section_id)
-);
+  enrollment_id INT NOT NULL AUTO_INCREMENT,
+  student_id    VARCHAR(64) NOT NULL,
+  section_id    INT         NOT NULL,
+  status ENUM('REGISTERED','DROPPED') NOT NULL DEFAULT 'REGISTERED',
+  PRIMARY KEY (enrollment_id),
+  UNIQUE KEY uq_student_section (student_id, section_id),
+  KEY idx_enr_student (student_id),
+  KEY idx_enr_section (section_id),
+  CONSTRAINT fk_enr_student
+    FOREIGN KEY (student_id) REFERENCES students(student_id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_enr_section
+    FOREIGN KEY (section_id) REFERENCES sections(section_id)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO enrollments(student_id, section_id) VALUES
-(4,1),(4,2),(4,3),(4,5),
-(5,1),(5,4),(5,6),
-(6,2),(6,3),(6,5),(6,6);
-
--- GRADES (per-assessment coinstructorsmponent)
+-- GRADES (one row per component; composite PK)
 CREATE TABLE grades (
-  grade_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  enrollment_id BIGINT NOT NULL,
-  component VARCHAR(32) NOT NULL,
-  score DECIMAL(6,2) NOT NULL,
-  final_grade VARCHAR(4),
-  UNIQUE (enrollment_id, component),
-  FOREIGN KEY (enrollment_id) REFERENCES enrollments(enrollment_id)
-);
+  enrollment_id INT NOT NULL,
+  component     VARCHAR(64) NOT NULL, -- Quiz1, Midterm, EndSem, etc.
+  score         DECIMAL(5,2) NULL,
+  final_grade   VARCHAR(8)  NULL,     -- e.g., A, A-, B+
+  PRIMARY KEY (enrollment_id, component),
+  CONSTRAINT fk_grades_enr
+    FOREIGN KEY (enrollment_id) REFERENCES enrollments(enrollment_id)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- SETTINGS (maintenance mode toggle)
+-- SETTINGS
 CREATE TABLE settings (
-  `key` VARCHAR(64) PRIMARY KEY,
-  `value` VARCHAR(64) NOT NULL
-);
+  `key`   VARCHAR(64)  NOT NULL,
+  `value` VARCHAR(256) NULL,
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO settings VALUES ('maintenance_on','false');
+-- ────────────────────────────────────────────────────────────────────────────
+-- CSV IMPORTS  (expects CSVs in same directory; first row = headers)
+-- If secure_file_priv blocks loads, run the mysql client with --local-infile=1
+-- ────────────────────────────────────────────────────────────────────────────
+SET SESSION sql_log_bin = 0;
+SET GLOBAL local_infile = 1;
+
+LOAD DATA LOCAL INFILE 'students.csv'
+INTO TABLE students
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(student_id, roll_no, full_name, program, year);
+
+LOAD DATA LOCAL INFILE 'instructors.csv'
+INTO TABLE instructors
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(instructor_id, department, instructor_name);
+
+LOAD DATA LOCAL INFILE 'courses.csv'
+INTO TABLE courses
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(course_id, code, title, credits);
+
+-- sections.csv may or may not include section_id; we handle blank → AUTO_INCREMENT
+LOAD DATA LOCAL INFILE 'sections.csv'
+INTO TABLE sections
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(@sid, course_id, instructor_id, day_time, room, capacity, semester, year)
+SET section_id = NULLIF(@sid,'');
+
+-- enrollments.csv: enrollment_id (optional), student_id, section_id, status
+LOAD DATA LOCAL INFILE 'enrollments.csv'
+INTO TABLE enrollments
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(@eid, student_id, section_id, @st)
+SET enrollment_id = NULLIF(@eid,''),
+    status        = IFNULL(NULLIF(@st,''),'REGISTERED');
+
+-- grades.csv: enrollment_id, component, score, final_grade
+LOAD DATA LOCAL INFILE 'grades.csv'
+INTO TABLE grades
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(enrollment_id, component, @sc, @fg)
+SET score = NULLIF(@sc,''), final_grade = NULLIF(@fg,'');
+
+-- settings.csv: key,value
+LOAD DATA LOCAL INFILE 'settings.csv'
+INTO TABLE settings
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(`key`,`value`);
+
+SET FOREIGN_KEY_CHECKS = 1;
