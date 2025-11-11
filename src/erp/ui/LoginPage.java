@@ -63,15 +63,7 @@ public class LoginPage extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ignored) {
-        }
-        // ▶ Ensure Inter is loaded & applied globally
-        FontKit.init();
-        SwingUtilities.invokeLater(() -> new LoginPage().setVisible(true));
-    }
+    // (Removed the extra main() — entrypoint is erp.Main)
 
     public LoginPage() {
         setTitle("IIITD ERP – Sign in");
@@ -146,12 +138,14 @@ public class LoginPage extends JFrame {
         RoundedButton signIn = new RoundedButton("Sign in");
         signIn.setFont(FontKit.bold(18f));
         signIn.addActionListener(e -> {
-            //replace with real auth later
+            // replace with real auth later
             SwingUtilities.invokeLater(() -> {
                 new Dashboard("Student 123").setVisible(true);
                 dispose(); // close login window
             });
         });
+        // Allow pressing Enter to submit
+        getRootPane().setDefaultButton(signIn);
 
         body.add(signIn, gc);
     }

@@ -1,15 +1,29 @@
 package erp.db;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import javax.sql.DataSource;
 
-public class DatabaseConnection {
-    private static final String URL = "jdbc:mysql://localhost:3306/erp_db";
-    private static final String USER = "root";  // replace with your username
-    private static final String PASSWORD = "yourpassword";
+public final class DatabaseConnection {
+    private static HikariDataSource authDs;
+    private static HikariDataSource erpDs;
 
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+    public static void init() {
+        HikariConfig authCfg = new HikariConfig();
+        authCfg.setJdbcUrl("jdbc:mysql://localhost:3306/auth_db");
+        authCfg.setUsername("auth_user");
+        authCfg.setPassword("secret");
+        authCfg.setMaximumPoolSize(5);
+        authDs = new HikariDataSource(authCfg);
+
+        HikariConfig erpCfg = new HikariConfig();
+        erpCfg.setJdbcUrl("jdbc:mysql://localhost:3306/erp_db");
+        erpCfg.setUsername("erp_user");
+        erpCfg.setPassword("secret");
+        erpCfg.setMaximumPoolSize(5);
+        erpDs = new HikariDataSource(erpCfg);
     }
+
+    public static DataSource auth() { return authDs; }
+    public static DataSource erp()  { return erpDs; }
 }
