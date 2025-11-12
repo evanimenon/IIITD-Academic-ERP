@@ -10,8 +10,7 @@ import java.awt.*;
 
 import erp.ui.auth.LoginPage;
 import erp.ui.common.FontKit;
-import erp.ui.common.Dashboard;
-import erp.ui.common.Dashboard.NavButton;
+import erp.ui.student.Dashboard.NavButton;
 
 public class CourseCatalogue extends JFrame {
     // Palette

@@ -1,12 +1,12 @@
-package erp.ui.common;
+package erp.ui.admin;
 
 import erp.ui.auth.*;
 import erp.ui.common.FontKit;
-import erp.ui.student.CourseCatalogue;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
@@ -18,10 +18,84 @@ public class Dashboard extends JFrame {
     private static final Color TEAL_DARK = new Color(39, 96, 92);
     private static final Color TEAL = new Color(28, 122, 120);
     private static final Color TEAL_LIGHT = new Color(55, 115, 110);
-    private static final Color BG = new Color(246, 247, 248); // light app bg
+    private static final Color BG = new Color(246, 247, 248);
     private static final Color TEXT_900 = new Color(24, 30, 37);
     private static final Color TEXT_600 = new Color(100, 116, 139);
     private static final Color CARD = Color.WHITE;
+
+    private static boolean MAINTENANCE_MODE = false;
+
+    private RoundedPanel actionCard(String title, String desc, Runnable onClick) {
+        RoundedPanel card = new RoundedPanel(20);
+        card.setBackground(CARD);
+        card.setLayout(new BorderLayout());
+        card.setBorder(new EmptyBorder(20, 24, 20, 24));
+
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(FontKit.bold(18f));
+        titleLabel.setForeground(TEXT_900);
+
+        JLabel descLabel = new JLabel("<html><p style='width:240px;'>" + desc + "</p></html>");
+        descLabel.setFont(FontKit.regular(14f));
+        descLabel.setForeground(TEXT_600);
+
+        card.add(titleLabel, BorderLayout.NORTH);
+        card.add(descLabel, BorderLayout.CENTER);
+
+        // hover + click behavior
+        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        card.addMouseListener(new MouseAdapter() {
+            Color normal = CARD;
+            Color hover = new Color(238, 241, 245);
+            @Override public void mouseEntered(MouseEvent e) { 
+                card.setBackground(hover); card.repaint(); 
+            }
+            @Override public void mouseExited(MouseEvent e) { 
+                card.setBackground(normal); card.repaint(); 
+            }
+            @Override public void mouseClicked(MouseEvent e) {
+                onClick.run(); 
+            }
+        });
+
+        return card;
+    }
+
+    private RoundedPanel maintenanceCard() {
+        RoundedPanel card = new RoundedPanel(20);
+        card.setBackground(CARD);
+        card.setLayout(new BorderLayout());
+        card.setBorder(new EmptyBorder(20, 24, 20, 24));
+
+        JLabel label = new JLabel("🔧 Maintenance Mode");
+        label.setFont(FontKit.bold(18f));
+        label.setForeground(TEXT_900);
+
+        JLabel status = new JLabel(MAINTENANCE_MODE ? "ON" : "OFF", SwingConstants.RIGHT);
+        status.setFont(FontKit.semibold(16f));
+        status.setForeground(MAINTENANCE_MODE ? new Color(34, 197, 94) : new Color(229, 72, 77));
+
+        card.add(label, BorderLayout.WEST);
+        card.add(status, BorderLayout.EAST);
+
+        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        card.addMouseListener(new MouseAdapter() {
+            Color normal = CARD;
+            Color hover = new Color(238, 241, 245);
+            @Override public void mouseEntered(MouseEvent e) { card.setBackground(hover); card.repaint(); }
+            @Override public void mouseExited(MouseEvent e) { card.setBackground(normal); card.repaint(); }
+            @Override public void mouseClicked(MouseEvent e) {
+                MAINTENANCE_MODE = !MAINTENANCE_MODE;
+                status.setText(MAINTENANCE_MODE ? "ON" : "OFF");
+                status.setForeground(MAINTENANCE_MODE ? new Color(34, 197, 94) : new Color(229, 72, 77));
+                JOptionPane.showMessageDialog(card, "Maintenance mode " +
+                        (MAINTENANCE_MODE ? "enabled" : "disabled"));
+            }
+        });
+
+        return card;
+    }
+
 
     public Dashboard(String userDisplayName) {
         setTitle("IIITD ERP – Dashboard");
@@ -95,30 +169,20 @@ public class Dashboard extends JFrame {
         nav.setBorder(new EmptyBorder(16, 0, 16, 0));
 
         // Navigation Links
-        NavButton homeBtn = new NavButton("  🏠  Home", true);
-        nav.add(homeBtn);
-        homeBtn.addActionListener(e -> {
-            SwingUtilities.invokeLater(() -> {
-                new Dashboard(userDisplayName).setVisible(true);
-                dispose();
-            });
-        });
+
+        nav.add(new NavButton("🏠 Dashboard", true));
         nav.add(Box.createVerticalStrut(8));
-        
-        // Highlighted button for current page
-        NavButton courseCatalogueBtn = new NavButton("  📚  Course Catalogue", false);
-        nav.add(courseCatalogueBtn);
-        courseCatalogueBtn.addActionListener(e -> {
-            SwingUtilities.invokeLater(() -> {
-                new CourseCatalogue(userDisplayName).setVisible(true);
-                dispose();
-            });
-        });
+        NavButton addUserBtn = new NavButton("👤 Add User", false);
+        addUserBtn.addActionListener(e -> new AddUser(userDisplayName).setVisible(true));
+        nav.add(addUserBtn);
+        nav.add(new NavButton("📘 Manage Courses", false));
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("  📜  My Registrations", false));
+        nav.add(new NavButton("👨 Assign Instructor", false));
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("  🗺️  Time Table", false));
-        nav.add(Box.createVerticalStrut(40)); // Increased vertical space
+        nav.add(new NavButton("🔧 Maintenance Mode", false));
+        nav.add(Box.createVerticalStrut(8));
+        nav.add(new NavButton("💾 Backup / Restore", false));
+
         
         // Separator
         nav.add(new JSeparator() {{ 
@@ -128,7 +192,6 @@ public class Dashboard extends JFrame {
             setAlignmentX(Component.CENTER_ALIGNMENT);
         }});
         nav.add(Box.createVerticalStrut(40));
-
         nav.add(new NavButton("  ⚙️  Settings", false));
         nav.add(Box.createVerticalStrut(8));
         nav.add(new NavButton("  🚪  Log Out", false)); // Used door emoji for log out
@@ -166,10 +229,11 @@ public class Dashboard extends JFrame {
         h1.setFont(FontKit.bold(34f));
         heroLeft.add(h1);
 
-        JLabel subtitle = new JLabel("Always stay updated in your student portal");
+        JLabel subtitle = new JLabel("Manage users, courses, and system maintenance");
         subtitle.setForeground(new Color(210, 233, 229));
         subtitle.setFont(FontKit.regular(16f));
         heroLeft.add(subtitle);
+
 
         hero.add(heroLeft, BorderLayout.CENTER);
 
@@ -188,40 +252,24 @@ public class Dashboard extends JFrame {
         heroCircle.setOpaque(false);
         hero.add(heroCircle, BorderLayout.EAST);
 
-        // Center content area (scroll)
-        JPanel content = new JPanel();
-        content.setOpaque(false);
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setBorder(new EmptyBorder(20, 0, 0, 0));
+        // ---- Content (Quick Actions) ----
+        JPanel quick = new JPanel(new GridLayout(2, 2, 20, 20));
+        quick.setOpaque(false);
+        quick.setBorder(new EmptyBorder(30, 0, 0, 0));
 
-        // "Your Courses" section
-        JLabel secTitle = new JLabel("Your Courses");
-        secTitle.setFont(FontKit.bold(22f));
-        secTitle.setForeground(TEXT_900);
-        content.add(secTitle);
+        quick.add(actionCard("👤 Add New User", "Create student/instructor/admin accounts", () -> {
+            new AddUser(userDisplayName).setVisible(true);
+        }));
 
-        JSeparator sep = new JSeparator();
-        sep.setForeground(new Color(210, 213, 218));
-        sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-        sep.setBorder(new EmptyBorder(10, 0, 10, 0));
-        content.add(sep);
+        quick.add(actionCard("📘 Manage Courses", "Create or edit courses and sections", () ->
+                JOptionPane.showMessageDialog(this, "Open Manage Courses panel")));
 
-        RoundedPanel coursesCard = new RoundedPanel(16);
-        coursesCard.setBackground(CARD);
-        coursesCard.setBorder(new EmptyBorder(20, 20, 20, 20));
-        coursesCard.setLayout(new BorderLayout());
-        JLabel empty = new JLabel(
-                "<html><b>You haven’t enrolled in any courses yet.</b> Enroll in some courses to get started…</html>");
-        empty.setForeground(TEXT_600);
-        empty.setFont(FontKit.semibold(14f));
-        coursesCard.add(empty, BorderLayout.CENTER);
-        content.add(coursesCard);
+        quick.add(actionCard("👨 Assign Instructor", "Link instructors to sections", () ->
+                JOptionPane.showMessageDialog(this, "Open Assign Instructor panel")));
 
-        main.add(new JScrollPane(content) {{
-            setBorder(null);
-            getVerticalScrollBar().setUnitIncrement(16);
-            setBackground(BG);
-        }}, BorderLayout.CENTER);
+        quick.add(maintenanceCard());
+
+        main.add(quick, BorderLayout.CENTER);
     }
 
     private static String todayString() {
@@ -285,6 +333,6 @@ public class Dashboard extends JFrame {
     public static void main(String[] args) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
         FontKit.init();
-        SwingUtilities.invokeLater(() -> new Dashboard("Student 123").setVisible(true));
+        SwingUtilities.invokeLater(() -> new Dashboard("Admin 123").setVisible(true));
     }
 }
