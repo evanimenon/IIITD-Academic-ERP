@@ -1,7 +1,7 @@
 package erp.ui.common;
 
 import erp.ui.auth.*;
-import erp.ui.auth.LoginPage.FontKit;
+import erp.ui.common.FontKit;
 import erp.ui.student.CourseCatalogue;
 
 import javax.swing.*;
@@ -157,18 +157,18 @@ public class Dashboard extends JFrame {
 
         JLabel date = new JLabel(todayString());
         date.setForeground(new Color(196, 234, 229));
-        date.setFont(LoginPage.FontKit.semibold(14f));
+        date.setFont(FontKit.semibold(14f));
         heroLeft.add(date);
         heroLeft.add(Box.createVerticalStrut(8));
 
         JLabel h1 = new JLabel("Welcome Back " + userDisplayName + "!");
         h1.setForeground(Color.WHITE);
-        h1.setFont(LoginPage.FontKit.bold(34f));
+        h1.setFont(FontKit.bold(34f));
         heroLeft.add(h1);
 
         JLabel subtitle = new JLabel("Always stay updated in your student portal");
         subtitle.setForeground(new Color(210, 233, 229));
-        subtitle.setFont(LoginPage.FontKit.regular(16f));
+        subtitle.setFont(FontKit.regular(16f));
         heroLeft.add(subtitle);
 
         hero.add(heroLeft, BorderLayout.CENTER);
@@ -196,7 +196,7 @@ public class Dashboard extends JFrame {
 
         // "Your Courses" section
         JLabel secTitle = new JLabel("Your Courses");
-        secTitle.setFont(LoginPage.FontKit.bold(22f));
+        secTitle.setFont(FontKit.bold(22f));
         secTitle.setForeground(TEXT_900);
         content.add(secTitle);
 
@@ -213,7 +213,7 @@ public class Dashboard extends JFrame {
         JLabel empty = new JLabel(
                 "<html><b>You haven’t enrolled in any courses yet.</b> Enroll in some courses to get started…</html>");
         empty.setForeground(TEXT_600);
-        empty.setFont(LoginPage.FontKit.semibold(14f));
+        empty.setFont(FontKit.semibold(14f));
         coursesCard.add(empty, BorderLayout.CENTER);
         content.add(coursesCard);
 
@@ -265,7 +265,7 @@ public class Dashboard extends JFrame {
             setContentAreaFilled(false);
             setOpaque(false);
             setForeground(Color.WHITE);
-            setFont(LoginPage.FontKit.semibold(16f));
+            setFont(FontKit.semibold(16f));
             setBorder(new EmptyBorder(10, 14, 10, 14));
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         }
@@ -284,7 +284,7 @@ public class Dashboard extends JFrame {
     // Quick manual launch
     public static void main(String[] args) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
-        LoginPage.FontKit.init();
+        FontKit.init();
         SwingUtilities.invokeLater(() -> new Dashboard("Student 123").setVisible(true));
     }
 }

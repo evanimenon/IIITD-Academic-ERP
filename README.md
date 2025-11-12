@@ -6,6 +6,12 @@
 find src -name "*.java" > sources.txt
 javac -cp "src:lib/*" -d out @sources.txt
 
+# in cmd.exe
+mkdir bin/del files.txt
+for /R src %f in (*.java) do @echo %f >> files.txt
+javac -cp ".;lib/*" -d bin @files.txt
+java -cp "bin;lib/*" erp.ui.auth.LoginPage
+
 # run importer
 java -cp "out:lib/*" erp.tools.ImportUsersCsv ./auth_db.csv
 

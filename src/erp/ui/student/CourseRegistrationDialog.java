@@ -3,7 +3,7 @@ package erp.ui.student;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import erp.ui.auth.LoginPage.FontKit;
+import erp.ui.common.FontKit;
 
 public class CourseRegistrationDialog extends JDialog {
     private static final Color TEAL_DARK = new Color(39, 96, 92);

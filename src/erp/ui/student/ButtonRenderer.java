@@ -4,14 +4,15 @@ import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
-import erp.ui.auth.LoginPage.FontKit;
+import erp.ui.auth.LoginPage;
+import erp.ui.common.FontKit;
 
 public class ButtonRenderer extends JButton implements TableCellRenderer {
     private static final Color TEAL_DARK = new Color(39, 96, 92);
     
     public ButtonRenderer() {
         setOpaque(true);
-        setFont(LoginPage.FontKit.semibold(14f));
+        setFont(FontKit.semibold(14f));
         setForeground(Color.WHITE);
         setBackground(TEAL_DARK);
         setFocusPainted(false);

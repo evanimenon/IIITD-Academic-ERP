@@ -7,7 +7,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 import java.awt.*;
-import erp.ui.auth.LoginPage.FontKit;
+
+import erp.ui.auth.LoginPage;
+import erp.ui.common.FontKit;
 import erp.ui.common.Dashboard;
 import erp.ui.common.Dashboard.NavButton;
 
@@ -19,7 +21,7 @@ public class CourseCatalogue extends JFrame {
     private static final Color BORDER_COLOR = new Color(230, 233, 236);
 
     public CourseCatalogue(String userDisplayName) {
-        LoginPage.FontKit.init(); 
+        FontKit.init(); 
 
         setTitle("Course Catalogue");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -158,7 +160,7 @@ public class CourseCatalogue extends JFrame {
         table.setShowVerticalLines(false);
         table.setShowHorizontalLines(true);
         table.setGridColor(BORDER_COLOR);
-        table.setFont(LoginPage.FontKit.regular(15f));
+        table.setFont(FontKit.regular(15f));
         table.setBackground(Color.WHITE); // Ensure table background is white
         
         // --- Header Styling & FIX for Visibility ---
@@ -166,7 +168,7 @@ public class CourseCatalogue extends JFrame {
         header.setBackground(TEAL_DARK);
         header.setForeground(Color.WHITE);
         // FIX: Using a known-good FontKit to prevent rendering failure
-        header.setFont(LoginPage.FontKit.bold(16f)); 
+        header.setFont(FontKit.bold(16f)); 
         header.setPreferredSize(new Dimension(table.getWidth(), 55)); // Force header height
         header.setReorderingAllowed(false);
         header.setResizingAllowed(true);
@@ -200,7 +202,7 @@ public class CourseCatalogue extends JFrame {
     }
 
     public static void main(String[] args) {
-        LoginPage.FontKit.init();
+        FontKit.init();
         SwingUtilities.invokeLater(() -> new CourseCatalogue("Student 123").setVisible(true));
     }
 }
