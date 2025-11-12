@@ -10,6 +10,7 @@ javac -cp "src:lib/*" -d out @sources.txt
 mkdir bin/del files.txt
 for /R src %f in (*.java) do @echo %f >> files.txt
 javac -cp ".;lib/*" -d bin @files.txt
+xcopy src\resources bin\resources /E /I /Y   (this fixed the images not showing up)
 java -cp "bin;lib/*" erp.ui.auth.LoginPage
 
 # run importer

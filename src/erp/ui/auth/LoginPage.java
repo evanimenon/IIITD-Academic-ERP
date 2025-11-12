@@ -791,10 +791,13 @@ public class LoginPage extends JFrame {
         setMinimumSize(new Dimension(1100, 720));
         setLocationRelativeTo(null);
 
-        BackgroundPanel bg = new BackgroundPanel("bg_login.png");
+        // --- Change 1: Check resource path ---
+        // Ensure /bg_login.png is available in the classpath (e.g., in the same package directory)
+        BackgroundPanel bg = new BackgroundPanel("/resources/bg_login.png");
         bg.setLayout(new GridBagLayout());
         setContentPane(bg);
 
+        // --- Change 2: LoginCard improvement applied in its inner class definition ---
         LoginCard card = new LoginCard(450, 500);
         GridBagConstraints rootGc = new GridBagConstraints();
         bg.add(card, rootGc);
@@ -811,7 +814,8 @@ public class LoginPage extends JFrame {
         // Logo
         JPanel logoRow = new JPanel(new FlowLayout(FlowLayout.LEFT,0,0));
         logoRow.setOpaque(false);
-        JLabel logo = new JLabel(loadScaled("iiitd_logo.png", 350, 80));
+        // --- Change 3: Added better error logging in loadScaled method ---
+        JLabel logo = new JLabel(loadScaled("/resources/iiitd_logo.png", 350, 80));
         if (logo.getIcon() != null) {
             logoRow.add(logo);
             body.add(logoRow, gc);
@@ -901,6 +905,7 @@ public class LoginPage extends JFrame {
     }
 
     // ---------------------- Helpers ----------------------
+    
     private static JLabel subtleLabel(String txt) {
         JLabel l = new JLabel(txt);
         l.setForeground(new Color(75,85,99));
@@ -910,10 +915,14 @@ public class LoginPage extends JFrame {
 
     private static ImageIcon loadScaled(String path,int w,int h) {
         try(InputStream in = LoginPage.class.getResourceAsStream(path)) {
-            if (in==null) return null;
             Image img = ImageIO.read(in).getScaledInstance(w,h,Image.SCALE_SMOOTH);
             return new ImageIcon(img);
-        } catch(Exception e){return null;}
+        } 
+        catch(Exception e){
+            System.err.println("Error loading image: " + path);
+            e.printStackTrace();
+            return null;
+        }
     }
 
     // ---------------------- Inner Classes ----------------------
@@ -922,8 +931,16 @@ public class LoginPage extends JFrame {
         private Image bg;
         BackgroundPanel(String cpPath){
             try(InputStream in = LoginPage.class.getResourceAsStream(cpPath)){
-                if(in!=null) bg = ImageIO.read(in);
-            }catch(Exception ignored){}
+                if(in!=null){
+                    bg = ImageIO.read(in);
+                    revalidate();
+                    repaint();
+                }
+            }
+            catch(Exception e){
+                System.err.println("Error loading background image: " + cpPath);
+                e.printStackTrace();
+            }
         }
         @Override
         protected void paintComponent(Graphics g){
@@ -954,27 +971,39 @@ public class LoginPage extends JFrame {
         @Override protected void paintComponent(Graphics g){
             Graphics2D g2=(Graphics2D)g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-            int arc=26,pad=16;
-            int w=getWidth(),h=getHeight();
-            for(int i=6;i>=1;i--){
-                float alpha=0.035f*(i/6f);
+            int arc=26, pad=16;
+            int w=getWidth(), h=getHeight();
+            
+            // Draw a subtle, darker shadow for better contrast and depth
+            for(int i=3;i>=1;i--){
+                float alpha=0.08f * (i/3f); // Increased alpha for a darker shadow
                 g2.setColor(new Color(0,0,0,alpha));
                 g2.fill(new RoundRectangle2D.Double(pad-i,pad-i,w-2*pad+2*i,h-2*pad+2*i,arc+i,arc+i));
             }
+            
+            // Draw the main white card
             g2.setColor(Color.WHITE);
             g2.fill(new RoundRectangle2D.Double(pad,pad,w-2*pad,h-2*pad,arc,arc));
             g2.dispose();
         }
     }
 
+    // ... (RoundedTextField, RoundedPasswordField, RoundedButton remain the same) ...
     static class RoundedTextField extends JTextField {
         private final String placeholder;
-        RoundedTextField(int cols,String placeholder){ super(cols); this.placeholder=placeholder;
-            setOpaque(false); setBorder(new EmptyBorder(12,16,12,16));
+        RoundedTextField(int cols,String placeholder){ 
+            super(cols); 
+            this.placeholder=placeholder;
+            setOpaque(false); 
+            setBorder(new EmptyBorder(12,16,12,16));
             setFont(FontKit.regular(16f));
             addFocusListener(new FocusAdapter(){
-                @Override public void focusGained(FocusEvent e){ repaint(); }
-                @Override public void focusLost(FocusEvent e){ repaint(); }
+                @Override public void focusGained(FocusEvent e){ 
+                    repaint(); 
+                }
+                @Override public void focusLost(FocusEvent e){ 
+                    repaint(); 
+                }
             });
         }
         @Override protected void paintComponent(Graphics g){
@@ -1044,9 +1073,11 @@ public class LoginPage extends JFrame {
             super.paintComponent(g);
         }
     }
-
+    
     // ---------------------- Main ----------------------
     public static void main(String[] args) {
+        System.out.println(LoginPage.class.getResource("/resources/iiitd_logo.png"));
+        System.out.println(LoginPage.class.getResource("/resources/bg_login.png"));
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
         FontKit.init();
         erp.db.DatabaseConnection.init();
