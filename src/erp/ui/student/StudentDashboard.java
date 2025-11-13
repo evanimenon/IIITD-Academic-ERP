@@ -112,7 +112,7 @@ public class StudentDashboard extends JFrame {
         nav.add(Box.createVerticalStrut(8));
 
         NavButton catalogueBtn = new NavButton("  📚  Course Catalogue", false);
-        catalogueBtn.addActionListener(e -> { new CourseCatalogue(displayName).setVisible(true); dispose(); });
+        catalogueBtn.addActionListener(e -> { new CourseCatalog(displayName).setVisible(true); dispose(); });
         nav.add(catalogueBtn);
         nav.add(Box.createVerticalStrut(8));
 

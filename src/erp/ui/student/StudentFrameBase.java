@@ -107,7 +107,7 @@ public abstract class StudentFrameBase extends JFrame {
         NavButton catalog = new NavButton("  📚  Course Catalogue", active == Page.CATALOG);
         catalog.addActionListener(e -> {
             if (active != Page.CATALOG) {
-                new CourseCatalogue(userDisplayName).setVisible(true);
+                new CourseCatalog(userDisplayName).setVisible(true);
                 dispose();
             }
         });
