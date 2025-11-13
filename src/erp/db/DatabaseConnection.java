@@ -2,6 +2,9 @@ package erp.db;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
+import java.sql.Connection;
+
 import javax.sql.DataSource;
 
 
@@ -31,4 +34,7 @@ public final class DatabaseConnection {
 
     public static DataSource auth() { return authDs; }
     public static DataSource erp()  { return erpDs; }
+
+
+
 }
