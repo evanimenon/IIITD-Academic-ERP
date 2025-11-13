@@ -89,7 +89,7 @@ public class AddUser extends JFrame {
 
         // Navigation Links
         NavButton dashboardBtn = new NavButton("🏠 Dashboard", false);
-        dashboardBtn.addActionListener(e -> new Dashboard(adminName).setVisible(true));
+        dashboardBtn.addActionListener(e -> new AdminDashboard(adminName).setVisible(true));
         nav.add(dashboardBtn);
         nav.add(Box.createVerticalStrut(8));
 

@@ -11,7 +11,7 @@ import java.io.InputStream;
 
 import erp.auth.AuthService;
 import erp.ui.common.FontKit;
-import erp.ui.student.Dashboard;
+import erp.ui.student.StudentDashboard;
 
 public class LoginPage extends JFrame {
 
@@ -115,7 +115,7 @@ public class LoginPage extends JFrame {
                     var session = new AuthService().login(user, pwStr);
 
                     SwingUtilities.invokeLater(() -> {
-                        new Dashboard(session.username() + " • " + session.role()).setVisible(true);
+                        new StudentDashboard(session.username() + " • " + session.role()).setVisible(true);
                         dispose();
                     });
                 } catch (AuthService.AuthException ex) {

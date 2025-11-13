@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
-public class Dashboard extends JFrame {
+public class AdminDashboard extends JFrame {
 
     // Palette
     private static final Color TEAL_DARK = new Color(39, 96, 92);
@@ -97,7 +97,7 @@ public class Dashboard extends JFrame {
     }
 
 
-    public Dashboard(String userDisplayName) {
+    public AdminDashboard(String userDisplayName) {
         setTitle("IIITD ERP – Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1200, 800));
@@ -333,6 +333,6 @@ public class Dashboard extends JFrame {
     public static void main(String[] args) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
         FontKit.init();
-        SwingUtilities.invokeLater(() -> new Dashboard("Admin 123").setVisible(true));
+        SwingUtilities.invokeLater(() -> new AdminDashboard("Admin 123").setVisible(true));
     }
 }

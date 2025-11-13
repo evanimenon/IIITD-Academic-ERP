@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
-public class Dashboard extends JFrame {
+public class StudentDashboard extends JFrame {
 
     // Palette
     private static final Color TEAL_DARK = new Color(39, 96, 92);
@@ -22,7 +22,7 @@ public class Dashboard extends JFrame {
     private static final Color TEXT_600 = new Color(100, 116, 139);
     private static final Color CARD = Color.WHITE;
 
-    public Dashboard(String userDisplayName) {
+    public StudentDashboard(String userDisplayName) {
         setTitle("IIITD ERP – Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1200, 800));
@@ -94,7 +94,7 @@ public class Dashboard extends JFrame {
         nav.add(homeBtn);
         homeBtn.addActionListener(e -> {
             SwingUtilities.invokeLater(() -> {
-                new Dashboard(userDisplayName).setVisible(true);
+                new StudentDashboard(userDisplayName).setVisible(true);
                 dispose();
             });
         });
@@ -105,7 +105,7 @@ public class Dashboard extends JFrame {
         nav.add(courseCatalogueBtn);
         courseCatalogueBtn.addActionListener(e -> {
             SwingUtilities.invokeLater(() -> {
-                new CourseCatalogue(userDisplayName).setVisible(true);
+                new CourseCatalog(userDisplayName).setVisible(true);
                 dispose();
             });
         });
@@ -289,6 +289,6 @@ public class Dashboard extends JFrame {
     public static void main(String[] args) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
         FontKit.init();
-        SwingUtilities.invokeLater(() -> new Dashboard("Student 123").setVisible(true));
+        SwingUtilities.invokeLater(() -> new StudentDashboard("Student 123").setVisible(true));
     }
 }
