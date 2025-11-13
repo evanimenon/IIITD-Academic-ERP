@@ -1,6 +1,6 @@
 package erp.ui.student;
 
-import erp.ui.auth.*;
+import erp.ui.auth.LoginPage;
 import erp.ui.common.FontKit;
 
 import javax.swing.*;
@@ -44,25 +44,22 @@ public class Dashboard extends JFrame {
         JPanel profile = new JPanel();
         profile.setOpaque(false);
         profile.setLayout(new BoxLayout(profile, BoxLayout.Y_AXIS));
-        EmptyBorder br = new EmptyBorder(8, 8, 32, 8);
-        profile.setBorder(br);
+        profile.setBorder(new EmptyBorder(8, 8, 32, 8));
 
-        // Circular Avatar with rounded corner panel
         JPanel avatarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         avatarPanel.setOpaque(false);
-        
+
         JLabel avatar = new JLabel() {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(new Color(230, 233, 236));
-                // Draw a circle
-                g2.fillOval(0, 0, getWidth(), getHeight()); 
+                g2.fillOval(0, 0, getWidth(), getHeight());
                 g2.dispose();
             }
             @Override public Dimension getPreferredSize() { return new Dimension(100, 100); }
         };
-        
+
         avatarPanel.add(avatar);
         profile.add(avatarPanel);
         profile.add(Box.createVerticalStrut(16));
@@ -78,13 +75,12 @@ public class Dashboard extends JFrame {
         meta.setForeground(new Color(210, 225, 221));
         meta.setFont(FontKit.regular(14f));
         profile.add(meta);
-        
-        // Rounded corners for the entire profile block (visual style enhancement)
+
+        // subtle border
         profile.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(TEAL_LIGHT, 1),
             new EmptyBorder(8, 8, 32, 8)
         ));
-
         sidebar.add(profile, BorderLayout.NORTH);
 
         // Nav
@@ -93,8 +89,8 @@ public class Dashboard extends JFrame {
         nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
         nav.setBorder(new EmptyBorder(16, 0, 16, 0));
 
-        // Navigation Links
-        NavButton homeBtn = new NavButton("  🏠  Home", true);
+        // Home
+        NavButton homeBtn = new NavButton("  🏠  Home", true);
         nav.add(homeBtn);
         homeBtn.addActionListener(e -> {
             SwingUtilities.invokeLater(() -> {
@@ -103,9 +99,9 @@ public class Dashboard extends JFrame {
             });
         });
         nav.add(Box.createVerticalStrut(8));
-        
-        // Highlighted button for current page
-        NavButton courseCatalogueBtn = new NavButton("  📚  Course Catalogue", false);
+
+        // Course Catalogue (FIX: actually navigate)
+        NavButton courseCatalogueBtn = new NavButton("  📚  Course Catalogue", false);
         nav.add(courseCatalogueBtn);
         courseCatalogueBtn.addActionListener(e -> {
             SwingUtilities.invokeLater(() -> {
@@ -113,25 +109,35 @@ public class Dashboard extends JFrame {
                 dispose();
             });
         });
+
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("  📜  My Registrations", false));
+        nav.add(new NavButton("  📜  My Registrations", false));
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("  🗺️  Time Table", false));
-        nav.add(Box.createVerticalStrut(40)); // Increased vertical space
-        
+        nav.add(new NavButton("  🗺️  Time Table", false));
+        nav.add(Box.createVerticalStrut(40));
+
         // Separator
-        nav.add(new JSeparator() {{ 
-            setForeground(new Color(60, 120, 116)); 
+        nav.add(new JSeparator() {{
+            setForeground(new Color(60, 120, 116));
             setBackground(new Color(60, 120, 116));
             setMaximumSize(new Dimension(240, 1));
             setAlignmentX(Component.CENTER_ALIGNMENT);
         }});
         nav.add(Box.createVerticalStrut(40));
 
-        nav.add(new NavButton("  ⚙️  Settings", false));
+        nav.add(new NavButton("  ⚙️  Settings", false));
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("  🚪  Log Out", false)); // Used door emoji for log out
-        
+
+        // Log Out → back to LoginPage
+        NavButton logoutBtn = new NavButton("  🚪  Log Out", false);
+        nav.add(logoutBtn);
+        logoutBtn.addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> {
+                new LoginPage().setVisible(true);
+                dispose();
+            });
+        });
+
         sidebar.add(nav, BorderLayout.CENTER);
         root.add(sidebar, BorderLayout.WEST);
 
@@ -239,7 +245,6 @@ public class Dashboard extends JFrame {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             int w = getWidth(), h = getHeight();
-            // soft shadow
             for (int i = 6; i >= 1; i--) {
                 float a = 0.035f * (i / 6f);
                 g2.setColor(new Color(0, 0, 0, a));
