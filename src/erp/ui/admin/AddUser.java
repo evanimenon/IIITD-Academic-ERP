@@ -4,8 +4,16 @@ import erp.ui.common.FontKit;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicComboBoxUI;
+
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+
+import erp.ui.auth.LoginPage.RoundedTextField;
+import erp.db.Maintenance;
+import erp.ui.auth.LoginPage.RoundedPasswordField;
+import erp.ui.common.NavButton;
+
 
 public class AddUser extends JFrame {
 
@@ -20,7 +28,7 @@ public class AddUser extends JFrame {
     public AddUser(String adminName) {
         setTitle("IIITD ERP – Add User");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setMinimumSize(new Dimension(900, 700));
+        setMinimumSize(new Dimension(1220, 840));
         setLocationRelativeTo(null);
 
         JPanel root = new JPanel(new BorderLayout());
@@ -89,21 +97,44 @@ public class AddUser extends JFrame {
 
         // Navigation Links
         NavButton dashboardBtn = new NavButton("🏠 Dashboard", false);
-        dashboardBtn.addActionListener(e -> new AdminDashboard(adminName).setVisible(true));
+        dashboardBtn.addActionListener(e -> {
+            new AdminDashboard(adminName).setVisible(true);
+            AddUser.this.dispose();
+        });
         nav.add(dashboardBtn);
         nav.add(Box.createVerticalStrut(8));
 
         NavButton addUserBtn = new NavButton("👤 Add User", true);
-        addUserBtn.addActionListener(e -> new AddUser(adminName).setVisible(true));
+        addUserBtn.addActionListener(e -> {
+            new AddUser(adminName).setVisible(true);
+            AddUser.this.dispose();
+        });
         nav.add(addUserBtn);
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("📘 Manage Courses", false));
+
+        NavButton manageCoursesBtn = new NavButton("📘 Manage Courses", false);
+        manageCoursesBtn.addActionListener(e -> {
+            new ManageCourses(adminName).setVisible(true);
+            AddUser.this.dispose();
+        });
+        nav.add(manageCoursesBtn);
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("👨 Assign Instructor", false));
+
+        NavButton assignInstBtn = new NavButton("👨 Assign Instructor", false);
+        assignInstBtn.addActionListener(e -> {
+            new AssignInstructor(adminName).setVisible(true);
+            AddUser.this.dispose();
+        });
+        nav.add(assignInstBtn);
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("🔧 Maintenance Mode", false));
+
+        NavButton maintenanceModeBtn = new NavButton("🔧 Maintenance Mode", false);
+        maintenanceModeBtn.addActionListener(e -> {
+            new MaintenanceMode(adminName).setVisible(true);
+            AddUser.this.dispose();
+        });
+        nav.add(maintenanceModeBtn);
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("💾 Backup / Restore", false));
 
         
         // Separator
@@ -139,10 +170,24 @@ public class AddUser extends JFrame {
 
         root.add(hero, BorderLayout.NORTH);
 
+        if (Maintenance.isOn()) {
+            RoundedPanel banner = new RoundedPanel(12);
+            banner.setBackground(new Color(255, 235, 230)); // light red
+            banner.setBorder(new EmptyBorder(12, 18, 12, 18));
+
+            JLabel msg = new JLabel("⚠️  Maintenance Mode is ON – Changes are disabled");
+            msg.setFont(FontKit.semibold(14f));
+            msg.setForeground(new Color(180, 60, 50));
+            banner.add(msg);
+
+            root.add(banner, BorderLayout.NORTH);
+        }
+
+
         // --- Main form ---
         RoundedPanel formCard = new RoundedPanel(20);
         formCard.setBackground(CARD);
-        formCard.setBorder(new EmptyBorder(40, 60, 40, 60));
+        formCard.setBorder(new EmptyBorder(40, 60, 60, 60));
         formCard.setLayout(new GridBagLayout());
         root.add(formCard, BorderLayout.CENTER);
 
@@ -158,7 +203,7 @@ public class AddUser extends JFrame {
         formCard.add(nameLabel, gbc);
 
         gbc.gridx = 1;
-        JTextField nameField = new JTextField(20);
+        RoundedTextField nameField = new RoundedTextField(30, "Enter full name");
         nameField.setFont(FontKit.regular(15f));
         formCard.add(nameField, gbc);
 
@@ -169,7 +214,7 @@ public class AddUser extends JFrame {
         formCard.add(emailLabel, gbc);
 
         gbc.gridx = 1;
-        JTextField emailField = new JTextField(20);
+        RoundedTextField emailField = new RoundedTextField(30, "Enter email address");
         emailField.setFont(FontKit.regular(15f));
         formCard.add(emailField, gbc);
 
@@ -181,7 +226,7 @@ public class AddUser extends JFrame {
 
         gbc.gridx = 1;
         String[] roles = {"Student", "Instructor", "Admin"};
-        JComboBox<String> roleBox = new JComboBox<>(roles);
+        RoundedComboBox<String> roleBox = new RoundedComboBox<>(roles);
         roleBox.setFont(FontKit.regular(15f));
         formCard.add(roleBox, gbc);
 
@@ -192,7 +237,7 @@ public class AddUser extends JFrame {
         formCard.add(passwordLabel, gbc);
 
         gbc.gridx = 1;
-        JPasswordField passwordField = new JPasswordField(20);
+        RoundedPasswordField passwordField = new RoundedPasswordField(30, "Enter password");
         passwordField.setFont(FontKit.regular(15f));
         formCard.add(passwordField, gbc);
 
@@ -203,7 +248,7 @@ public class AddUser extends JFrame {
         formCard.add(confirmLabel, gbc);
 
         gbc.gridx = 1;
-        JPasswordField confirmField = new JPasswordField(20);
+        RoundedPasswordField confirmField = new RoundedPasswordField(30, "Confirm password");
         confirmField.setFont(FontKit.regular(15f));
         formCard.add(confirmField, gbc);
 
@@ -251,30 +296,75 @@ public class AddUser extends JFrame {
         formCard.add(submitBtn, gbc);
     }
 
-    public static class NavButton extends JButton {
-        private final boolean selected;
-        public NavButton(String text, boolean selected) {
-            super(text);
-            this.selected = selected;
-            setHorizontalAlignment(LEFT);
-            setFocusPainted(false);
-            setBorderPainted(false);
-            setContentAreaFilled(false);
-            setOpaque(false);
-            setForeground(Color.WHITE);
-            setFont(FontKit.semibold(16f));
-            setBorder(new EmptyBorder(10, 14, 10, 14));
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    public static class RoundedComboBox<E> extends JComboBox<E> {
+        private final Color bg = new Color(0xD9, 0xD9, 0xD9);
+        private final Color text = new Color(24, 30, 37);
+        private final Color placeholderColor = new Color(140, 148, 160);
+        private String placeholder = "";
+
+        public RoundedComboBox() {
+            super();
+            setup();
         }
+
+        public RoundedComboBox(E[] items) {
+            super(items);
+            setup();
+        }
+
+        private void setup() {
+            setOpaque(false);
+            setBorder(new EmptyBorder(12, 16, 12, 16));
+            setFont(FontKit.regular(16f));
+            setForeground(text);
+            setBackground(bg);
+
+            setUI(new BasicComboBoxUI() {
+                @Override protected JButton createArrowButton() {
+                    JButton arrow = new JButton("▼");
+                    arrow.setBorder(null);
+                    arrow.setFont(FontKit.regular(12f));
+                    arrow.setOpaque(false);
+                    arrow.setContentAreaFilled(false);
+                    arrow.setFocusPainted(false);
+                    arrow.setForeground(new Color(100, 116, 139));
+                    return arrow;
+                }
+
+                @Override public void paintCurrentValueBackground(Graphics g, Rectangle bounds, boolean hasFocus) {
+                    // no grey highlight
+                }
+            });
+
+            // remove default border
+            setBorder(new EmptyBorder(12, 16, 12, 16));
+        }
+
+        public void setPlaceholder(String text) {
+            this.placeholder = text;
+            repaint();
+        }
+
         @Override protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            if (getModel().isRollover() || selected) {
-                g2.setColor(new Color(255, 255, 255, selected ? 60 : 30));
-                g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 14, 14));
-            }
+
+            // Rounded background
+            g2.setColor(bg);
+            g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 16, 16));
+
             g2.dispose();
             super.paintComponent(g);
+
+            // Placeholder
+            if (getSelectedIndex() == -1 || getSelectedItem() == null || getSelectedItem().toString().trim().isEmpty()) {
+                Graphics2D g3 = (Graphics2D) g.create();
+                g3.setColor(placeholderColor);
+                g3.setFont(getFont());
+                Insets ins = getInsets();
+                g3.drawString(placeholder, ins.left, getHeight() / 2 + getFont().getSize() / 2 - 3);
+                g3.dispose();
+            }
         }
     }
 

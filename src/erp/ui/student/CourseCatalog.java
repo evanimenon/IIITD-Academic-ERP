@@ -9,7 +9,9 @@ import java.sql.*;
 import java.util.regex.PatternSyntaxException;
 
 import erp.db.DatabaseConnection;
+import erp.db.Maintenance;
 import erp.ui.common.FontKit;
+import erp.ui.common.RoundedPanel;
 
 public class CourseCatalog extends StudentFrameBase {
 
@@ -28,6 +30,19 @@ public class CourseCatalog extends StudentFrameBase {
 
     public CourseCatalog(String userDisplayName) {
         super(userDisplayName, Page.CATALOG);
+        setTitle("IIITD ERP – Course Catalog");
+        if (Maintenance.isOn()) {
+            RoundedPanel banner = new RoundedPanel(12);
+            banner.setBackground(new Color(255, 235, 230)); // light red
+            banner.setBorder(new EmptyBorder(12, 18, 12, 18));
+
+            JLabel msg = new JLabel("⚠️  Maintenance Mode is ON – Changes are disabled");
+            msg.setFont(FontKit.semibold(14f));
+            msg.setForeground(new Color(180, 60, 50));
+            banner.add(msg);
+
+            root.add(banner, BorderLayout.NORTH);
+        }
     }
 
     @Override

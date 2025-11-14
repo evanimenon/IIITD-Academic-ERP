@@ -1,16 +1,17 @@
 package erp.ui.admin;
 
-import erp.ui.auth.*;
 import erp.ui.common.FontKit;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.RoundRectangle2D;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
+
+import erp.ui.common.RoundedPanel;
+import erp.ui.common.NavButton;
 
 public class AdminDashboard extends JFrame {
 
@@ -170,18 +171,45 @@ public class AdminDashboard extends JFrame {
 
         // Navigation Links
 
-        nav.add(new NavButton("🏠 Dashboard", true));
+        NavButton dashboardBtn = new NavButton("🏠 Dashboard", false);
+        dashboardBtn.addActionListener(e -> {
+            new AdminDashboard(userDisplayName).setVisible(true);
+            AdminDashboard.this.dispose();
+        });
+        nav.add(dashboardBtn);
         nav.add(Box.createVerticalStrut(8));
+
         NavButton addUserBtn = new NavButton("👤 Add User", false);
-        addUserBtn.addActionListener(e -> new AddUser(userDisplayName).setVisible(true));
+        addUserBtn.addActionListener(e -> {
+            new AddUser(userDisplayName).setVisible(true);
+            AdminDashboard.this.dispose();
+        });
         nav.add(addUserBtn);
-        nav.add(new NavButton("📘 Manage Courses", false));
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("👨 Assign Instructor", false));
+
+        NavButton manageCoursesBtn = new NavButton("📘 Manage Courses", false);
+        manageCoursesBtn.addActionListener(e -> {
+            new ManageCourses(userDisplayName).setVisible(true);
+            AdminDashboard.this.dispose();
+        });
+        nav.add(manageCoursesBtn);
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("🔧 Maintenance Mode", false));
+
+        NavButton assignInstBtn = new NavButton("👨 Assign Instructor", true);
+        assignInstBtn.addActionListener(e -> {
+            new AssignInstructor(userDisplayName).setVisible(true);
+            AdminDashboard.this.dispose();
+        });
+        nav.add(assignInstBtn);
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("💾 Backup / Restore", false));
+
+        NavButton maintenanceModeBtn = new NavButton("🔧 Maintenance Mode", false);
+        maintenanceModeBtn.addActionListener(e -> {
+            new MaintenanceMode(userDisplayName).setVisible(true);
+            AdminDashboard.this.dispose();
+        });
+        nav.add(maintenanceModeBtn);
+        nav.add(Box.createVerticalStrut(8));
 
         
         // Separator
@@ -259,13 +287,18 @@ public class AdminDashboard extends JFrame {
 
         quick.add(actionCard("👤 Add New User", "Create student/instructor/admin accounts", () -> {
             new AddUser(userDisplayName).setVisible(true);
+            AdminDashboard.this.dispose();
         }));
 
-        quick.add(actionCard("📘 Manage Courses", "Create or edit courses and sections", () ->
-                JOptionPane.showMessageDialog(this, "Open Manage Courses panel")));
+        quick.add(actionCard("📘 Manage Courses", "Create or edit courses and sections", () -> {
+            new ManageCourses(userDisplayName).setVisible(true);
+            AdminDashboard.this.dispose();
+        }));
 
-        quick.add(actionCard("👨 Assign Instructor", "Link instructors to sections", () ->
-                JOptionPane.showMessageDialog(this, "Open Assign Instructor panel")));
+        quick.add(actionCard("👨 Assign Instructor", "Link instructors to sections", () -> {
+            new AssignInstructor(userDisplayName).setVisible(true);
+            AdminDashboard.this.dispose();
+        }));
 
         quick.add(maintenanceCard());
 
@@ -278,55 +311,6 @@ public class AdminDashboard extends JFrame {
         String month = d.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         String year = String.valueOf(d.getYear());
         return day + " " + month + " " + year;
-    }
-
-    // Rounded panel with soft shadow
-    static class RoundedPanel extends JPanel {
-        private final int arc;
-        RoundedPanel(int arc) { this.arc = arc; setOpaque(false); }
-        @Override protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            int w = getWidth(), h = getHeight();
-            // soft shadow
-            for (int i = 6; i >= 1; i--) {
-                float a = 0.035f * (i / 6f);
-                g2.setColor(new Color(0, 0, 0, a));
-                g2.fill(new RoundRectangle2D.Double(6 - i, 6 - i, w - 12 + 2*i, h - 12 + 2*i, arc + i, arc + i));
-            }
-            g2.setColor(getBackground());
-            g2.fill(new RoundRectangle2D.Double(6, 6, w - 12, h - 12, arc, arc));
-            g2.dispose();
-            super.paintComponent(g);
-        }
-    }
-
-    // Sidebar button
-    public static class NavButton extends JButton {
-        private final boolean selected;
-        public NavButton(String text, boolean selected) {
-            super(text);
-            this.selected = selected;
-            setHorizontalAlignment(LEFT);
-            setFocusPainted(false);
-            setBorderPainted(false);
-            setContentAreaFilled(false);
-            setOpaque(false);
-            setForeground(Color.WHITE);
-            setFont(FontKit.semibold(16f));
-            setBorder(new EmptyBorder(10, 14, 10, 14));
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        }
-        @Override protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            if (getModel().isRollover() || selected) {
-                g2.setColor(new Color(255, 255, 255, selected ? 60 : 30));
-                g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 14, 14));
-            }
-            g2.dispose();
-            super.paintComponent(g);
-        }
     }
 
     // Quick manual launch

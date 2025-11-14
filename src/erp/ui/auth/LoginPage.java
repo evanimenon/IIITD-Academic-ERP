@@ -218,9 +218,9 @@ public class LoginPage extends JFrame {
         }
     }
 
-    static class RoundedTextField extends JTextField {
+    public static class RoundedTextField extends JTextField {
         private final String placeholder;
-        RoundedTextField(int cols, String placeholder) {
+        public RoundedTextField(int cols, String placeholder) {
             super(cols);
             this.placeholder = placeholder;
             setOpaque(false);
@@ -250,9 +250,9 @@ public class LoginPage extends JFrame {
         }
     }
 
-    static class RoundedPasswordField extends JPasswordField {
+    public static class RoundedPasswordField extends JPasswordField {
         private final String placeholder;
-        RoundedPasswordField(int cols, String placeholder) {
+        public RoundedPasswordField(int cols, String placeholder) {
             super(cols);
             this.placeholder = placeholder;
             setOpaque(false);
@@ -282,10 +282,10 @@ public class LoginPage extends JFrame {
         }
     }
 
-    static class RoundedButton extends JButton {
+    public static class RoundedButton extends JButton {
         private final Color base = new Color(39, 96, 92);
         private final Color hover = new Color(28, 122, 120);
-        RoundedButton(String text) {
+        public RoundedButton(String text) {
             super(text);
             setFocusPainted(false);
             setBorderPainted(false);

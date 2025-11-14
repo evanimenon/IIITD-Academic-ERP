@@ -366,7 +366,6 @@ public class StudentDashboard extends JFrame {
         };
     }
 
-    // Rounded panel with soft shadow
     static class RoundedPanel extends JPanel {
         private final int arc;
         RoundedPanel(int arc) { this.arc = arc; setOpaque(false); }
