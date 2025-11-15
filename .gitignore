@@ -1,16 +1,29 @@
-# build artifacts
-/out/
-/bin/
-/target/
-/*.class
+###########################################
+# Java / Swing ERP Project - .gitignore
+###########################################
 
-# OS files
+# Build artifacts
+/bin/
+/out/
+/target/
+
+# Compiled classes
+*.class
+
+# macOS metadata
 .DS_Store
 
-# IDE configs (optional)
+# IDE configs
 .idea/
 .vscode/
 *.iml
 
-# local DB config
+# Local environment secrets (DO NOT COMMIT)
 src/resources/db.properties
+
+# Logs (if you create logs later)
+*.log
+
+# Temporary files
+*.tmp
+*.swp

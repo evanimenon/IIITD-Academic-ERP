@@ -130,7 +130,7 @@ public final class AuthDAO {
         if (passwordPlain == null) throw new IllegalArgumentException("password required");
         if (role == null || role.isBlank()) role = "student";
 
-        final String insertSql = "INSERT INTO users_auth (username, password_hash, role, created_at) VALUES (?, ?, ?, NOW())";
+        final String insertSql = "INSERT INTO users_auth (username, password_hash, role) VALUES (?, ?, ?)";
         String hashed = BCrypt.hashpw(passwordPlain, BCrypt.gensalt(12));
 
         try (Connection c = DatabaseConnection.auth().getConnection();

@@ -27,3 +27,4 @@ java -cp "out:lib/*" erp.tools.ImportUsersCsv ./auth_db.csv
 | **Admin**     | `admin1`                              | `admin@123`  |
 | **Instructor**| `inst1`, `sambuddho`, `payel`, etc.   | `inst@123`   |
 | **Student**   | `stu1`, `stu2`                        | `stud@123`   |
+
