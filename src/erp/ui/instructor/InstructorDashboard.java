@@ -17,6 +17,10 @@ import java.util.Locale;
 import erp.ui.common.NavButton;
 import erp.ui.common.RoundedPanel;
 
+// Auth helpers
+import erp.auth.AuthContext;
+import erp.auth.Role;
+
 public class InstructorDashboard extends JFrame {
 
     // Palette
@@ -49,6 +53,16 @@ public class InstructorDashboard extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1220, 840));
         setLocationRelativeTo(null);
+
+        // Authorization guard: only allow INSTRUCTOR role to proceed
+        Role actual = AuthContext.getRole();
+        if (actual != Role.INSTRUCTOR) {
+            JOptionPane.showMessageDialog(null, "You are not authorized to access the Instructor Dashboard.");
+            AuthContext.clear();
+            new LoginPage().setVisible(true);
+            dispose();
+            return;
+        }
 
         JPanel root = new JPanel(new BorderLayout());
         root.setBackground(BG);
@@ -135,7 +149,7 @@ public class InstructorDashboard extends JFrame {
         nav.add(Box.createVerticalStrut(8));
 
         NavButton logoutBtn = new NavButton("  🚪  Log Out", false);
-        logoutBtn.addActionListener(e -> { new LoginPage().setVisible(true); dispose(); });
+        logoutBtn.addActionListener(e -> { AuthContext.clear(); new LoginPage().setVisible(true); dispose(); });
         nav.add(logoutBtn);
 
         sidebar.add(nav, BorderLayout.CENTER);

@@ -15,6 +15,11 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+import erp.auth.AuthContext;
+import erp.auth.Role;
+import erp.ui.common.NavButton;
+import erp.ui.common.RoundedPanel;
+
 public class StudentDashboard extends JFrame {
 
     // Palette
@@ -43,6 +48,16 @@ public class StudentDashboard extends JFrame {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
         FontKit.init();
         DatabaseConnection.init();
+
+        // Authorization guard: only allow STUDENT role to proceed
+        Role actual = AuthContext.getRole();
+        if (actual != Role.STUDENT) {
+            JOptionPane.showMessageDialog(null, "You are not authorized to access the Student Dashboard.");
+            AuthContext.clear();
+            new LoginPage().setVisible(true);
+            dispose();
+            return;
+        }
 
         if (studentId != null && !studentId.isBlank()) fetchStudentMeta(studentId);
 
@@ -131,7 +146,7 @@ public class StudentDashboard extends JFrame {
         nav.add(Box.createVerticalStrut(8));
 
         NavButton logoutBtn = new NavButton("  🚪  Log Out", false);
-        logoutBtn.addActionListener(e -> { new LoginPage().setVisible(true); dispose(); });
+        logoutBtn.addActionListener(e -> { AuthContext.clear(); new LoginPage().setVisible(true); dispose(); });
         nav.add(logoutBtn);
 
         sidebar.add(nav, BorderLayout.CENTER);

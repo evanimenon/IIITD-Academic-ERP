@@ -13,6 +13,11 @@ import java.util.Locale;
 import erp.ui.common.RoundedPanel;
 import erp.ui.common.NavButton;
 
+// Auth helpers (must exist in your project)
+import erp.auth.AuthContext;
+import erp.auth.Role;
+import erp.ui.auth.LoginPage;
+
 public class AdminDashboard extends JFrame {
 
     // Palette
@@ -48,14 +53,14 @@ public class AdminDashboard extends JFrame {
         card.addMouseListener(new MouseAdapter() {
             Color normal = CARD;
             Color hover = new Color(238, 241, 245);
-            @Override public void mouseEntered(MouseEvent e) { 
-                card.setBackground(hover); card.repaint(); 
+            @Override public void mouseEntered(MouseEvent e) {
+                card.setBackground(hover); card.repaint();
             }
-            @Override public void mouseExited(MouseEvent e) { 
-                card.setBackground(normal); card.repaint(); 
+            @Override public void mouseExited(MouseEvent e) {
+                card.setBackground(normal); card.repaint();
             }
             @Override public void mouseClicked(MouseEvent e) {
-                onClick.run(); 
+                onClick.run();
             }
         });
 
@@ -104,6 +109,18 @@ public class AdminDashboard extends JFrame {
         setMinimumSize(new Dimension(1200, 800));
         setLocationRelativeTo(null);
 
+        // Authorization guard: only allow ADMIN role to proceed
+        Role actual = AuthContext.getRole();
+        if (actual != Role.ADMIN) {
+            JOptionPane.showMessageDialog(null, "You are not authorized to access the Admin Dashboard.");
+            // Clear any session and redirect to login
+            AuthContext.clear();
+            new LoginPage().setVisible(true);
+            // Ensure we don't continue constructing the frame
+            dispose();
+            return;
+        }
+
         // app bg
         JPanel root = new JPanel(new BorderLayout());
         root.setBackground(BG);
@@ -126,19 +143,19 @@ public class AdminDashboard extends JFrame {
         // Circular Avatar with rounded corner panel
         JPanel avatarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         avatarPanel.setOpaque(false);
-        
+
         JLabel avatar = new JLabel() {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(new Color(230, 233, 236));
                 // Draw a circle
-                g2.fillOval(0, 0, getWidth(), getHeight()); 
+                g2.fillOval(0, 0, getWidth(), getHeight());
                 g2.dispose();
             }
             @Override public Dimension getPreferredSize() { return new Dimension(100, 100); }
         };
-        
+
         avatarPanel.add(avatar);
         profile.add(avatarPanel);
         profile.add(Box.createVerticalStrut(16));
@@ -154,7 +171,7 @@ public class AdminDashboard extends JFrame {
         meta.setForeground(new Color(210, 225, 221));
         meta.setFont(FontKit.regular(14f));
         profile.add(meta);
-        
+
         // Rounded corners for the entire profile block (visual style enhancement)
         profile.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(TEAL_LIGHT, 1),
@@ -211,19 +228,26 @@ public class AdminDashboard extends JFrame {
         nav.add(maintenanceModeBtn);
         nav.add(Box.createVerticalStrut(8));
 
-        
+
         // Separator
-        nav.add(new JSeparator() {{ 
-            setForeground(new Color(60, 120, 116)); 
+        nav.add(new JSeparator() {{
+            setForeground(new Color(60, 120, 116));
             setBackground(new Color(60, 120, 116));
             setMaximumSize(new Dimension(240, 1));
             setAlignmentX(Component.CENTER_ALIGNMENT);
         }});
         nav.add(Box.createVerticalStrut(40));
-        nav.add(new NavButton("  ⚙️  Settings", false));
+        nav.add(new NavButton("  \u00A0⚙️ \u00A0Settings", false));
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("  🚪  Log Out", false)); // Used door emoji for log out
-        
+
+        NavButton logoutNav = new NavButton("  \u00A0🚪 \u00A0Log Out", false);
+        logoutNav.addActionListener(e -> {
+            AuthContext.clear();
+            new LoginPage().setVisible(true);
+            AdminDashboard.this.dispose();
+        });
+        nav.add(logoutNav);
+
         sidebar.add(nav, BorderLayout.CENTER);
         root.add(sidebar, BorderLayout.WEST);
 

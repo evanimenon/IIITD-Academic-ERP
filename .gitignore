@@ -1,0 +1,16 @@
+# build artifacts
+/out/
+/bin/
+/target/
+/*.class
+
+# OS files
+.DS_Store
+
+# IDE configs (optional)
+.idea/
+.vscode/
+*.iml
+
+# local DB config
+src/resources/db.properties

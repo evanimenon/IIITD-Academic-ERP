@@ -12,6 +12,12 @@ import java.io.InputStream;
 import erp.auth.AuthService;
 import erp.ui.common.FontKit;
 import erp.ui.student.StudentDashboard;
+import erp.ui.instructor.InstructorDashboard;
+import erp.ui.admin.AdminDashboard;
+import java.util.Locale;
+import erp.auth.AuthContext;
+import erp.auth.Role;
+
 import erp.ui.common.RoundedButton;
 
 public class LoginPage extends JFrame {
@@ -115,15 +121,43 @@ public class LoginPage extends JFrame {
                 try {
                     var session = new AuthService().login(user, pwStr);
 
+                    // store session centrally for auth checks elsewhere
+                    AuthContext.setSession(session);
+
                     SwingUtilities.invokeLater(() -> {
-                        new StudentDashboard(session.username() + " • " + session.role()).setVisible(true);
-                        dispose();
+                        // route user to the appropriate dashboard based on normalized role
+                        Role r = Role.from(session.role());
+                        String display = session.username() + " • " + session.role();
+
+                        switch (r) {
+                            case STUDENT -> {
+                                // StudentDashboard has a convenience constructor that accepts displayName
+                                new StudentDashboard(display).setVisible(true);
+                                dispose();
+                            }
+                            case INSTRUCTOR -> {
+                                // InstructorDashboard expects (instrID, displayName) — use userId as instrID placeholder
+                                new InstructorDashboard(String.valueOf(session.userId()),
+                                        display).setVisible(true);
+                                dispose();
+                            }
+                            case ADMIN -> {
+                                new AdminDashboard(display).setVisible(true);
+                                dispose();
+                            }
+                            default -> {
+                                // Unknown role — clear session and show error
+                                AuthContext.clear();
+                                showError("Your account is not authorized. Contact admin.");
+                            }
+                        }
                     });
+
                 } catch (AuthService.AuthException ex) {
                     SwingUtilities.invokeLater(() -> showError(ex.getMessage()));
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    SwingUtilities.invokeLater(() -> showError("Login error. Check DB connection and credentials."));
+                    SwingUtilities.invokeLater(() -> showError("Incorrect username or password."));
                 } finally {
                     SwingUtilities.invokeLater(() -> {
                         signIn.setEnabled(true);
@@ -154,7 +188,8 @@ public class LoginPage extends JFrame {
 
     private static ImageIcon loadScaled(String path, int w, int h) {
         try (InputStream in = LoginPage.class.getResourceAsStream(path)) {
-            if (in == null) return null;
+            if (in == null)
+                return null;
             Image img = ImageIO.read(in).getScaledInstance(w, h, Image.SCALE_SMOOTH);
             return new ImageIcon(img);
         } catch (Exception e) {
@@ -167,6 +202,7 @@ public class LoginPage extends JFrame {
     // ---- inner UI bits ----
     static class BackgroundPanel extends JPanel {
         private Image bg;
+
         BackgroundPanel(String cpPath) {
             try (InputStream in = LoginPage.class.getResourceAsStream(cpPath)) {
                 if (in != null) {
@@ -178,12 +214,16 @@ public class LoginPage extends JFrame {
             }
             setOpaque(true);
         }
-        @Override protected void paintComponent(Graphics g) {
+
+        @Override
+        protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            if (bg == null) return;
+            if (bg == null)
+                return;
             int pw = getWidth(), ph = getHeight();
             int iw = bg.getWidth(null), ih = bg.getHeight(null);
-            if (iw <= 0 || ih <= 0) return;
+            if (iw <= 0 || ih <= 0)
+                return;
             double scale = Math.max(pw / (double) iw, ph / (double) ih);
             int dw = (int) (iw * scale), dh = (int) (ih * scale);
             int dx = (pw - dw) / 2, dy = (ph - dh) / 2;
@@ -194,16 +234,27 @@ public class LoginPage extends JFrame {
     static class LoginCard extends JComponent {
         private final int prefW, prefH;
         private final JPanel body = new JPanel();
+
         LoginCard(int w, int h) {
-            prefW = w; prefH = h;
+            prefW = w;
+            prefH = h;
             setLayout(new GridBagLayout());
             body.setOpaque(false);
             add(body, new GridBagConstraints());
             setOpaque(false);
         }
-        JPanel getBody() { return body; }
-        @Override public Dimension getPreferredSize() { return new Dimension(prefW, prefH); }
-        @Override protected void paintComponent(Graphics g) {
+
+        JPanel getBody() {
+            return body;
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            return new Dimension(prefW, prefH);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             int arc = 26, pad = 16;
@@ -211,7 +262,8 @@ public class LoginPage extends JFrame {
             for (int i = 6; i >= 1; i--) {
                 float alpha = 0.035f * (i / 6f);
                 g2.setColor(new Color(0, 0, 0, alpha));
-                g2.fill(new RoundRectangle2D.Double(pad - i, pad - i, w - 2 * pad + 2 * i, h - 2 * pad + 2 * i, arc + i, arc + i));
+                g2.fill(new RoundRectangle2D.Double(pad - i, pad - i, w - 2 * pad + 2 * i, h - 2 * pad + 2 * i, arc + i,
+                        arc + i));
             }
             g2.setColor(Color.WHITE);
             g2.fill(new RoundRectangle2D.Double(pad, pad, w - 2 * pad, h - 2 * pad, arc, arc));
@@ -221,6 +273,7 @@ public class LoginPage extends JFrame {
 
     public static class RoundedTextField extends JTextField {
         private final String placeholder;
+
         public RoundedTextField(int cols, String placeholder) {
             super(cols);
             this.placeholder = placeholder;
@@ -228,11 +281,20 @@ public class LoginPage extends JFrame {
             setBorder(new EmptyBorder(12, 16, 12, 16));
             setFont(FontKit.regular(16f));
             addFocusListener(new FocusAdapter() {
-                @Override public void focusGained(FocusEvent e) { repaint(); }
-                @Override public void focusLost(FocusEvent e) { repaint(); }
+                @Override
+                public void focusGained(FocusEvent e) {
+                    repaint();
+                }
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    repaint();
+                }
             });
         }
-        @Override protected void paintComponent(Graphics g) {
+
+        @Override
+        protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(new Color(0xD9, 0xD9, 0xD9));
@@ -253,6 +315,7 @@ public class LoginPage extends JFrame {
 
     public static class RoundedPasswordField extends JPasswordField {
         private final String placeholder;
+
         public RoundedPasswordField(int cols, String placeholder) {
             super(cols);
             this.placeholder = placeholder;
@@ -260,11 +323,20 @@ public class LoginPage extends JFrame {
             setBorder(new EmptyBorder(12, 16, 12, 16));
             setFont(FontKit.regular(16f));
             addFocusListener(new FocusAdapter() {
-                @Override public void focusGained(FocusEvent e) { repaint(); }
-                @Override public void focusLost(FocusEvent e) { repaint(); }
+                @Override
+                public void focusGained(FocusEvent e) {
+                    repaint();
+                }
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    repaint();
+                }
             });
         }
-        @Override protected void paintComponent(Graphics g) {
+
+        @Override
+        protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(new Color(0xD9, 0xD9, 0xD9));
@@ -285,7 +357,10 @@ public class LoginPage extends JFrame {
 
     // Quick manual launch
     public static void main(String[] args) {
-        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignored) {
+        }
         FontKit.init();
         erp.db.DatabaseConnection.init();
         SwingUtilities.invokeLater(() -> new LoginPage().setVisible(true));
