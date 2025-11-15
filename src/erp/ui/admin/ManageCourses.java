@@ -87,7 +87,7 @@ public class ManageCourses extends JFrame{
         nav.setBorder(new EmptyBorder(16, 0, 16, 0));
 
         // Navigation Links
-        NavButton dashboardBtn = new NavButton("🏠 Dashboard", false);
+        NavButton dashboardBtn = new NavButton("🏠 Home", false);
         dashboardBtn.addActionListener(e -> {
             new AdminDashboard(adminName).setVisible(true);
             ManageCourses.this.dispose();
@@ -160,5 +160,8 @@ public class ManageCourses extends JFrame{
         hero.add(adminLabel, BorderLayout.EAST);
 
         root.add(hero, BorderLayout.NORTH);
+
+        //--- Main Area ---
+        JPanel main = new JPanel();
     }
 }

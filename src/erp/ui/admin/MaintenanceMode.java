@@ -8,6 +8,8 @@ import java.awt.*;
 import erp.ui.common.RoundedPanel;
 import erp.ui.common.NavButton;
 
+import erp.ui.common.RoundedButton;
+
 public class MaintenanceMode extends JFrame{
 
     private static final Color TEAL_DARK = new Color(39, 96, 92);
@@ -89,7 +91,7 @@ public class MaintenanceMode extends JFrame{
         nav.setBorder(new EmptyBorder(16, 0, 16, 0));
 
         // Navigation Links
-        NavButton dashboardBtn = new NavButton("🏠 Dashboard", false);
+        NavButton dashboardBtn = new NavButton("🏠 Home", false);
         dashboardBtn.addActionListener(e -> {
             new AdminDashboard(adminName).setVisible(true);
             MaintenanceMode.this.dispose();
@@ -166,7 +168,7 @@ public class MaintenanceMode extends JFrame{
         // --- Main Area ---
         JPanel main = new JPanel();
         main.setOpaque(false);
-        main.setLayout(new GridBagLayout()); // center the card
+        main.setLayout(new GridBagLayout());
         root.add(main, BorderLayout.CENTER);
 
         // Card
@@ -185,7 +187,7 @@ public class MaintenanceMode extends JFrame{
         card.add(Box.createVerticalStrut(24));
 
         // Yes button
-        JButton yesBtn = new JButton("Enable");
+        RoundedButton yesBtn = new RoundedButton("Enable");
         yesBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         yesBtn.setFont(FontKit.semibold(16f));
         yesBtn.setFocusPainted(false);
@@ -201,7 +203,7 @@ public class MaintenanceMode extends JFrame{
         card.add(Box.createVerticalStrut(16));
 
         // No button
-        JButton noBtn = new JButton("Disable");
+        RoundedButton noBtn = new RoundedButton("Disable");
         noBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         noBtn.setFont(FontKit.semibold(16f));
         noBtn.setFocusPainted(false);
@@ -213,8 +215,6 @@ public class MaintenanceMode extends JFrame{
             JOptionPane.showMessageDialog(this, "Maintenance Mode Disabled");
         });
         card.add(noBtn);
-
-        // Add card to center
         main.add(card);
 
 

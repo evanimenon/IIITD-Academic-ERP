@@ -13,6 +13,7 @@ import erp.ui.auth.LoginPage.RoundedTextField;
 import erp.db.Maintenance;
 import erp.ui.auth.LoginPage.RoundedPasswordField;
 import erp.ui.common.NavButton;
+import erp.ui.common.RoundedButton;
 
 
 public class AddUser extends JFrame {
@@ -96,7 +97,7 @@ public class AddUser extends JFrame {
         nav.setBorder(new EmptyBorder(16, 0, 16, 0));
 
         // Navigation Links
-        NavButton dashboardBtn = new NavButton("🏠 Dashboard", false);
+        NavButton dashboardBtn = new NavButton("🏠 Home", false);
         dashboardBtn.addActionListener(e -> {
             new AdminDashboard(adminName).setVisible(true);
             AddUser.this.dispose();
@@ -256,7 +257,7 @@ public class AddUser extends JFrame {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
 
-        JButton submitBtn = new JButton("Add User");
+        RoundedButton submitBtn = new RoundedButton("Add User");
         submitBtn.setFont(FontKit.bold(16f));
         submitBtn.setBackground(TEAL_DARK);
         submitBtn.setForeground(Color.WHITE);

@@ -2,7 +2,10 @@ package erp.ui.instructor;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.util.List;
+import java.util.ArrayList;
 import java.awt.*;
+
 
 import erp.db.DatabaseConnection;
 import erp.db.Maintenance;
@@ -10,10 +13,26 @@ import erp.ui.auth.LoginPage;
 import erp.ui.common.FontKit;
 
 import erp.ui.common.NavButton;
+import erp.ui.common.RoundedButton;
 import erp.ui.common.RoundedPanel;
 
 
 public class MySections extends JFrame {
+    // ---- Simple local model to avoid DB ----
+    private static class SectionInfo {
+        String sectionID;
+        String courseCode;
+        String courseName;
+        String semester;
+
+        SectionInfo(String sectionID, String courseCode, String courseName, String semester) {
+            this.sectionID = sectionID;
+            this.courseCode = courseCode;
+            this.courseName = courseName;
+            this.semester = semester;
+        }
+    }
+
     // Palette
     private static final Color TEAL_DARK  = new Color(39, 96, 92);
     private static final Color TEAL       = new Color(28, 122, 120);
@@ -143,6 +162,67 @@ public class MySections extends JFrame {
 
         root.add(hero, BorderLayout.NORTH);
 
+        // ---------- MAIN CONTENT ----------
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setOpaque(false);
+        content.setBorder(new EmptyBorder(24, 32, 24, 32));
+
+        // --- TEMP DATA: Hardcoded list of sections ---
+        List<SectionInfo> sections = new ArrayList<>();
+        sections.add(new SectionInfo("S01", "CSE201", "Data Structures & Algorithms", "Monsoon 2025"));
+        sections.add(new SectionInfo("S02", "CSE203", "Advanced Programming", "Monsoon 2025"));
+        sections.add(new SectionInfo("S05", "CSE222", "Operating Systems", "Winter 2025"));
+
+        for (SectionInfo sec : sections) {
+            RoundedPanel card = new RoundedPanel(20);
+            card.setBackground(CARD);
+            card.setBorder(new EmptyBorder(20, 24, 20, 24));
+            card.setLayout(new BorderLayout());
+
+            // left column
+            JPanel left = new JPanel();
+            left.setOpaque(false);
+            left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
+
+            JLabel title = new JLabel(sec.courseCode + " – " + sec.sectionID);
+            title.setFont(FontKit.bold(20f));
+            title.setForeground(TEXT_900);
+
+            JLabel subtitle = new JLabel(sec.courseName);
+            subtitle.setFont(FontKit.regular(15f));
+            subtitle.setForeground(TEXT_600);
+
+            JLabel sem = new JLabel("Semester: " + sec.semester);
+            sem.setFont(FontKit.regular(14f));
+            sem.setForeground(TEXT_600);
+
+            left.add(title);
+            left.add(Box.createVerticalStrut(6));
+            left.add(subtitle);
+            left.add(Box.createVerticalStrut(4));
+            left.add(sem);
+
+            card.add(left, BorderLayout.WEST);
+
+            // right column – action buttons
+            JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+            actions.setOpaque(false);
+
+            RoundedButton viewBtn = new RoundedButton("View");
+            viewBtn.addActionListener(e -> { new SectionInfoPage("s01").setVisible(true);});
+            viewBtn.setBackground(TEAL);
+            viewBtn.setForeground(Color.WHITE);
+            viewBtn.setFont(FontKit.semibold(14f));
+            viewBtn.setFocusPainted(false);
+            viewBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+            actions.add(viewBtn);
+            card.add(actions, BorderLayout.EAST);
+            content.add(card);
+            content.add(Box.createVerticalStrut(16));
+        }
+        root.add(new JScrollPane(content), BorderLayout.CENTER);
+
         if (Maintenance.isOn()) {
             RoundedPanel banner = new RoundedPanel(12);
             banner.setBackground(new Color(255, 235, 230)); // light red
@@ -157,3 +237,4 @@ public class MySections extends JFrame {
         }
     }
 }
+

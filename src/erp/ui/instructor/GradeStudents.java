@@ -3,6 +3,9 @@ package erp.ui.instructor;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import java.awt.*;
 
 import erp.db.DatabaseConnection;
@@ -14,6 +17,7 @@ import erp.ui.auth.LoginPage;
 import erp.ui.common.FontKit;
 
 import erp.ui.common.NavButton;
+import erp.ui.common.RoundedButton;
 import erp.ui.common.RoundedPanel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -21,6 +25,22 @@ import java.awt.event.MouseEvent;
 
 
 public class GradeStudents extends JFrame {
+
+    // ---- Simple local model to avoid DB ----
+    private static class SectionInfo {
+        String sectionID;
+        String courseCode;
+        String courseName;
+        String semester;
+
+        SectionInfo(String sectionID, String courseCode, String courseName, String semester) {
+            this.sectionID = sectionID;
+            this.courseCode = courseCode;
+            this.courseName = courseName;
+            this.semester = semester;
+        }
+    }
+
     // Palette
     private static final Color TEAL_DARK  = new Color(39, 96, 92);
     private static final Color TEAL       = new Color(28, 122, 120);
@@ -150,87 +170,79 @@ public class GradeStudents extends JFrame {
 
         root.add(hero, BorderLayout.NORTH);
 
-        // --- Main Content: List of Sections ---
+        // ---------- MAIN CONTENT ----------
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setOpaque(false);
         content.setBorder(new EmptyBorder(24, 32, 24, 32));
 
-        
+        // --- TEMP DATA: Hardcoded list of sections ---
+        List<SectionInfo> sections = new ArrayList<>();
+        sections.add(new SectionInfo("S01", "CSE201", "Data Structures & Algorithms", "Monsoon 2025"));
+        sections.add(new SectionInfo("S02", "CSE203", "Advanced Programming", "Monsoon 2025"));
+        sections.add(new SectionInfo("S05", "CSE222", "Operating Systems", "Winter 2025"));
 
-        // --- THIS HAS ERRORS IM GONNA FIX IT LATER ---
-        // class SectionInfo {
-        //     String sectionID;
-        //     String courseCode;
-        //     String courseName;
-        //     String semester;
-        // }
-        // TODO: Replace with DB results
-        // List<SectionInfo> sections = Database.getSectionsForInstructor(instrID);
+        for (SectionInfo sec : sections) {
+            RoundedPanel card = new RoundedPanel(20);
+            card.setBackground(CARD);
+            card.setBorder(new EmptyBorder(20, 24, 20, 24));
+            card.setLayout(new BorderLayout());
 
-        // for (SectionInfo sec : sections) {
-        //     RoundedPanel card = new RoundedPanel(20);
-        //     card.setBackground(CARD);
-        //     card.setBorder(new EmptyBorder(20, 24, 20, 24));
-        //     card.setLayout(new BorderLayout());
+            // left column
+            JPanel left = new JPanel();
+            left.setOpaque(false);
+            left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
 
-        //     // left: course + section info
-        //     JPanel left = new JPanel();
-        //     left.setOpaque(false);
-        //     left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
+            JLabel title = new JLabel(sec.courseCode + " – " + sec.sectionID);
+            title.setFont(FontKit.bold(20f));
+            title.setForeground(TEXT_900);
 
-        //     JLabel title = new JLabel(sec.courseCode + " – " + sec.sectionID);
-        //     title.setFont(FontKit.bold(20f));
-        //     title.setForeground(TEXT_900);
+            JLabel subtitle = new JLabel(sec.courseName);
+            subtitle.setFont(FontKit.regular(15f));
+            subtitle.setForeground(TEXT_600);
 
-        //     JLabel subtitle = new JLabel(sec.courseName);
-        //     subtitle.setFont(FontKit.regular(15f));
-        //     subtitle.setForeground(TEXT_600);
+            JLabel sem = new JLabel("Semester: " + sec.semester);
+            sem.setFont(FontKit.regular(14f));
+            sem.setForeground(TEXT_600);
 
-        //     JLabel sem = new JLabel("Semester: " + sec.semester);
-        //     sem.setFont(FontKit.regular(14f));
-        //     sem.setForeground(TEXT_600);
+            left.add(title);
+            left.add(Box.createVerticalStrut(6));
+            left.add(subtitle);
+            left.add(Box.createVerticalStrut(4));
+            left.add(sem);
 
-        //     left.add(title);
-        //     left.add(Box.createVerticalStrut(6));
-        //     left.add(subtitle);
-        //     left.add(Box.createVerticalStrut(4));
-        //     left.add(sem);
+            card.add(left, BorderLayout.WEST);
 
-        //     card.add(left, BorderLayout.WEST);
+            // right column – action buttons
+            JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+            actions.setOpaque(false);
 
-        //     // right: action buttons
-        //     JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
-        //     actions.setOpaque(false);
+            RoundedButton csvBtn = new RoundedButton("Upload CSV");
+            csvBtn.addActionListener(e -> { new CSVUploadPage(instrID, displayName).setVisible(true); dispose(); });
+            csvBtn.setBackground(TEAL);
+            csvBtn.setForeground(Color.WHITE);
+            csvBtn.setFont(FontKit.semibold(14f));
+            csvBtn.setFocusPainted(false);
+            csvBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
 
-        //     JButton csvBtn = new JButton("Upload CSV");
-        //     csvBtn.setBackground(TEAL);
-        //     csvBtn.setForeground(Color.WHITE);
-        //     csvBtn.setFont(FontKit.semibold(14f));
-        //     csvBtn.setFocusPainted(false);
-        //     csvBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+            RoundedButton manualBtn = new RoundedButton("Manual Grading");
+            manualBtn.addActionListener(e -> { new ManualGradingPage(instrID, displayName).setVisible(true); dispose(); });
+            manualBtn.setBackground(TEAL_LIGHT);
+            manualBtn.setForeground(Color.WHITE);
+            manualBtn.setFont(FontKit.semibold(14f));
+            manualBtn.setFocusPainted(false);
+            manualBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
 
-        //     csvBtn.addActionListener(e -> { new CSVUploadPage(instrID, displayName).setVisible(true); dispose(); });
+            actions.add(csvBtn);
+            actions.add(manualBtn);
 
-        //     JButton manualBtn = new JButton("Manual Grading");
-        //     manualBtn.setBackground(TEAL_LIGHT);
-        //     manualBtn.setForeground(Color.WHITE);
-        //     manualBtn.setFont(FontKit.semibold(14f));
-        //     manualBtn.setFocusPainted(false);
-        //     manualBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+            card.add(actions, BorderLayout.EAST);
 
-        //     manualBtn.addActionListener(e -> { new ManualGradingPage(instrID, displayName).setVisible(true); dispose(); });
+            content.add(card);
+            content.add(Box.createVerticalStrut(16));
+        }
 
-        //     actions.add(csvBtn);
-        //     actions.add(manualBtn);
-
-        //     card.add(actions, BorderLayout.EAST);
-
-        //     content.add(card);
-        //     content.add(Box.createVerticalStrut(16));
-        // }
-
-        // root.add(new JScrollPane(content), BorderLayout.CENTER);
+        root.add(new JScrollPane(content), BorderLayout.CENTER);
 
 
         if (Maintenance.isOn()) {
@@ -246,41 +258,4 @@ public class GradeStudents extends JFrame {
             root.add(banner, BorderLayout.NORTH);
         }
     }
-
-    private RoundedPanel actionCard(String title, String desc, Runnable onClick) {
-        RoundedPanel card = new RoundedPanel(20);
-        card.setBackground(CARD);
-        card.setLayout(new BorderLayout());
-        card.setBorder(new EmptyBorder(20, 24, 20, 24));
-
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(FontKit.bold(18f));
-        titleLabel.setForeground(TEXT_900);
-
-        JLabel descLabel = new JLabel("<html><p style='width:240px;'>" + desc + "</p></html>");
-        descLabel.setFont(FontKit.regular(14f));
-        descLabel.setForeground(TEXT_600);
-
-        card.add(titleLabel, BorderLayout.NORTH);
-        card.add(descLabel, BorderLayout.CENTER);
-
-        // hover + click behavior
-        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        card.addMouseListener(new MouseAdapter() {
-            Color normal = CARD;
-            Color hover = new Color(238, 241, 245);
-            @Override public void mouseEntered(MouseEvent e) { 
-                card.setBackground(hover); card.repaint(); 
-            }
-            @Override public void mouseExited(MouseEvent e) { 
-                card.setBackground(normal); card.repaint(); 
-            }
-            @Override public void mouseClicked(MouseEvent e) {
-                onClick.run(); 
-            }
-        });
-
-        return card;
-    }
-
 }

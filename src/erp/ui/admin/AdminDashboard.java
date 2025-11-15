@@ -171,7 +171,7 @@ public class AdminDashboard extends JFrame {
 
         // Navigation Links
 
-        NavButton dashboardBtn = new NavButton("🏠 Dashboard", false);
+        NavButton dashboardBtn = new NavButton("🏠 Home", true);
         dashboardBtn.addActionListener(e -> {
             new AdminDashboard(userDisplayName).setVisible(true);
             AdminDashboard.this.dispose();
@@ -195,7 +195,7 @@ public class AdminDashboard extends JFrame {
         nav.add(manageCoursesBtn);
         nav.add(Box.createVerticalStrut(8));
 
-        NavButton assignInstBtn = new NavButton("👨 Assign Instructor", true);
+        NavButton assignInstBtn = new NavButton("👨 Assign Instructor", false);
         assignInstBtn.addActionListener(e -> {
             new AssignInstructor(userDisplayName).setVisible(true);
             AdminDashboard.this.dispose();

@@ -226,7 +226,8 @@ public class CSVUploadPage extends JFrame {
                     "CSV uploaded successfully.\nAll grades updated.",
                     "Success", JOptionPane.INFORMATION_MESSAGE);
 
-        } catch (Exception ex) {
+        } 
+        catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error reading file.", "Error", JOptionPane.ERROR_MESSAGE);
         }

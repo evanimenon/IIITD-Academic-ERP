@@ -12,6 +12,7 @@ import java.io.InputStream;
 import erp.auth.AuthService;
 import erp.ui.common.FontKit;
 import erp.ui.student.StudentDashboard;
+import erp.ui.common.RoundedButton;
 
 public class LoginPage extends JFrame {
 
@@ -279,34 +280,6 @@ public class LoginPage extends JFrame {
                 g3.drawString(placeholder, ins.left, getHeight() / 2 + getFont().getSize() / 2 - 3);
                 g3.dispose();
             }
-        }
-    }
-
-    public static class RoundedButton extends JButton {
-        private final Color base = new Color(39, 96, 92);
-        private final Color hover = new Color(28, 122, 120);
-        public RoundedButton(String text) {
-            super(text);
-            setFocusPainted(false);
-            setBorderPainted(false);
-            setContentAreaFilled(false);
-            setForeground(Color.WHITE);
-            setFont(FontKit.bold(18f));
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            setBorder(new EmptyBorder(14, 28, 14, 28));
-            setRolloverEnabled(true);
-        }
-        @Override protected void paintComponent(Graphics g) {
-            boolean isHover = getModel().isRollover();
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            int arc = 24, w = getWidth(), h = getHeight();
-            int shadowOffset = isHover ? 4 : 3;
-            g2.fill(new RoundRectangle2D.Double(1, shadowOffset, w - 2, h - 2, arc, arc));
-            g2.setColor(isHover ? hover : base);
-            g2.fill(new RoundRectangle2D.Double(0, 0, w - 2, h - shadowOffset - 1, arc, arc));
-            g2.dispose();
-            super.paintComponent(g);
         }
     }
 

@@ -11,6 +11,8 @@ import erp.ui.admin.AddUser.RoundedComboBox;
 import erp.ui.common.RoundedPanel;
 import erp.ui.common.NavButton;
 
+import erp.ui.common.RoundedButton;
+
 public class AssignInstructor extends JFrame {
 
     private static final Color TEAL_DARK = new Color(39, 96, 92);
@@ -92,7 +94,7 @@ public class AssignInstructor extends JFrame {
         nav.setBorder(new EmptyBorder(16, 0, 16, 0));
 
         // Navigation Links
-        NavButton dashboardBtn = new NavButton("🏠 Dashboard", false);
+        NavButton dashboardBtn = new NavButton("🏠 Home", false);
         dashboardBtn.addActionListener(e -> {
             new AdminDashboard(adminName).setVisible(true);
             AssignInstructor.this.dispose();
@@ -229,7 +231,7 @@ public class AssignInstructor extends JFrame {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
 
-        JButton assignBtn = new JButton("Assign Instructor");
+        RoundedButton assignBtn = new RoundedButton("Assign Instructor");
         assignBtn.setFont(FontKit.bold(16f));
         assignBtn.setForeground(Color.WHITE);
         assignBtn.setBackground(TEAL);
