@@ -1,8 +1,8 @@
 # AP-Project
 
 # macOS/ Linux
-javac -d out -cp "lib/*" $(find src -name "*.java")
-java -cp "out:lib/*:src" erp.Main
+javac -cp "lib/*" -d out $(find src -name "*.java")
+java -cp "out:lib/*:src:src/resources" erp.Main
 
 # Windows
 javac -d out -cp "lib/*" (Get-ChildItem -Recurse src\*.java | ForEach-Object {$_.FullName})
