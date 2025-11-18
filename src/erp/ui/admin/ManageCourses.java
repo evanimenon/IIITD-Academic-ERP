@@ -1,11 +1,30 @@
 package erp.ui.admin;
+import erp.db.DatabaseConnection;
+import erp.ui.admin.EditExistingCourses.TitleCell;
 import erp.ui.common.FontKit;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 import erp.ui.common.RoundedPanel;
+import erp.ui.student.CourseCatalog;
 import erp.ui.common.NavButton;
+import erp.db.Maintenance;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import erp.ui.common.TableHeader;
 
 public class ManageCourses extends JFrame{
     private static final Color TEAL_DARK = new Color(39, 96, 92);
@@ -15,6 +34,43 @@ public class ManageCourses extends JFrame{
     private static final Color TEXT_900 = new Color(24, 30, 37);
     private static final Color TEXT_600 = new Color(100, 116, 139);
     private static final Color CARD = Color.WHITE;
+    private static final Color BORDER_COLOR = new Color(230, 233, 236);
+
+    private RoundedPanel actionCard(String title, String desc, Runnable onClick) {
+        RoundedPanel card = new RoundedPanel(20);
+        card.setBackground(CARD);
+        card.setLayout(new BorderLayout());
+        card.setBorder(new EmptyBorder(20, 24, 20, 24));
+
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(FontKit.bold(18f));
+        titleLabel.setForeground(TEXT_900);
+
+        JLabel descLabel = new JLabel("<html><p style='width:240px;'>" + desc + "</p></html>");
+        descLabel.setFont(FontKit.regular(14f));
+        descLabel.setForeground(TEXT_600);
+
+        card.add(titleLabel, BorderLayout.NORTH);
+        card.add(descLabel, BorderLayout.CENTER);
+
+        // hover + click behavior
+        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        card.addMouseListener(new MouseAdapter() {
+            Color normal = CARD;
+            Color hover = new Color(238, 241, 245);
+            @Override public void mouseEntered(MouseEvent e) {
+                card.setBackground(hover); card.repaint();
+            }
+            @Override public void mouseExited(MouseEvent e) {
+                card.setBackground(normal); card.repaint();
+            }
+            @Override public void mouseClicked(MouseEvent e) {
+                onClick.run();
+            }
+        });
+
+        return card;
+    }
 
     public ManageCourses(String adminName) {
         setTitle("IIITD ERP – Manage Courses");
@@ -118,15 +174,6 @@ public class ManageCourses extends JFrame{
         });
         nav.add(assignInstBtn);
         nav.add(Box.createVerticalStrut(8));
-
-        NavButton maintenanceModeBtn = new NavButton("🔧 Maintenance Mode", false);
-        maintenanceModeBtn.addActionListener(e -> {
-            new MaintenanceMode(adminName).setVisible(true);
-            ManageCourses.this.dispose();
-        });
-        nav.add(maintenanceModeBtn);
-        nav.add(Box.createVerticalStrut(8));
-
         
         // Separator
         nav.add(new JSeparator() {{ 
@@ -138,7 +185,7 @@ public class ManageCourses extends JFrame{
         nav.add(Box.createVerticalStrut(40));
         nav.add(new NavButton("  ⚙️  Settings", false));
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("  🚪  Log Out", false)); // Used door emoji for log out
+        nav.add(new NavButton("  🚪  Log Out", false));
         
         sidebar.add(nav, BorderLayout.CENTER);
         root.add(sidebar, BorderLayout.WEST);
@@ -161,7 +208,54 @@ public class ManageCourses extends JFrame{
 
         root.add(hero, BorderLayout.NORTH);
 
-        //--- Main Area ---
-        JPanel main = new JPanel();
+        if (Maintenance.isOn()) {
+            RoundedPanel banner = new RoundedPanel(12);
+            banner.setBackground(new Color(255, 235, 230)); // light red
+            banner.setBorder(new EmptyBorder(12, 18, 12, 18));
+
+            JLabel msg = new JLabel("⚠️  Maintenance Mode is ON – Changes are disabled");
+            msg.setFont(FontKit.semibold(14f));
+            msg.setForeground(new Color(180, 60, 50));
+            banner.add(msg);
+
+            root.add(banner, BorderLayout.NORTH);
+        }
+
+
+        // Main container center area
+        JPanel mainArea = new JPanel(new BorderLayout());
+        mainArea.setOpaque(false);
+
+        // Section title
+        JLabel title = new JLabel("Select Editing Mode: ");
+        title.setFont(FontKit.semibold(24f));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBorder(new EmptyBorder(20, 0, 20, 0));
+        mainArea.add(title, BorderLayout.NORTH);
+
+        // Cards panel (3 cards)
+        JPanel cards = new JPanel(new GridLayout(1, 2, 20, 20));
+        cards.setOpaque(false);
+        cards.setBorder(new EmptyBorder(20, 40, 40, 40));
+
+        // --- STUDENT CARD ---
+        cards.add(actionCard("🎓 Add New Course",
+                            "Add a new course to the course catalog",
+                            () -> {
+                                new AddNewCourse(adminName).setVisible(true);
+                                ManageCourses.this.dispose();
+                            }));
+
+        // --- INSTRUCTOR CARD ---
+        cards.add(actionCard("👨 Edit Existing Course",
+                            "Edit details of an existing course",
+                            () -> {
+                                new EditExistingCourses(adminName).setVisible(true);
+                                ManageCourses.this.dispose();
+                            }));
+
+        mainArea.add(cards, BorderLayout.CENTER);
+        root.add(mainArea, BorderLayout.CENTER);
     }
+
 }

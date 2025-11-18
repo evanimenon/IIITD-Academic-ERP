@@ -6,9 +6,9 @@ public class Maintenance {
         return maintenanceOn; 
     }
     public static void turnOn() {
-         maintenanceOn = true; 
+        maintenanceOn = true; 
     }
     public static void turnOff() {
-         maintenanceOn = false; 
+        maintenanceOn = false; 
     }
 }

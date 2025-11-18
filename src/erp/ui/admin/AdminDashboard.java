@@ -13,10 +13,10 @@ import java.util.Locale;
 import erp.ui.common.RoundedPanel;
 import erp.ui.common.NavButton;
 
-// Auth helpers (must exist in your project)
 import erp.auth.AuthContext;
 import erp.auth.Role;
 import erp.ui.auth.LoginPage;
+import erp.db.Maintenance;
 
 public class AdminDashboard extends JFrame {
 
@@ -69,13 +69,13 @@ public class AdminDashboard extends JFrame {
 
     private RoundedPanel maintenanceCard() {
         RoundedPanel card = new RoundedPanel(20);
-        card.setBackground(CARD);
+        card.setBackground(TEAL);
         card.setLayout(new BorderLayout());
         card.setBorder(new EmptyBorder(20, 24, 20, 24));
 
         JLabel label = new JLabel("🔧 Maintenance Mode");
         label.setFont(FontKit.bold(18f));
-        label.setForeground(TEXT_900);
+        label.setForeground(CARD);
 
         JLabel status = new JLabel(MAINTENANCE_MODE ? "ON" : "OFF", SwingConstants.RIGHT);
         status.setFont(FontKit.semibold(16f));
@@ -86,19 +86,32 @@ public class AdminDashboard extends JFrame {
 
         card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         card.addMouseListener(new MouseAdapter() {
-            Color normal = CARD;
-            Color hover = new Color(238, 241, 245);
-            @Override public void mouseEntered(MouseEvent e) { card.setBackground(hover); card.repaint(); }
-            @Override public void mouseExited(MouseEvent e) { card.setBackground(normal); card.repaint(); }
+            final Color normal = card.getBackground();
+            final Color hover  = normal.darker();
+            @Override public void mouseEntered(MouseEvent e) {
+                card.setBackground(hover);
+                card.repaint();
+            }
+            @Override public void mouseExited(MouseEvent e) {
+                card.setBackground(normal);
+                card.repaint();
+            }
             @Override public void mouseClicked(MouseEvent e) {
                 MAINTENANCE_MODE = !MAINTENANCE_MODE;
-                status.setText(MAINTENANCE_MODE ? "ON" : "OFF");
-                status.setForeground(MAINTENANCE_MODE ? new Color(34, 197, 94) : new Color(229, 72, 77));
-                JOptionPane.showMessageDialog(card, "Maintenance mode " +
-                        (MAINTENANCE_MODE ? "enabled" : "disabled"));
+                if(MAINTENANCE_MODE){
+                    status.setText("ON");
+                    status.setForeground(new Color(34, 197, 94));
+                    erp.db.Maintenance.turnOn();
+                    JOptionPane.showMessageDialog(card, "Maintenance mode enabled");
+                } 
+                else {
+                    status.setText("OFF");
+                    status.setForeground(new Color(229, 72, 77));
+                    erp.db.Maintenance.turnOff();
+                    JOptionPane.showMessageDialog(card, "Maintenance mode disabled");
+                }
             }
         });
-
         return card;
     }
 
@@ -166,13 +179,12 @@ public class AdminDashboard extends JFrame {
         name.setFont(FontKit.bold(18f));
         profile.add(name);
 
-        JLabel meta = new JLabel("Year, Program");
+        JLabel meta = new JLabel("Year, ID");
         meta.setAlignmentX(Component.CENTER_ALIGNMENT);
         meta.setForeground(new Color(210, 225, 221));
         meta.setFont(FontKit.regular(14f));
         profile.add(meta);
 
-        // Rounded corners for the entire profile block (visual style enhancement)
         profile.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(TEAL_LIGHT, 1),
             new EmptyBorder(8, 8, 32, 8)
@@ -198,7 +210,7 @@ public class AdminDashboard extends JFrame {
 
         NavButton addUserBtn = new NavButton("👤 Add User", false);
         addUserBtn.addActionListener(e -> {
-            new AddUser(userDisplayName).setVisible(true);
+            new AddStudent(userDisplayName).setVisible(true);
             AdminDashboard.this.dispose();
         });
         nav.add(addUserBtn);
@@ -218,14 +230,6 @@ public class AdminDashboard extends JFrame {
             AdminDashboard.this.dispose();
         });
         nav.add(assignInstBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-        NavButton maintenanceModeBtn = new NavButton("🔧 Maintenance Mode", false);
-        maintenanceModeBtn.addActionListener(e -> {
-            new MaintenanceMode(userDisplayName).setVisible(true);
-            AdminDashboard.this.dispose();
-        });
-        nav.add(maintenanceModeBtn);
         nav.add(Box.createVerticalStrut(8));
 
 

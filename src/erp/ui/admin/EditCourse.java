@@ -1,27 +1,39 @@
 package erp.ui.admin;
-import erp.db.Maintenance;
-import erp.ui.common.FontKit;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import erp.ui.common.RoundedPanel;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import erp.db.DatabaseConnection;
+import erp.ui.common.FontKit;
 import erp.ui.common.NavButton;
-
 import erp.ui.common.RoundedButton;
+import erp.ui.common.RoundedPanel;
+import erp.ui.common.RoundedTextField;
 
-public class MaintenanceMode extends JFrame{
-
+public class EditCourse extends JFrame {
     private static final Color TEAL_DARK = new Color(39, 96, 92);
     private static final Color TEAL = new Color(28, 122, 120);
     private static final Color TEAL_LIGHT = new Color(55, 115, 110);
     private static final Color BG = new Color(246, 247, 248);
     private static final Color TEXT_900 = new Color(24, 30, 37);
+    private static final Color BORDER = new Color(230, 233, 236);
     private static final Color TEXT_600 = new Color(100, 116, 139);
     private static final Color CARD = Color.WHITE;
 
-    public MaintenanceMode(String adminName) {
-        setTitle("IIITD ERP – Maintenance Mode");
+    private RoundedTextField codeField, titleField, creditField;
+
+    private final String courseId;
+    private final String adminName;
+
+    public EditCourse(String adminName, String courseId) {
+        this.adminName = adminName;
+        this.courseId = courseId;
+
+        setTitle("IIITD ERP – Assign Instructor");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(1220, 840));
         setLocationRelativeTo(null);
@@ -94,7 +106,7 @@ public class MaintenanceMode extends JFrame{
         NavButton dashboardBtn = new NavButton("🏠 Home", false);
         dashboardBtn.addActionListener(e -> {
             new AdminDashboard(adminName).setVisible(true);
-            MaintenanceMode.this.dispose();
+            EditCourse.this.dispose();
         });
         nav.add(dashboardBtn);
         nav.add(Box.createVerticalStrut(8));
@@ -102,15 +114,15 @@ public class MaintenanceMode extends JFrame{
         NavButton addUserBtn = new NavButton("👤 Add User", false);
         addUserBtn.addActionListener(e -> {
             new AddUser(adminName).setVisible(true);
-            MaintenanceMode.this.dispose();
+            EditCourse.this.dispose();
         });
         nav.add(addUserBtn);
         nav.add(Box.createVerticalStrut(8));
 
-        NavButton manageCoursesBtn = new NavButton("📘 Manage Courses", false);
+        NavButton manageCoursesBtn = new NavButton("📘 Manage Courses", true);
         manageCoursesBtn.addActionListener(e -> {
             new ManageCourses(adminName).setVisible(true);
-            MaintenanceMode.this.dispose();
+            EditCourse.this.dispose();
         });
         nav.add(manageCoursesBtn);
         nav.add(Box.createVerticalStrut(8));
@@ -118,17 +130,9 @@ public class MaintenanceMode extends JFrame{
         NavButton assignInstBtn = new NavButton("👨 Assign Instructor", false);
         assignInstBtn.addActionListener(e -> {
             new AssignInstructor(adminName).setVisible(true);
-            MaintenanceMode.this.dispose();
+            EditCourse.this.dispose();
         });
         nav.add(assignInstBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-        NavButton maintenanceModeBtn = new NavButton("🔧 Maintenance Mode", true);
-        maintenanceModeBtn.addActionListener(e -> {
-            new MaintenanceMode(adminName).setVisible(true);
-            MaintenanceMode.this.dispose();
-        });
-        nav.add(maintenanceModeBtn);
         nav.add(Box.createVerticalStrut(8));
 
         
@@ -153,7 +157,7 @@ public class MaintenanceMode extends JFrame{
         hero.setBorder(new EmptyBorder(24, 28, 24, 28));
         hero.setLayout(new BorderLayout());
 
-        JLabel h1 = new JLabel("🔧 Maintenance Mode");
+        JLabel h1 = new JLabel("👨 Assign Instructor");
         h1.setFont(FontKit.bold(28f));
         h1.setForeground(Color.WHITE);
         hero.add(h1, BorderLayout.WEST);
@@ -165,58 +169,124 @@ public class MaintenanceMode extends JFrame{
 
         root.add(hero, BorderLayout.NORTH);
 
-        // --- Main Area ---
-        JPanel main = new JPanel();
-        main.setOpaque(false);
-        main.setLayout(new GridBagLayout());
-        root.add(main, BorderLayout.CENTER);
+        // --- Main content area ---
+        RoundedPanel form = new RoundedPanel(20);
+        form.setBackground(Color.WHITE);
+        form.setBorder(new EmptyBorder(32, 40, 32, 40));
+        form.setLayout(new GridBagLayout());
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.insets = new Insets(12, 12, 12, 12);
+        gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.weightx = 1;
 
-        // Card
-        RoundedPanel card = new RoundedPanel(24);
-        card.setBackground(CARD);
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBorder(new EmptyBorder(40, 50, 40, 50));
+        // Fields
+        codeField   = new RoundedTextField(20, "Enter course code");
+        titleField  = new RoundedTextField(20, "Enter course title");
+        creditField = new RoundedTextField(20, "Enter credits");
 
-        // Heading
-        JLabel title = new JLabel("Turn Maintenance Mode On?");
-        title.setFont(FontKit.bold(22f));
-        title.setForeground(TEXT_900);
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        card.add(title);
+        addRow(form, gc, 0, "Course Code", codeField);
+        addRow(form, gc, 1, "Title", titleField);
+        addRow(form, gc, 2, "Credits", creditField);
 
-        card.add(Box.createVerticalStrut(24));
+        root.add(form, BorderLayout.CENTER);
 
-        // Yes button
-        RoundedButton yesBtn = new RoundedButton("Enable");
-        yesBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        yesBtn.setFont(FontKit.semibold(16f));
-        yesBtn.setFocusPainted(false);
-        yesBtn.setBackground(TEAL);
-        yesBtn.setForeground(Color.WHITE);
-        yesBtn.setPreferredSize(new Dimension(160, 42));
-        yesBtn.addActionListener(e -> {
-            Maintenance.turnOn();
-            JOptionPane.showMessageDialog(this, "Maintenance Mode Enabled");
+        // Buttons
+        JPanel btns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 16, 12));
+        btns.setOpaque(false);
+
+        RoundedButton cancel = new RoundedButton("Cancel");
+        cancel.addActionListener(e -> {
+            new EditExistingCourses(adminName).setVisible(true);
+            dispose();
         });
-        card.add(yesBtn);
 
-        card.add(Box.createVerticalStrut(16));
+        RoundedButton save = new RoundedButton("Save Changes");
+        save.addActionListener(e -> saveChanges());
 
-        // No button
-        RoundedButton noBtn = new RoundedButton("Disable");
-        noBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        noBtn.setFont(FontKit.semibold(16f));
-        noBtn.setFocusPainted(false);
-        noBtn.setBackground(TEXT_600);
-        noBtn.setForeground(Color.WHITE);
-        noBtn.setPreferredSize(new Dimension(160, 42));
-        noBtn.addActionListener(e -> {
-            Maintenance.turnOff();
-            JOptionPane.showMessageDialog(this, "Maintenance Mode Disabled");
-        });
-        card.add(noBtn);
-        main.add(card);
+        btns.add(cancel);
+        btns.add(save);
 
+        root.add(btns, BorderLayout.SOUTH);
 
+        loadCourse();
+    }
+
+    private void addRow(JPanel p, GridBagConstraints gc, int row,String label, JComponent field) {
+        gc.gridx = 0; gc.gridy = row;
+        gc.weightx = 0;
+        JLabel l = new JLabel(label);
+        l.setFont(FontKit.semibold(15f));
+        p.add(l, gc);
+
+        gc.gridx = 1;
+        gc.weightx = 1;
+        p.add(field, gc);
+    }
+
+    private void loadCourse() {
+        String query = "SELECT code, title, credits FROM courses WHERE course_id = ?";
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setString(1, courseId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                codeField.setText(rs.getString("code"));
+                titleField.setText(rs.getString("title"));
+                creditField.setText(String.valueOf(rs.getInt("credits")));
+            }
+        } 
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(this,"Failed to load course:\n" + e.getMessage(),"Database Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void saveChanges() {
+        String code = codeField.getText().trim();
+        String title = titleField.getText().trim();
+        String creditsStr = creditField.getText().trim();
+
+        if (code.isEmpty() || title.isEmpty() || creditsStr.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "All fields are required.");
+            return;
+        }
+
+        int credits;
+        try {
+            credits = Integer.parseInt(creditsStr);
+        } 
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(this,"Credits must be a number.","Invalid Input",JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String query = "UPDATE courses SET code = ?, title = ?, credits = ? WHERE course_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setString(1, code);
+            ps.setString(2, title);
+            ps.setInt(3, credits);
+            ps.setString(4, courseId);
+
+            ps.executeUpdate();
+
+            JOptionPane.showMessageDialog(this,
+                    "Course updated successfully!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            new EditExistingCourses(adminName).setVisible(true);
+            dispose();
+
+        } 
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Failed to update course:\n" + e.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

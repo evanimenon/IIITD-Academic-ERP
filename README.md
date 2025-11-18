@@ -8,7 +8,7 @@ java -cp "out:lib/*:src" erp.Main
 javac -d out -cp "lib/*" (Get-ChildItem -Recurse src\*.java | ForEach-Object {$_.FullName})
 java -cp "out;lib/*;src" erp.Main
 
-# in cmd.exe ?
+# in cmd
 mkdir bin/del files.txt
 for /R src %f in (*.java) do @echo %f >> files.txt
 javac -cp ".;lib/*" -d bin @files.txt
@@ -27,4 +27,3 @@ java -cp "out:lib/*" erp.tools.ImportUsersCsv ./auth_db.csv
 | **Admin**     | `admin1`                              | `admin@123`  |
 | **Instructor**| `inst1`, `sambuddho`, `payel`, etc.   | `inst@123`   |
 | **Student**   | `stu1`, `stu2`                        | `stud@123`   |
-

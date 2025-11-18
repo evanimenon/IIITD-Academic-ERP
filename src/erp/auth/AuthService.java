@@ -12,6 +12,7 @@ import java.util.logging.Logger;
  * - Returns a Session containing userId, username and role.
  * - Does not leak whether username exists; returns generic AuthException on failure.
  */
+
 public class AuthService {
     private static final Logger LOGGER = Logger.getLogger(AuthService.class.getName());
 

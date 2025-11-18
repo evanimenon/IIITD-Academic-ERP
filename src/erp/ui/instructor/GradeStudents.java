@@ -10,7 +10,7 @@ import java.awt.*;
 
 import erp.db.DatabaseConnection;
 import erp.db.Maintenance;
-import erp.ui.admin.AddUser;
+import erp.ui.admin.AddStudent;
 import erp.ui.admin.AdminDashboard;
 import erp.ui.admin.ManageCourses;
 import erp.ui.auth.LoginPage;

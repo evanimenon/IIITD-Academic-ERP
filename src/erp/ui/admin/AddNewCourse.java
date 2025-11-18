@@ -1,27 +1,26 @@
 package erp.ui.admin;
 
 import erp.ui.common.FontKit;
+import erp.ui.common.RoundedButton;
+import erp.ui.common.RoundedPasswordField;
+import erp.ui.common.RoundedTextField;
+import erp.db.DatabaseConnection;
+import erp.ui.common.NavButton;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicComboBoxUI;
-
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import erp.ui.common.RoundedTextField;
+import org.mindrot.jbcrypt.BCrypt;
 import erp.db.Maintenance;
-import erp.ui.common.RoundedPasswordField;
-import erp.ui.common.NavButton;
-import erp.ui.common.RoundedButton;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import erp.ui.common.RoundedPanel;
-
-public class AddUser extends JFrame {
+public class AddNewCourse extends JFrame {
 
     private static final Color TEAL_DARK = new Color(39, 96, 92);
     private static final Color TEAL = new Color(28, 122, 120);
@@ -31,44 +30,8 @@ public class AddUser extends JFrame {
     private static final Color TEXT_600 = new Color(100, 116, 139);
     private static final Color CARD = Color.WHITE;
 
-    private RoundedPanel actionCard(String title, String desc, Runnable onClick) {
-        RoundedPanel card = new RoundedPanel(20);
-        card.setBackground(CARD);
-        card.setLayout(new BorderLayout());
-        card.setBorder(new EmptyBorder(20, 24, 20, 24));
-
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(FontKit.bold(18f));
-        titleLabel.setForeground(TEXT_900);
-
-        JLabel descLabel = new JLabel("<html><p style='width:240px;'>" + desc + "</p></html>");
-        descLabel.setFont(FontKit.regular(14f));
-        descLabel.setForeground(TEXT_600);
-
-        card.add(titleLabel, BorderLayout.NORTH);
-        card.add(descLabel, BorderLayout.CENTER);
-
-        // hover + click behavior
-        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        card.addMouseListener(new MouseAdapter() {
-            Color normal = CARD;
-            Color hover = new Color(238, 241, 245);
-            @Override public void mouseEntered(MouseEvent e) {
-                card.setBackground(hover); card.repaint();
-            }
-            @Override public void mouseExited(MouseEvent e) {
-                card.setBackground(normal); card.repaint();
-            }
-            @Override public void mouseClicked(MouseEvent e) {
-                onClick.run();
-            }
-        });
-
-        return card;
-    }
-
-    public AddUser(String adminName) {
-        setTitle("IIITD ERP – Add User");
+    public AddNewCourse(String adminName) {
+        setTitle("IIITD ERP – Add New Course");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(1220, 840));
         setLocationRelativeTo(null);
@@ -94,19 +57,19 @@ public class AddUser extends JFrame {
         // Circular Avatar with rounded corner panel
         JPanel avatarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         avatarPanel.setOpaque(false);
-
+        
         JLabel avatar = new JLabel() {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(new Color(230, 233, 236));
                 // Draw a circle
-                g2.fillOval(0, 0, getWidth(), getHeight());
+                g2.fillOval(0, 0, getWidth(), getHeight()); 
                 g2.dispose();
             }
             @Override public Dimension getPreferredSize() { return new Dimension(100, 100); }
         };
-
+        
         avatarPanel.add(avatar);
         profile.add(avatarPanel);
         profile.add(Box.createVerticalStrut(16));
@@ -117,12 +80,12 @@ public class AddUser extends JFrame {
         name.setFont(FontKit.bold(18f));
         profile.add(name);
 
-        JLabel meta = new JLabel("Year, Program");
+        JLabel meta = new JLabel("Year");
         meta.setAlignmentX(Component.CENTER_ALIGNMENT);
         meta.setForeground(new Color(210, 225, 221));
         meta.setFont(FontKit.regular(14f));
         profile.add(meta);
-
+        
         // Rounded corners for the entire profile block (visual style enhancement)
         profile.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(TEAL_LIGHT, 1),
@@ -141,23 +104,23 @@ public class AddUser extends JFrame {
         NavButton dashboardBtn = new NavButton("🏠 Home", false);
         dashboardBtn.addActionListener(e -> {
             new AdminDashboard(adminName).setVisible(true);
-            AddUser.this.dispose();
+            AddNewCourse.this.dispose();
         });
         nav.add(dashboardBtn);
         nav.add(Box.createVerticalStrut(8));
 
-        NavButton addUserBtn = new NavButton("👤 Add User", true);
+        NavButton addUserBtn = new NavButton("👤 Add User", false);
         addUserBtn.addActionListener(e -> {
             new AddUser(adminName).setVisible(true);
-            AddUser.this.dispose();
+            AddNewCourse.this.dispose();
         });
         nav.add(addUserBtn);
         nav.add(Box.createVerticalStrut(8));
 
-        NavButton manageCoursesBtn = new NavButton("📘 Manage Courses", false);
+        NavButton manageCoursesBtn = new NavButton("📘 Manage Courses", true);
         manageCoursesBtn.addActionListener(e -> {
             new ManageCourses(adminName).setVisible(true);
-            AddUser.this.dispose();
+            AddNewCourse.this.dispose();
         });
         nav.add(manageCoursesBtn);
         nav.add(Box.createVerticalStrut(8));
@@ -165,24 +128,24 @@ public class AddUser extends JFrame {
         NavButton assignInstBtn = new NavButton("👨 Assign Instructor", false);
         assignInstBtn.addActionListener(e -> {
             new AssignInstructor(adminName).setVisible(true);
-            AddUser.this.dispose();
+            AddNewCourse.this.dispose();
         });
         nav.add(assignInstBtn);
         nav.add(Box.createVerticalStrut(8));
 
-
+        
         // Separator
-        nav.add(new JSeparator() {{
-            setForeground(new Color(60, 120, 116));
+        nav.add(new JSeparator() {{ 
+            setForeground(new Color(60, 120, 116)); 
             setBackground(new Color(60, 120, 116));
             setMaximumSize(new Dimension(240, 1));
             setAlignmentX(Component.CENTER_ALIGNMENT);
         }});
         nav.add(Box.createVerticalStrut(40));
-        nav.add(new NavButton("  ⚙️  Settings", false));
+        nav.add(new NavButton("  ⚙️  Settings", false));
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("  🚪  Log Out", false)); // Used door emoji for log out
-
+        nav.add(new NavButton("  🚪  Log Out", false)); // Used door emoji for log out
+        
         sidebar.add(nav, BorderLayout.CENTER);
         root.add(sidebar, BorderLayout.WEST);
 
@@ -218,42 +181,137 @@ public class AddUser extends JFrame {
         }
 
 
-        // Main container center area
-        JPanel mainArea = new JPanel(new BorderLayout());
-        mainArea.setOpaque(false);
+        // --- Main form ---
+        RoundedPanel formCard = new RoundedPanel(20);
+        formCard.setBackground(CARD);
+        formCard.setBorder(new EmptyBorder(40, 60, 60, 60));
+        formCard.setLayout(new GridBagLayout());
+        root.add(formCard, BorderLayout.CENTER);
 
-        // Section title
-        JLabel title = new JLabel("Select User Type to Add");
-        title.setFont(FontKit.semibold(24f));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBorder(new EmptyBorder(20, 0, 20, 0));
-        mainArea.add(title, BorderLayout.NORTH);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0; 
+        gbc.gridy = 0;
 
-        // Cards panel (3 cards)
-        JPanel cards = new JPanel(new GridLayout(1, 2, 20, 20));
-        cards.setOpaque(false);
-        cards.setBorder(new EmptyBorder(20, 40, 40, 40));
 
-        // --- STUDENT CARD ---
-        cards.add(actionCard("🎓 Add Student",
-                            "Create a new student account",
-                            () -> {
-                                new AddStudent(adminName).setVisible(true);
-                                AddUser.this.dispose();
-                            }));
+        // ID
+        formCard.add(label("Course ID:"), gbc);
 
-        // --- INSTRUCTOR CARD ---
-        cards.add(actionCard("👨 Add Instructor",
-                            "Add a faculty/instructor account",
-                            () -> {
-                                new AddInstructor(adminName).setVisible(true);
-                                AddUser.this.dispose();
-                            }));
+        gbc.gridx = 1;
+        RoundedTextField idField = new RoundedTextField(30, "Enter Course ID");
+        idField.setFont(FontKit.regular(15f));
+        formCard.add(idField, gbc);
 
-        mainArea.add(cards, BorderLayout.CENTER);
+        // CODE
+        gbc.gridx = 0; gbc.gridy++;
+        formCard.add(label("Course Code:"), gbc);
 
-        // finally add to frame
-        root.add(mainArea, BorderLayout.CENTER);
+        gbc.gridx = 1;
+        RoundedTextField codeField = new RoundedTextField(30, "Enter Course code");
+        codeField.setFont(FontKit.regular(15f));
+        formCard.add(codeField, gbc);
+
+        // TITLE
+        gbc.gridx = 0; gbc.gridy++;
+        formCard.add(label("Course Title:"), gbc);
+
+        gbc.gridx = 1;
+        RoundedTextField titleField = new RoundedTextField(30, "Enter course title");
+        titleField.setFont(FontKit.regular(15f));
+        formCard.add(titleField, gbc);
+
+        // CREDITS
+        gbc.gridx = 0; gbc.gridy++;
+        formCard.add(label("Credits:"), gbc);
+
+        gbc.gridx = 1;
+        String[] credits = { "1", "2", "4" };
+        JComboBox<String> creditBox = new JComboBox<>(credits);
+        creditBox.setFont(FontKit.regular(15f));
+        formCard.add(creditBox, gbc);
+
+        // ADD BUTTON
+        gbc.gridx = 0; gbc.gridy++;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        RoundedButton submitBtn = new RoundedButton("Add Course");
+        submitBtn.setFont(FontKit.bold(16f));
+        submitBtn.setBackground(TEAL_DARK);
+        submitBtn.setForeground(Color.WHITE);
+        submitBtn.setFocusPainted(false);
+        submitBtn.setBorder(new EmptyBorder(10, 30, 10, 30));
+        submitBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        submitBtn.addActionListener(e -> {
+            String courseId = idField.getText().trim();
+            String code = codeField.getText().trim();
+            String title = titleField.getText().trim();
+            int creditno = Integer.parseInt((String) creditBox.getSelectedItem());
+
+            if (courseId.isEmpty() || code.isEmpty() || title.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            boolean saved = addCourse(courseId, code, title, creditno);
+            if (saved) {
+                JOptionPane.showMessageDialog(this, "Student added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                idField.setText("");
+                codeField.setText("");
+                titleField.setText("");
+                creditBox.setSelectedIndex(0);
+            } 
+            else {
+                JOptionPane.showMessageDialog(this, "Student ID or Roll Number already exists!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        formCard.add(submitBtn, gbc);
+    }
+
+    private boolean addCourse(String courseId, String code, String title, int credits) {
+        try (Connection erpConn = DatabaseConnection.erp().getConnection();) {
+
+            // Check ERP duplicates
+            try (PreparedStatement ps = erpConn.prepareStatement("SELECT COUNT(*) FROM courses WHERE course_id=? AND code=?")) {
+                ps.setString(1, courseId);
+                ps.setString(2, code);
+                try (ResultSet rs = ps.executeQuery()) {
+                    rs.next();
+                    // maintaining count for debugging
+                    int count = rs.getInt(1);
+                    System.out.println("ERP duplicate count: " + count);
+                    if (count > 0){
+                        return false;
+                    }
+                }
+            }
+
+            // Insert ERP
+            try (PreparedStatement ps = erpConn.prepareStatement("INSERT INTO courses(course_id, code, title, credits) VALUES (?, ?, ?, ?, ?)")) {
+                ps.setString(1, courseId);
+                ps.setString(2, code);
+                ps.setString(3, title);
+                ps.setInt(5, credits);
+                ps.executeUpdate();
+            }
+            return true;
+
+        } 
+        catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    private JLabel label(String text) {
+        JLabel l = new JLabel(text);
+        l.setFont(FontKit.semibold(16f));
+        l.setForeground(TEXT_900);
+        return l;
     }
 
     public static class RoundedComboBox<E> extends JComboBox<E> {
@@ -295,8 +353,6 @@ public class AddUser extends JFrame {
                     // no grey highlight
                 }
             });
-
-            // remove default border
             setBorder(new EmptyBorder(12, 16, 12, 16));
         }
 
@@ -328,10 +384,31 @@ public class AddUser extends JFrame {
         }
     }
 
+    // Rounded panel class (reuse from Dashboard)
+    static class RoundedPanel extends JPanel {
+        private final int arc;
+        RoundedPanel(int arc) { this.arc = arc; setOpaque(false); }
+        @Override protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            int w = getWidth(), h = getHeight();
+            for (int i = 6; i >= 1; i--) {
+                float a = 0.035f * (i / 6f);
+                g2.setColor(new Color(0, 0, 0, a));
+                g2.fill(new RoundRectangle2D.Double(6 - i, 6 - i, w - 12 + 2*i, h - 12 + 2*i, arc + i, arc + i));
+            }
+            g2.setColor(getBackground());
+            g2.fill(new RoundRectangle2D.Double(6, 6, w - 12, h - 12, arc, arc));
+            g2.dispose();
+            super.paintComponent(g);
+        }
+    }
+
     // For manual test
     public static void main(String[] args) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
         FontKit.init();
-        SwingUtilities.invokeLater(() -> new AddUser("Admin 123").setVisible(true));
+        SwingUtilities.invokeLater(() -> new AddStudent("Admin 123").setVisible(true));
     }
+    
 }

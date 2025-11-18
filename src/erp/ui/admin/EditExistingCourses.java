@@ -1,21 +1,38 @@
-package erp.ui.student;
+package erp.ui.admin;
+import erp.db.DatabaseConnection;
+import erp.ui.common.FontKit;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.sql.*;
-import java.util.regex.PatternSyntaxException;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
-import erp.db.DatabaseConnection;
-import erp.db.Maintenance;
-import erp.ui.common.FontKit;
+import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 import erp.ui.common.RoundedPanel;
+import erp.ui.student.CourseCatalog;
+import erp.ui.common.NavButton;
+import erp.db.Maintenance;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import erp.ui.common.TableHeader;
 
-public class CourseCatalog extends StudentFrameBase {
-
+public class EditExistingCourses extends JFrame{
+    private static final Color TEAL_DARK = new Color(39, 96, 92);
+    private static final Color TEAL = new Color(28, 122, 120);
+    private static final Color TEAL_LIGHT = new Color(55, 115, 110);
+    private static final Color BG = new Color(246, 247, 248);
+    private static final Color TEXT_900 = new Color(24, 30, 37);
+    private static final Color TEXT_600 = new Color(100, 116, 139);
+    private static final Color CARD = Color.WHITE;
     private static final Color BORDER_COLOR = new Color(230, 233, 236);
 
     static class TitleCell {
@@ -29,25 +46,143 @@ public class CourseCatalog extends StudentFrameBase {
     private DefaultTableModel model;
     private JTable table;
 
-    public CourseCatalog(String userDisplayName) {
-        super(userDisplayName, Page.CATALOG);
-        setTitle("IIITD ERP – Course Catalog");
-        if (Maintenance.isOn()) {
-            RoundedPanel banner = new RoundedPanel(12);
-            banner.setBackground(new Color(255, 235, 230)); // light red
-            banner.setBorder(new EmptyBorder(12, 18, 12, 18));
+    public EditExistingCourses(String adminName) {
+        setTitle("IIITD ERP – Manage Courses");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setMinimumSize(new Dimension(1220, 840));
+        setLocationRelativeTo(null);
 
-            JLabel msg = new JLabel("⚠️  Maintenance Mode is ON – Changes are disabled");
-            msg.setFont(FontKit.semibold(14f));
-            msg.setForeground(new Color(180, 60, 50));
-            banner.add(msg);
+        JPanel root = new JPanel(new BorderLayout());
+        root.setBackground(BG);
+        setContentPane(root);
 
-            root.add(banner, BorderLayout.NORTH);
-        }
-    }
+        // --- Sidebar ---
+        JPanel sidebar = new JPanel();
+        sidebar.setBackground(TEAL_DARK);
+        sidebar.setPreferredSize(new Dimension(280, 0));
+        sidebar.setLayout(new BorderLayout());
+        sidebar.setBorder(new EmptyBorder(24, 16, 24, 16));
 
-    @Override
-    protected JComponent buildMainContent() {
+        // Profile block (Top part of sidebar)
+        JPanel profile = new JPanel();
+        profile.setOpaque(false);
+        profile.setLayout(new BoxLayout(profile, BoxLayout.Y_AXIS));
+        EmptyBorder br = new EmptyBorder(8, 8, 32, 8);
+        profile.setBorder(br);
+
+        // Circular Avatar with rounded corner panel
+        JPanel avatarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        avatarPanel.setOpaque(false);
+        
+        JLabel avatar = new JLabel() {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new Color(230, 233, 236));
+                // Draw a circle
+                g2.fillOval(0, 0, getWidth(), getHeight()); 
+                g2.dispose();
+            }
+            @Override public Dimension getPreferredSize() { return new Dimension(100, 100); }
+        };
+        
+        avatarPanel.add(avatar);
+        profile.add(avatarPanel);
+        profile.add(Box.createVerticalStrut(16));
+
+        JLabel name = new JLabel(adminName);
+        name.setAlignmentX(Component.CENTER_ALIGNMENT);
+        name.setForeground(Color.WHITE);
+        name.setFont(FontKit.bold(18f));
+        profile.add(name);
+
+        JLabel meta = new JLabel("Year, Program");
+        meta.setAlignmentX(Component.CENTER_ALIGNMENT);
+        meta.setForeground(new Color(210, 225, 221));
+        meta.setFont(FontKit.regular(14f));
+        profile.add(meta);
+        
+        // Rounded corners for the entire profile block (visual style enhancement)
+        profile.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(TEAL_LIGHT, 1),
+            new EmptyBorder(8, 8, 32, 8)
+        ));
+
+        sidebar.add(profile, BorderLayout.NORTH);
+
+        // Nav
+        JPanel nav = new JPanel();
+        nav.setOpaque(false);
+        nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
+        nav.setBorder(new EmptyBorder(16, 0, 16, 0));
+
+        // Navigation Links
+        NavButton dashboardBtn = new NavButton("🏠 Home", false);
+        dashboardBtn.addActionListener(e -> {
+            new AdminDashboard(adminName).setVisible(true);
+            EditExistingCourses.this.dispose();
+        });
+        nav.add(dashboardBtn);
+        nav.add(Box.createVerticalStrut(8));
+
+        NavButton addUserBtn = new NavButton("👤 Add User", false);
+        addUserBtn.addActionListener(e -> {
+            new AddUser(adminName).setVisible(true);
+            EditExistingCourses.this.dispose();
+        });
+        nav.add(addUserBtn);
+        nav.add(Box.createVerticalStrut(8));
+
+        NavButton manageCoursesBtn = new NavButton("📘 Manage Courses", true);
+        manageCoursesBtn.addActionListener(e -> {
+            new ManageCourses(adminName).setVisible(true);
+            EditExistingCourses.this.dispose();
+        });
+        nav.add(manageCoursesBtn);
+        nav.add(Box.createVerticalStrut(8));
+
+        NavButton assignInstBtn = new NavButton("👨 Assign Instructor", false);
+        assignInstBtn.addActionListener(e -> {
+            new AssignInstructor(adminName).setVisible(true);
+            EditExistingCourses.this.dispose();
+        });
+        nav.add(assignInstBtn);
+        nav.add(Box.createVerticalStrut(8));
+        
+        // Separator
+        nav.add(new JSeparator() {{ 
+            setForeground(new Color(60, 120, 116)); 
+            setBackground(new Color(60, 120, 116));
+            setMaximumSize(new Dimension(240, 1));
+            setAlignmentX(Component.CENTER_ALIGNMENT);
+        }});
+        nav.add(Box.createVerticalStrut(40));
+        nav.add(new NavButton("  ⚙️  Settings", false));
+        nav.add(Box.createVerticalStrut(8));
+        nav.add(new NavButton("  🚪  Log Out", false));
+        
+        sidebar.add(nav, BorderLayout.CENTER);
+        root.add(sidebar, BorderLayout.WEST);
+
+        // --- Top banner ---
+        RoundedPanel hero = new RoundedPanel(24);
+        hero.setBackground(TEAL_DARK);
+        hero.setBorder(new EmptyBorder(24, 28, 24, 28));
+        hero.setLayout(new BorderLayout());
+
+        JLabel h1 = new JLabel("📘 Manage Courses");
+        h1.setFont(FontKit.bold(28f));
+        h1.setForeground(Color.WHITE);
+        hero.add(h1, BorderLayout.WEST);
+
+        JLabel adminLabel = new JLabel("Logged in as " + adminName);
+        adminLabel.setFont(FontKit.regular(14f));
+        adminLabel.setForeground(new Color(200, 230, 225));
+        hero.add(adminLabel, BorderLayout.EAST);
+
+        root.add(hero, BorderLayout.NORTH);
+
+        //--- Main Area ---
         JPanel main = new JPanel(new BorderLayout());
         main.setOpaque(false);
 
@@ -94,6 +229,7 @@ public class CourseCatalog extends StudentFrameBase {
         JTableHeader hdr = table.getTableHeader();
         hdr.setDefaultRenderer(new TableHeader());
 
+
         sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
 
@@ -131,29 +267,20 @@ public class CourseCatalog extends StudentFrameBase {
         };
         cm.getColumn(2).setCellRenderer(titleR);
 
-        // click to select/deselect row; open registration stub
         table.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
+            @Override
+            public void mouseClicked(MouseEvent e) {
                 int row = table.rowAtPoint(e.getPoint());
-                int col = table.columnAtPoint(e.getPoint());
                 if (row < 0) return;
 
-                if (table.isRowSelected(row)) {
-                    table.clearSelection(); // deselect
-                } else {
-                    table.setRowSelectionInterval(row, row);
-                }
+                int modelRow = table.convertRowIndexToModel(row);
+                String courseId = String.valueOf(model.getValueAt(modelRow, 0));
 
-                if (col == 2) {
-                    int modelRow = table.convertRowIndexToModel(row);
-                    String courseId = String.valueOf(model.getValueAt(modelRow, 0));
-                    TitleCell cell = (TitleCell) model.getValueAt(modelRow, 2);
-                    JOptionPane.showMessageDialog(CourseCatalog.this,
-                            "Register for: " + courseId + "\n" + cell.title,
-                            "Course Selected", JOptionPane.INFORMATION_MESSAGE);
-                }
+                new EditCourse(adminName, courseId).setVisible(true);
+                EditExistingCourses.this.dispose();
             }
         });
+
 
         JScrollPane sc = new JScrollPane(table);
         sc.setBorder(BorderFactory.createLineBorder(BORDER_COLOR, 1));
@@ -175,7 +302,7 @@ public class CourseCatalog extends StudentFrameBase {
         });
 
         loadCourses();
-        return main;
+        root.add(main, BorderLayout.CENTER);
     }
 
     private static String esc(String s) { return s == null ? "" : s.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;"); }
@@ -207,10 +334,5 @@ public class CourseCatalog extends StudentFrameBase {
                     "Database Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        erp.db.DatabaseConnection.init();
-        SwingUtilities.invokeLater(() -> new CourseCatalog("Student 123").setVisible(true));
     }
 }

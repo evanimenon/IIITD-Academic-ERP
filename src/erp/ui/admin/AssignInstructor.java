@@ -5,9 +5,13 @@ import erp.ui.common.FontKit;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.geom.RoundRectangle2D;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import erp.ui.admin.AddUser.RoundedComboBox;
+import erp.db.DatabaseConnection;
+import erp.ui.admin.AddStudent.RoundedComboBox;
 import erp.ui.common.RoundedPanel;
 import erp.ui.common.NavButton;
 
@@ -125,15 +129,6 @@ public class AssignInstructor extends JFrame {
         });
         nav.add(assignInstBtn);
         nav.add(Box.createVerticalStrut(8));
-
-        NavButton maintenanceModeBtn = new NavButton("🔧 Maintenance Mode", false);
-        maintenanceModeBtn.addActionListener(e -> {
-            new MaintenanceMode(adminName).setVisible(true);
-            AssignInstructor.this.dispose();
-        });
-        nav.add(maintenanceModeBtn);
-        nav.add(Box.createVerticalStrut(8));
-
         
         // Separator
         nav.add(new JSeparator() {{ 
@@ -183,21 +178,6 @@ public class AssignInstructor extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
 
-        JLabel courseLabel = new JLabel("Course:");
-        courseLabel.setFont(FontKit.semibold(16f));
-        courseLabel.setForeground(TEXT_900);
-        formCard.add(courseLabel, gbc);
-
-        gbc.gridx = 1;
-        RoundedComboBox<String> courseDropdown = new RoundedComboBox<>();
-        courseDropdown.setFont(FontKit.regular(15f));
-        // TODO: DB → Load course list
-        courseDropdown.addItem("Choose Course");
-        formCard.add(courseDropdown, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-
         JLabel sectionLabel = new JLabel("Section:");
         sectionLabel.setFont(FontKit.semibold(16f));
         sectionLabel.setForeground(TEXT_900);
@@ -207,8 +187,22 @@ public class AssignInstructor extends JFrame {
         RoundedComboBox<String> sectionDropdown = new RoundedComboBox<>();
         sectionDropdown.setFont(FontKit.regular(15f));
 
-        // TODO: DB → Load sections based on selected course
-        sectionDropdown.addItem("Choose Section");
+        sectionDropdown.addItem("Choose Section: ");
+        try (Connection erpConn = DatabaseConnection.erp().getConnection();
+            PreparedStatement ps = erpConn.prepareStatement("SELECT section_id, course_id, day_time FROM sections ORDER BY course_id, section_id");
+            ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                int sectionId = rs.getInt("section_id");
+                String courseId = rs.getString("course_id");
+                String dayTime = rs.getString("day_time");
+                String option = sectionId + " - " + courseId + " (" + dayTime + ")";
+                sectionDropdown.addItem(option);
+            }
+        } 
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
         formCard.add(sectionDropdown, gbc);
 
         gbc.gridx = 0;
@@ -222,8 +216,24 @@ public class AssignInstructor extends JFrame {
         gbc.gridx = 1;
         RoundedComboBox<String> instructorDropdown = new RoundedComboBox<>();
         instructorDropdown.setFont(FontKit.regular(15f));
+
         // TODO: DB → Load instructors list
         instructorDropdown.addItem("Choose Instructor");
+        try (Connection erpConn = DatabaseConnection.erp().getConnection();
+            PreparedStatement ps = erpConn.prepareStatement("SELECT instructor_id, department, instructor_name FROM instructors;");
+            ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                int instID = rs.getInt("instructor_id");
+                String dept = rs.getString("department");
+                String fullname = rs.getString("instructor_name");
+                String option = instID + " - " + fullname + " (" + dept + ")";
+                instructorDropdown.addItem(option);
+            }
+        } 
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
         formCard.add(instructorDropdown, gbc);
 
         gbc.gridx = 0;
@@ -241,23 +251,55 @@ public class AssignInstructor extends JFrame {
 
         assignBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); 
         assignBtn.setAlignmentX(Component.LEFT_ALIGNMENT); 
-        // Click handler 
-        assignBtn.addActionListener(e -> { 
-            String course = (String) courseDropdown.getSelectedItem(); 
-            String section = (String) sectionDropdown.getSelectedItem(); 
-            String instructor = (String) instructorDropdown.getSelectedItem(); 
-            // Simple validation 
-            if (course.equals("Choose Course") || instructor.equals("Choose Instructor")) { 
-                JOptionPane.showMessageDialog(this, "Please select all required fields."); return; } 
-                // TODO: DB → Insert/Update instructor assignment 
-                // - Check existing assignment 
-                // - Insert new assignment 
-                // - Refresh table below 
-                
-                JOptionPane.showMessageDialog(this, "Instructor assigned successfully!"); });
 
+        // Action Listener for assign button that updates the DB
+        assignBtn.addActionListener(e -> {
+            String section = (String) sectionDropdown.getSelectedItem();
+            String instructor = (String) instructorDropdown.getSelectedItem();
+
+            // Validation for the fields not being empty
+            if (instructor.equals("Choose Instructor") || section.equals("Choose Section")) {
+                JOptionPane.showMessageDialog(this, "Please select all required fields.");
+                return;
+            }
+
+            //check if the instructor is already assigned to the section
+            if(instructorAlreadyAssigned(section, instructor)) {
+                JOptionPane.showMessageDialog(this, "This instructor is already assigned to the selected section.");
+                return;
+            }
+
+            try (Connection erpConn = DatabaseConnection.erp().getConnection()) {
+                try (PreparedStatement ps = erpConn.prepareStatement("UPDATE sections SET instructor_id = ? WHERE section_id = ?")) {
+                    ps.setInt(1, Integer.parseInt(instructor.split(" - ")[0])); // instructor_id
+                    ps.setInt(2, Integer.parseInt(section.split(" - ")[0]));    // section_id
+                    ps.executeUpdate();
+                }
+                JOptionPane.showMessageDialog(this, "Instructor assigned successfully!");
+            } 
+            catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error occurred while assigning instructor.");
+            }
+        });
         formCard.add(assignBtn, gbc);
+    }
 
-
+    private boolean instructorAlreadyAssigned(String section, String instructor) {
+        try (Connection erpConn = DatabaseConnection.erp().getConnection();
+             PreparedStatement ps = erpConn.prepareStatement("SELECT instructor_id FROM sections WHERE section_id = ?")) {
+            ps.setInt(1, Integer.parseInt(section.split(" - ")[0])); // section_id
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int assignedInstructorId = rs.getInt("instructor_id");
+                    int selectedInstructorId = Integer.parseInt(instructor.split(" - ")[0]);
+                    return assignedInstructorId == selectedInstructorId;
+                }
+            }
+        } 
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 }
