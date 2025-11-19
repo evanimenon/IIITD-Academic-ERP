@@ -1,10 +1,8 @@
 package erp.ui.admin;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.event.*;
 
-import java.awt.*;
+import java.awt.event.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,7 +14,9 @@ import erp.ui.common.RoundedButton;
 import erp.ui.common.RoundedPanel;
 import erp.ui.common.RoundedTextField;
 
-public class EditCourse extends JFrame {
+import java.awt.*;
+
+public class EditSectionDetails extends JFrame {
     private static final Color TEAL_DARK = new Color(39, 96, 92);
     private static final Color TEAL = new Color(28, 122, 120);
     private static final Color TEAL_LIGHT = new Color(55, 115, 110);
@@ -26,50 +26,14 @@ public class EditCourse extends JFrame {
     private static final Color TEXT_600 = new Color(100, 116, 139);
     private static final Color CARD = Color.WHITE;
 
-    private RoundedTextField codeField, titleField, creditField;
+    private RoundedTextField courseField, instructorField,dayTimeField, roomField, capacityField, semesterField, yearField;
 
-    private final String courseId;
+    private final String sectionID;
     private final String adminName;
 
-    private RoundedPanel actionCard(String title, String desc, Runnable onClick) {
-        RoundedPanel card = new RoundedPanel(20);
-        card.setBackground(CARD);
-        card.setLayout(new BorderLayout());
-        card.setBorder(new EmptyBorder(20, 24, 20, 24));
-
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(FontKit.bold(18f));
-        titleLabel.setForeground(TEXT_900);
-
-        JLabel descLabel = new JLabel("<html><p style='width:240px;'>" + desc + "</p></html>");
-        descLabel.setFont(FontKit.regular(14f));
-        descLabel.setForeground(TEXT_600);
-
-        card.add(titleLabel, BorderLayout.NORTH);
-        card.add(descLabel, BorderLayout.CENTER);
-
-        // hover + click behavior
-        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        card.addMouseListener(new MouseAdapter() {
-            Color normal = CARD;
-            Color hover = new Color(238, 241, 245);
-            @Override public void mouseEntered(MouseEvent e) {
-                card.setBackground(hover); card.repaint();
-            }
-            @Override public void mouseExited(MouseEvent e) {
-                card.setBackground(normal); card.repaint();
-            }
-            @Override public void mouseClicked(MouseEvent e) {
-                onClick.run();
-            }
-        });
-
-        return card;
-    }
-
-    public EditCourse(String adminName, String courseId) {
+    public EditSectionDetails(String adminName, String sectionID) {
         this.adminName = adminName;
-        this.courseId = courseId;
+        this.sectionID = sectionID;
 
         setTitle("IIITD ERP – Assign Instructor");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -144,7 +108,7 @@ public class EditCourse extends JFrame {
         NavButton dashboardBtn = new NavButton("🏠 Home", false);
         dashboardBtn.addActionListener(e -> {
             new AdminDashboard(adminName).setVisible(true);
-            EditCourse.this.dispose();
+            EditSectionDetails.this.dispose();
         });
         nav.add(dashboardBtn);
         nav.add(Box.createVerticalStrut(8));
@@ -152,7 +116,7 @@ public class EditCourse extends JFrame {
         NavButton addUserBtn = new NavButton("👤 Add User", false);
         addUserBtn.addActionListener(e -> {
             new AddUser(adminName).setVisible(true);
-            EditCourse.this.dispose();
+            EditSectionDetails.this.dispose();
         });
         nav.add(addUserBtn);
         nav.add(Box.createVerticalStrut(8));
@@ -160,7 +124,7 @@ public class EditCourse extends JFrame {
         NavButton manageCoursesBtn = new NavButton("📘 Manage Courses", true);
         manageCoursesBtn.addActionListener(e -> {
             new ManageCourses(adminName).setVisible(true);
-            EditCourse.this.dispose();
+            EditSectionDetails.this.dispose();
         });
         nav.add(manageCoursesBtn);
         nav.add(Box.createVerticalStrut(8));
@@ -168,7 +132,7 @@ public class EditCourse extends JFrame {
         NavButton assignInstBtn = new NavButton("👨 Assign Instructor", false);
         assignInstBtn.addActionListener(e -> {
             new AssignInstructor(adminName).setVisible(true);
-            EditCourse.this.dispose();
+            EditSectionDetails.this.dispose();
         });
         nav.add(assignInstBtn);
         nav.add(Box.createVerticalStrut(8));
@@ -184,7 +148,7 @@ public class EditCourse extends JFrame {
         nav.add(Box.createVerticalStrut(40));
         nav.add(new NavButton("  ⚙️  Settings", false));
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("  🚪  Log Out", false)); // Used door emoji for log out
+        nav.add(new NavButton("  🚪  Log Out", false));
         
         sidebar.add(nav, BorderLayout.CENTER);
         root.add(sidebar, BorderLayout.WEST);
@@ -195,7 +159,7 @@ public class EditCourse extends JFrame {
         hero.setBorder(new EmptyBorder(24, 28, 24, 28));
         hero.setLayout(new BorderLayout());
 
-        JLabel h1 = new JLabel("✒️ Edit Course");
+        JLabel h1 = new JLabel("🏛️ Edit Section " + sectionID);
         h1.setFont(FontKit.bold(28f));
         h1.setForeground(Color.WHITE);
         hero.add(h1, BorderLayout.WEST);
@@ -218,14 +182,22 @@ public class EditCourse extends JFrame {
         gc.weightx = 1;
 
         // Fields
-        codeField   = new RoundedTextField(20, "Enter course code");
-        titleField  = new RoundedTextField(20, "Enter course title");
-        creditField = new RoundedTextField(20, "Enter credits");
+        courseField   = new RoundedTextField(20, "Enter course code");
+        instructorField = new RoundedTextField(20, "Enter instructor name");
+        dayTimeField = new RoundedTextField(20, "e.g., Mon Wed Fri 10:00-11:00");
+        roomField = new RoundedTextField(20, "Enter room number");  
+        capacityField = new RoundedTextField(20, "Enter capacity");
+        semesterField = new RoundedTextField(20, "e.g., Fall");
+        yearField = new RoundedTextField(20, "e.g., 2024"); 
 
-        addRow(form, gc, 0, "Course Code", codeField);
-        addRow(form, gc, 1, "Title", titleField);
-        addRow(form, gc, 2, "Credits", creditField);
-        gc.gridy = 3;
+        addRow(form, gc, 0, "Course Code", courseField);
+        addRow(form, gc, 1, "Instructor Name", instructorField);
+        addRow(form, gc, 2, "Day & Time", dayTimeField);
+        addRow(form, gc, 3, "Room", roomField);
+        addRow(form, gc, 4, "Capacity", capacityField);
+        addRow(form, gc, 5, "Semester", semesterField);
+        addRow(form, gc, 6, "Year", yearField);
+        gc.gridy = 7;
         gc.gridx = 0;
         gc.gridwidth = 2;
         gc.anchor = GridBagConstraints.EAST;
@@ -247,44 +219,8 @@ public class EditCourse extends JFrame {
 
         form.add(btns, gc);
 
-        // --- Wrap form + action cards ---
-        JPanel centerWrap = new JPanel();
-        centerWrap.setLayout(new BoxLayout(centerWrap, BoxLayout.Y_AXIS));
-        centerWrap.setOpaque(false);
-
-        // form (already a RoundedPanel)
-        centerWrap.add(form);
-        centerWrap.add(Box.createVerticalStrut(24));
-
-        // --- Action Cards ---
-        JPanel cardRow = new JPanel(new GridLayout(1, 2, 20, 0));
-        cardRow.setOpaque(false);
-        cardRow.setBorder(new EmptyBorder(0, 50, 0, 50));
-
-        cardRow.add(actionCard(
-                "📚 Add a Section",
-                "Create a new section under this course.",
-                () -> {
-                    new AddSection(adminName, courseId).setVisible(true);
-                    dispose();
-                }
-        ));
-
-        cardRow.add(actionCard(
-                "✏️ Edit Sections",
-                "Modify or delete an existing section of this course.",
-                () -> {
-                    new EditSections(adminName, courseId).setVisible(true);
-                    dispose();
-                }
-        ));
-
-        centerWrap.add(cardRow);
-        centerWrap.add(Box.createVerticalStrut(20));
-
-        root.add(centerWrap, BorderLayout.CENTER);
-
-        loadCourse();
+        root.add(form, BorderLayout.CENTER);
+        loadSection();
     }
 
     private void addRow(JPanel p, GridBagConstraints gc, int row,String label, JComponent field) {
@@ -299,18 +235,22 @@ public class EditCourse extends JFrame {
         p.add(field, gc);
     }
 
-    private void loadCourse() {
-        String query = "SELECT code, title, credits FROM courses WHERE course_id = ?";
+    private void loadSection() {
+        String query = "SELECT course_id, instructor_id, day_time, room. capacity, semester, year FROM courses WHERE section_id = ?";
         try (Connection conn = DatabaseConnection.erp().getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
-            ps.setString(1, courseId);
+            ps.setString(1, sectionID);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                codeField.setText(rs.getString("code"));
-                titleField.setText(rs.getString("title"));
-                creditField.setText(String.valueOf(rs.getInt("credits")));
+                courseField.setText(rs.getString("course_id"));
+                instructorField.setText(rs.getString("instructor_id"));
+                dayTimeField.setText(rs.getString("day_time"));
+                roomField.setText(rs.getString("room"));
+                capacityField.setText(rs.getString("capacity"));
+                semesterField.setText(rs.getString("semester"));
+                yearField.setText(rs.getString("year"));
             }
         } 
         catch (Exception e) {
@@ -319,38 +259,55 @@ public class EditCourse extends JFrame {
     }
 
     private void saveChanges() {
-        String code = codeField.getText().trim();
-        String title = titleField.getText().trim();
-        String creditsStr = creditField.getText().trim();
+        String course = courseField.getText().trim();
+        String instructor = instructorField.getText().trim();
+        String dayTime = dayTimeField.getText().trim();
+        String room = roomField.getText().trim();
+        String capacitystr = capacityField.getText().trim();
+        String semester = semesterField.getText().trim();
+        String yearstr = yearField.getText().trim();
 
-        if (code.isEmpty() || title.isEmpty() || creditsStr.isEmpty()) {
+        if (course.isEmpty() || instructor.isEmpty() || dayTime.isEmpty() || room.isEmpty() || capacitystr.isEmpty() || semester.isEmpty() || yearstr.isEmpty()) {
             JOptionPane.showMessageDialog(this, "All fields are required.");
             return;
         }
 
-        int credits;
+        int year;
         try {
-            credits = Integer.parseInt(creditsStr);
+            year = Integer.parseInt(yearstr);
         } 
         catch (Exception e) {
             JOptionPane.showMessageDialog(this,"Credits must be a number.","Invalid Input",JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        String query = "UPDATE courses SET code = ?, title = ?, credits = ? WHERE course_id = ?";
+        int capacity;
+        try {
+            capacity = Integer.parseInt(capacitystr);
+        } 
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(this,"Capacity must be a number.","Invalid Input",JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String query = "UPDATE sections SET course_id = ?, instructor_id = ?, day_time = ?, room = ?, capacity = ?, semester = ?, year = ? WHERE section_id = ?";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
-            ps.setString(1, code);
-            ps.setString(2, title);
-            ps.setInt(3, credits);
-            ps.setString(4, courseId);
+            ps.setString(1, course);
+            ps.setString(2, instructor);   
+            ps.setString(3, dayTime);
+            ps.setString(4, room);
+            ps.setInt(5, capacity);
+            ps.setString(6, semester);
+            ps.setInt(7, year);
+            ps.setString(8, sectionID);
 
             ps.executeUpdate();
 
             JOptionPane.showMessageDialog(this,
-                    "Course updated successfully!",
+                    "Section updated successfully!",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
 
@@ -360,7 +317,7 @@ public class EditCourse extends JFrame {
         } 
         catch (Exception e) {
             JOptionPane.showMessageDialog(this,
-                    "Failed to update course:\n" + e.getMessage(),
+                    "Failed to update section:\n" + e.getMessage(),
                     "Database Error",
                     JOptionPane.ERROR_MESSAGE);
         }

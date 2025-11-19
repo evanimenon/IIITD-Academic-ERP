@@ -1,40 +1,34 @@
 package erp.ui.admin;
-import erp.db.DatabaseConnection;
-import erp.ui.admin.EditExistingCourses.TitleCell;
-import erp.ui.common.FontKit;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
+import java.awt.event.*;
 
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import erp.ui.common.RoundedPanel;
-import erp.ui.student.CourseCatalog;
+import erp.db.DatabaseConnection;
+import erp.ui.common.FontKit;
 import erp.ui.common.NavButton;
-import erp.db.Maintenance;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import erp.ui.common.TableHeader;
+import erp.ui.common.RoundedButton;
+import erp.ui.common.RoundedPanel;
+import erp.ui.common.RoundedTextField;
 
-public class ManageCourses extends JFrame{
+public class EditSections extends JFrame {
     private static final Color TEAL_DARK = new Color(39, 96, 92);
     private static final Color TEAL = new Color(28, 122, 120);
     private static final Color TEAL_LIGHT = new Color(55, 115, 110);
     private static final Color BG = new Color(246, 247, 248);
     private static final Color TEXT_900 = new Color(24, 30, 37);
+    private static final Color BORDER = new Color(230, 233, 236);
     private static final Color TEXT_600 = new Color(100, 116, 139);
     private static final Color CARD = Color.WHITE;
-    private static final Color BORDER_COLOR = new Color(230, 233, 236);
+
+    private final String courseId;
+    private final String adminName;
+    private JPanel main;
 
     private RoundedPanel actionCard(String title, String desc, Runnable onClick) {
         RoundedPanel card = new RoundedPanel(20);
@@ -72,8 +66,11 @@ public class ManageCourses extends JFrame{
         return card;
     }
 
-    public ManageCourses(String adminName) {
-        setTitle("IIITD ERP – Manage Courses");
+    public EditSections(String adminName, String courseId) {
+        this.adminName = adminName;
+        this.courseId = courseId;
+
+        setTitle("IIITD ERP – Assign Instructor");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(1220, 840));
         setLocationRelativeTo(null);
@@ -146,7 +143,7 @@ public class ManageCourses extends JFrame{
         NavButton dashboardBtn = new NavButton("🏠 Home", false);
         dashboardBtn.addActionListener(e -> {
             new AdminDashboard(adminName).setVisible(true);
-            ManageCourses.this.dispose();
+            EditSections.this.dispose();
         });
         nav.add(dashboardBtn);
         nav.add(Box.createVerticalStrut(8));
@@ -154,7 +151,7 @@ public class ManageCourses extends JFrame{
         NavButton addUserBtn = new NavButton("👤 Add User", false);
         addUserBtn.addActionListener(e -> {
             new AddUser(adminName).setVisible(true);
-            ManageCourses.this.dispose();
+            EditSections.this.dispose();
         });
         nav.add(addUserBtn);
         nav.add(Box.createVerticalStrut(8));
@@ -162,7 +159,7 @@ public class ManageCourses extends JFrame{
         NavButton manageCoursesBtn = new NavButton("📘 Manage Courses", true);
         manageCoursesBtn.addActionListener(e -> {
             new ManageCourses(adminName).setVisible(true);
-            ManageCourses.this.dispose();
+            EditSections.this.dispose();
         });
         nav.add(manageCoursesBtn);
         nav.add(Box.createVerticalStrut(8));
@@ -170,10 +167,11 @@ public class ManageCourses extends JFrame{
         NavButton assignInstBtn = new NavButton("👨 Assign Instructor", false);
         assignInstBtn.addActionListener(e -> {
             new AssignInstructor(adminName).setVisible(true);
-            ManageCourses.this.dispose();
+            EditSections.this.dispose();
         });
         nav.add(assignInstBtn);
         nav.add(Box.createVerticalStrut(8));
+
         
         // Separator
         nav.add(new JSeparator() {{ 
@@ -185,7 +183,7 @@ public class ManageCourses extends JFrame{
         nav.add(Box.createVerticalStrut(40));
         nav.add(new NavButton("  ⚙️  Settings", false));
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("  🚪  Log Out", false));
+        nav.add(new NavButton("  🚪  Log Out", false)); // Used door emoji for log out
         
         sidebar.add(nav, BorderLayout.CENTER);
         root.add(sidebar, BorderLayout.WEST);
@@ -196,7 +194,7 @@ public class ManageCourses extends JFrame{
         hero.setBorder(new EmptyBorder(24, 28, 24, 28));
         hero.setLayout(new BorderLayout());
 
-        JLabel h1 = new JLabel("📘 Manage Courses");
+        JLabel h1 = new JLabel("📃 Edit Sections (" + courseId + ")");
         h1.setFont(FontKit.bold(28f));
         h1.setForeground(Color.WHITE);
         hero.add(h1, BorderLayout.WEST);
@@ -208,54 +206,105 @@ public class ManageCourses extends JFrame{
 
         root.add(hero, BorderLayout.NORTH);
 
-        if (Maintenance.isOn()) {
-            RoundedPanel banner = new RoundedPanel(12);
-            banner.setBackground(new Color(255, 235, 230)); // light red
-            banner.setBorder(new EmptyBorder(12, 18, 12, 18));
+        // --- Main content area ---
+        main = new JPanel(new BorderLayout());
+        main.setBorder(new EmptyBorder(32, 32, 32, 32));
+        main.setOpaque(false);
+        root.add(main, BorderLayout.CENTER);
 
-            JLabel msg = new JLabel("⚠️  Maintenance Mode is ON – Changes are disabled");
-            msg.setFont(FontKit.semibold(14f));
-            msg.setForeground(new Color(180, 60, 50));
-            banner.add(msg);
+        loadSections();
 
-            root.add(banner, BorderLayout.NORTH);
+        
+    }
+
+    //load sections for the course from database and display as action cards
+    private void loadSections() {
+        main.removeAll();
+        String query = "SELECT section_id, course_id, instructor_id, day_time, room, capacity, semester, year FROM sections WHERE course_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setString(1, courseId);
+            try (ResultSet rs = ps.executeQuery()) {
+                boolean hasSections = false;
+                JPanel sectionsPanel = new JPanel();
+                sectionsPanel.setLayout(new GridLayout(0, 3, 20, 20));
+
+                while (rs.next()) {
+                    hasSections = true;
+                    String sectionId = rs.getString("section_id");
+                    String courseId = rs.getString("course_id");
+                    String instructorId = rs.getString("instructor_id");
+                    String dayTime = rs.getString("day_time");
+                    String room = rs.getString("room");
+                    String capacity = rs.getString("capacity");
+                    String semester = rs.getString("semester");
+                    String year = rs.getString("year");
+
+                    String title = "Section " + sectionId + " (" + courseId + ")";
+                    String desc = "Instructor: " + instructorId + "<br>Schedule: " + dayTime + "<br>Room: " + room +
+                            "<br>Capacity: " + capacity + "<br>Semester: " + semester + " " + year;
+
+                    RoundedPanel card = actionCard(title, desc, () -> {
+                        new EditSectionDetails(adminName, sectionId).setVisible(true);
+                        dispose();
+                    });
+
+                    sectionsPanel.add(card);
+                }
+
+                if (!hasSections) {
+                    showEmptyState();
+                    return;
+                }
+
+                JScrollPane scrollPane = new JScrollPane(sectionsPanel);
+                scrollPane.setBorder(null);
+                scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+                main.removeAll();
+                main.add(scrollPane, BorderLayout.CENTER);
+                main.revalidate();
+                main.repaint();
+
+            }
+
+        } 
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Failed to load sections:\n" + e.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
+    }
 
+    private void showEmptyState() {
+        JPanel emptyPanel = new JPanel();
+        emptyPanel.setOpaque(false);
+        emptyPanel.setLayout(new BoxLayout(emptyPanel, BoxLayout.Y_AXIS));
 
-        // Main container center area
-        JPanel mainArea = new JPanel(new BorderLayout());
-        mainArea.setOpaque(false);
+        JLabel msg = new JLabel("No sections in this course yet.");
+        msg.setFont(FontKit.bold(20f));
+        msg.setAlignmentX(Component.CENTER_ALIGNMENT);
+        msg.setForeground(TEXT_900);
 
-        // Section title
-        JLabel title = new JLabel("Select Editing Mode: ");
-        title.setFont(FontKit.semibold(24f));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBorder(new EmptyBorder(20, 0, 20, 0));
-        mainArea.add(title, BorderLayout.NORTH);
+        emptyPanel.add(Box.createVerticalStrut(40));
+        emptyPanel.add(msg);
+        emptyPanel.add(Box.createVerticalStrut(20));
 
-        JPanel cards = new JPanel(new GridLayout(2, 2, 20, 20));
-        cards.setOpaque(false);
-        cards.setBorder(new EmptyBorder(20, 40, 40, 40));
-        // --- ADMIN CARDS ---
+        // Add button
+        RoundedButton addBtn = new RoundedButton("Add a Section");
+        addBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        addBtn.setPreferredSize(new Dimension(200, 45));
+        addBtn.addActionListener(e -> {
+            new AddSection(adminName, courseId).setVisible(true);
+            dispose();
+        });
 
+        emptyPanel.add(addBtn);
 
-        // --- Add course card ---
-        cards.add(actionCard("🎓 Add New Course",
-                            "Add a new course to the course catalog",
-                            () -> {
-                                new AddNewCourse(adminName).setVisible(true);
-                                ManageCourses.this.dispose();
-                            }));
-        // --- Edit course card ---
-        cards.add(actionCard("👨 Edit Existing Course",
-                            "Edit details of an existing course",
-                            () -> {
-                                new EditExistingCourses(adminName).setVisible(true);
-                                ManageCourses.this.dispose();
-                            }));
-
-        mainArea.add(cards, BorderLayout.CENTER);
-        root.add(mainArea, BorderLayout.CENTER);
+        main.add(emptyPanel, BorderLayout.CENTER);
     }
 
 }

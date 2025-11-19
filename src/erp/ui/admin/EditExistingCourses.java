@@ -170,7 +170,7 @@ public class EditExistingCourses extends JFrame{
         hero.setBorder(new EmptyBorder(24, 28, 24, 28));
         hero.setLayout(new BorderLayout());
 
-        JLabel h1 = new JLabel("📘 Manage Courses");
+        JLabel h1 = new JLabel("📘 Edit Course");
         h1.setFont(FontKit.bold(28f));
         h1.setForeground(Color.WHITE);
         hero.add(h1, BorderLayout.WEST);
