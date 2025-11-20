@@ -214,11 +214,43 @@ public class EditSectionDetails extends JFrame {
         RoundedButton save = new RoundedButton("Save Changes");
         save.addActionListener(e -> saveChanges());
 
+        //button on the left to delete section 
+        RoundedButton delete = new RoundedButton("Delete Section");
+        delete.addActionListener(e -> {
+            // Confirm deletion
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Are you sure you want to delete this section?",
+                    "Confirm Deletion",
+                    JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                String query = "DELETE FROM sections WHERE section_id = ?";
+                try (Connection conn = DatabaseConnection.erp().getConnection();
+                     PreparedStatement ps = conn.prepareStatement(query)) {
+
+                    ps.setString(1, sectionID);
+                    ps.executeUpdate();
+
+                    JOptionPane.showMessageDialog(this,
+                            "Section deleted successfully!",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+
+                    new EditExistingCourses(adminName).setVisible(true);
+                    dispose();
+
+                } 
+                catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this,
+                            "Failed to delete section:\n" + ex.getMessage(),
+                            "Database Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        btns.add(delete);
         btns.add(cancel);
         btns.add(save);
-
         form.add(btns, gc);
-
         root.add(form, BorderLayout.CENTER);
         loadSection();
     }
@@ -236,7 +268,7 @@ public class EditSectionDetails extends JFrame {
     }
 
     private void loadSection() {
-        String query = "SELECT course_id, instructor_id, day_time, room. capacity, semester, year FROM courses WHERE section_id = ?";
+        String query = "SELECT course_id, instructor_id, day_time, room, capacity, semester, year FROM sections WHERE section_id = ?";
         try (Connection conn = DatabaseConnection.erp().getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 

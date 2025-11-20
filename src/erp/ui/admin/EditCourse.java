@@ -257,7 +257,7 @@ public class EditCourse extends JFrame {
         centerWrap.add(Box.createVerticalStrut(24));
 
         // --- Action Cards ---
-        JPanel cardRow = new JPanel(new GridLayout(1, 2, 20, 0));
+        JPanel cardRow = new JPanel(new GridLayout(1, 3, 20, 0));
         cardRow.setOpaque(false);
         cardRow.setBorder(new EmptyBorder(0, 50, 0, 50));
 
@@ -276,6 +276,47 @@ public class EditCourse extends JFrame {
                 () -> {
                     new EditSections(adminName, courseId).setVisible(true);
                     dispose();
+                }
+        ));
+
+        cardRow.add(actionCard(
+                "🗑️ Delete Course",
+                "Remove this course and all its sections from the system.",
+                () -> {
+                    int confirm = JOptionPane.showConfirmDialog(this,
+                            "Are you sure you want to delete this course? This action cannot be undone.",
+                            "Confirm Deletion",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        String query1 = "DELETE FROM courses WHERE course_id = ?";
+                        String query2 = "DELETE FROM sections WHERE course_id = ?";
+                        try (Connection conn = DatabaseConnection.erp().getConnection();
+                                PreparedStatement ps1 = conn.prepareStatement(query1);
+                                PreparedStatement ps2 = conn.prepareStatement(query2)) {
+    
+                                ps2.setString(1, courseId);
+                                ps2.executeUpdate();
+    
+                                ps1.setString(1, courseId);
+                                ps1.executeUpdate();
+    
+                                JOptionPane.showMessageDialog(this,
+                                        "Course deleted successfully!",
+                                        "Success",
+                                        JOptionPane.INFORMATION_MESSAGE);
+    
+                                new ManageCourses(adminName).setVisible(true);
+                                dispose();
+    
+                            } 
+                            catch (Exception e) {
+                                JOptionPane.showMessageDialog(this,
+                                        "Failed to delete course:\n" + e.getMessage(),
+                                        "Database Error",
+                                        JOptionPane.ERROR_MESSAGE);
+                            }
+                    }
                 }
         ));
 

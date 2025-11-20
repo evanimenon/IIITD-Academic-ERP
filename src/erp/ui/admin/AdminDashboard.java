@@ -313,7 +313,7 @@ public class AdminDashboard extends JFrame {
         quick.setOpaque(false);
         quick.setBorder(new EmptyBorder(30, 0, 0, 0));
 
-        quick.add(actionCard("👤 Add New User", "Create student/instructor/admin accounts", () -> {
+        quick.add(actionCard("👤 Add New User", "Create student/instructor accounts", () -> {
             new AddUser(userDisplayName).setVisible(true);
             AdminDashboard.this.dispose();
         }));
@@ -329,7 +329,6 @@ public class AdminDashboard extends JFrame {
         }));
 
         quick.add(maintenanceCard());
-
         main.add(quick, BorderLayout.CENTER);
     }
 

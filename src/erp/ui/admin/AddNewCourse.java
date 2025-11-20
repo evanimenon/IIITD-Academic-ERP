@@ -145,7 +145,7 @@ public class AddNewCourse extends JFrame {
         nav.add(Box.createVerticalStrut(40));
         nav.add(new NavButton("  ⚙️  Settings", false));
         nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("  🚪  Log Out", false)); // Used door emoji for log out
+        nav.add(new NavButton("  🚪  Log Out", false));
         
         sidebar.add(nav, BorderLayout.CENTER);
         root.add(sidebar, BorderLayout.WEST);
@@ -257,23 +257,22 @@ public class AddNewCourse extends JFrame {
                 return;
             }
 
-            boolean saved = addCourse(courseId, code, title, creditno);
-            if (saved) {
-                JOptionPane.showMessageDialog(this, "Student added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            String saved = addCourse(courseId, code, title, creditno);
+            if (saved==null) {
+                JOptionPane.showMessageDialog(this, "Course added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 idField.setText("");
                 codeField.setText("");
                 titleField.setText("");
-                creditBox.setSelectedIndex(0);
             } 
             else {
-                JOptionPane.showMessageDialog(this, "Student ID or Roll Number already exists!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, saved, "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         formCard.add(submitBtn, gbc);
     }
 
-    private boolean addCourse(String courseId, String code, String title, int credits) {
+    private String addCourse(String courseId, String code, String title, int credits) {
         try (Connection erpConn = DatabaseConnection.erp().getConnection();) {
 
             // Check ERP duplicates
@@ -286,25 +285,25 @@ public class AddNewCourse extends JFrame {
                     int count = rs.getInt(1);
                     System.out.println("ERP duplicate count: " + count);
                     if (count > 0){
-                        return false;
+                        return "Course with same ID and Code already exists in ERP.";
                     }
                 }
             }
 
             // Insert ERP
-            try (PreparedStatement ps = erpConn.prepareStatement("INSERT INTO courses(course_id, code, title, credits) VALUES (?, ?, ?, ?, ?)")) {
+            try (PreparedStatement ps = erpConn.prepareStatement("INSERT INTO courses(course_id, code, title, credits) VALUES (?, ?, ?, ?)")) {
                 ps.setString(1, courseId);
                 ps.setString(2, code);
                 ps.setString(3, title);
-                ps.setInt(5, credits);
+                ps.setInt(4, credits);
                 ps.executeUpdate();
             }
-            return true;
+            return null;
 
         } 
         catch (SQLException ex) {
             ex.printStackTrace();
-            return false;
+            return "Database error: " + ex.getMessage();
         }
     }
 

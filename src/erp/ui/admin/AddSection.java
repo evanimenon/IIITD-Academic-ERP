@@ -194,7 +194,7 @@ public class AddSection extends JFrame {
         formCard.add(label("Instructor ID:"), gbc);
 
         gbc.gridx = 1;
-        RoundedTextField instrField = new RoundedTextField(30, "Enter Instructor ID");
+        RoundedTextField instrField = new RoundedTextField(30, "Enter Instructor ID (Leave empty if TBA)");
         instrField.setFont(FontKit.regular(15f));
         formCard.add(instrField, gbc);
 
@@ -276,7 +276,7 @@ public class AddSection extends JFrame {
             int year = Integer.parseInt((String) yearBox.getSelectedItem());
 
             //check that all fields are filled
-            if (sectionID.isEmpty() || courseID.isEmpty() || instrId.isEmpty() || days.isEmpty() || time.isEmpty() || room.isEmpty() || capacity <= 0) {
+            if (sectionID.isEmpty() || courseID.isEmpty() || days.isEmpty() || time.isEmpty() || room.isEmpty() || capacity <= 0 || instrId.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please fill in all fields in correct format.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }

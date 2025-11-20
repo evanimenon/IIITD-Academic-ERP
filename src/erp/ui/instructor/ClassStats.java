@@ -3,9 +3,14 @@ package erp.ui.instructor;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 
+import erp.auth.AuthContext;
 import erp.db.DatabaseConnection;
 import erp.db.Maintenance;
 import erp.ui.auth.LoginPage;
@@ -18,21 +23,6 @@ import erp.ui.common.RoundedPanel;
 
 public class ClassStats extends JFrame {
 
-    // ---- Simple local model to replace DB ----
-    private static class SectionInfo {
-        String sectionID;
-        String courseCode;
-        String courseName;
-        String semester;
-
-        SectionInfo(String sectionID, String courseCode, String courseName, String semester) {
-            this.sectionID = sectionID;
-            this.courseCode = courseCode;
-            this.courseName = courseName;
-            this.semester = semester;
-        }
-    }
-
     // Palette
     private static final Color TEAL_DARK  = new Color(39, 96, 92);
     private static final Color TEAL       = new Color(28, 122, 120);
@@ -43,10 +33,23 @@ public class ClassStats extends JFrame {
     private static final Color CARD       = Color.WHITE;
     private String department = "Computer Science"; // TODO: fetch from DB
 
+    public class SectionInfo {
+        public int sectionID;
+        public String courseID;
+        public String instructorID;
+        public String dayTime;
+        public String semester;
+        public int year;
+        public String room;
+        public int capacity;
+    }
+
     public ClassStats(String instrID, String displayName) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
         FontKit.init();
         DatabaseConnection.init();
+
+        System.out.println("Loading stats for instructor: " + instrID);
 
         setTitle("IIITD ERP – Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -138,7 +141,7 @@ public class ClassStats extends JFrame {
         nav.add(Box.createVerticalStrut(8));
 
         NavButton logoutBtn = new NavButton("  🚪  Log Out", false);
-        logoutBtn.addActionListener(e -> { new LoginPage().setVisible(true); dispose(); });
+        logoutBtn.addActionListener(e -> { AuthContext.clear(); new LoginPage().setVisible(true); dispose(); });
         nav.add(logoutBtn);
 
         sidebar.add(nav, BorderLayout.CENTER);
@@ -167,11 +170,7 @@ public class ClassStats extends JFrame {
         content.setOpaque(false);
         content.setBorder(new EmptyBorder(24, 32, 24, 32));
 
-        // --- TEMP DATA: Hardcoded list of sections ---
-        List<SectionInfo> sections = new ArrayList<>();
-        sections.add(new SectionInfo("S01", "CSE201", "Data Structures & Algorithms", "Monsoon 2025"));
-        sections.add(new SectionInfo("S02", "CSE203", "Advanced Programming", "Monsoon 2025"));
-        sections.add(new SectionInfo("S05", "CSE222", "Operating Systems", "Winter 2025"));
+        List<SectionInfo> sections = fetchSectionsForInstructor(instrID);
 
         for (SectionInfo sec : sections) {
             RoundedPanel card = new RoundedPanel(20);
@@ -184,11 +183,11 @@ public class ClassStats extends JFrame {
             left.setOpaque(false);
             left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
 
-            JLabel title = new JLabel(sec.courseCode + " – " + sec.sectionID);
+            JLabel title = new JLabel(sec.courseID + " - Section " + String.format("%02d", sec.sectionID));
             title.setFont(FontKit.bold(20f));
             title.setForeground(TEXT_900);
 
-            JLabel subtitle = new JLabel(sec.courseName);
+            JLabel subtitle = new JLabel("Room: " + sec.room + " | Time: " + sec.dayTime);
             subtitle.setFont(FontKit.regular(15f));
             subtitle.setForeground(TEXT_600);
 
@@ -235,4 +234,51 @@ public class ClassStats extends JFrame {
             root.add(banner, BorderLayout.NORTH);
         }
     }
+
+    private List<SectionInfo> fetchSectionsForInstructor(String instructorId) {
+        List<SectionInfo> list = new ArrayList<>();
+
+        String sql = """
+            SELECT 
+                s.section_id,
+                s.course_id,
+                s.instructor_id,
+                s.day_time,
+                s.room,
+                s.capacity,
+                s.semester,
+                s.year
+            FROM sections s
+            JOIN courses c ON s.course_id = c.course_id
+            WHERE s.instructor_id = ?
+        """;
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, Long.parseLong(instructorId));
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    SectionInfo si = new SectionInfo();
+                    si.sectionID = rs.getInt("section_id");
+                    si.courseID = rs.getString("course_id");
+                    si.instructorID = instructorId;
+                    si.dayTime = rs.getString("day_time");
+                    si.room = rs.getString("room");
+                    si.capacity = rs.getInt("capacity");
+                    si.semester = rs.getString("semester");
+                    si.year = rs.getInt("year");
+                    
+                    list.add(si);
+                }
+            }
+        }
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return list;
+    }
+
 }

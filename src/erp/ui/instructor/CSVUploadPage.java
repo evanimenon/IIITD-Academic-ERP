@@ -7,6 +7,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 
+import erp.auth.AuthContext;
 import erp.db.DatabaseConnection;
 import erp.db.Maintenance;
 import erp.ui.auth.LoginPage;
@@ -122,7 +123,7 @@ public class CSVUploadPage extends JFrame {
         nav.add(Box.createVerticalStrut(8));
 
         NavButton logoutBtn = new NavButton("  🚪  Log Out", false);
-        logoutBtn.addActionListener(e -> { new LoginPage().setVisible(true); dispose(); });
+        logoutBtn.addActionListener(e -> { AuthContext.clear(); new LoginPage().setVisible(true); dispose(); });
         nav.add(logoutBtn);
 
         sidebar.add(nav, BorderLayout.CENTER);

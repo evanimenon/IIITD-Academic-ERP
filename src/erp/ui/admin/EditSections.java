@@ -211,10 +211,7 @@ public class EditSections extends JFrame {
         main.setBorder(new EmptyBorder(32, 32, 32, 32));
         main.setOpaque(false);
         root.add(main, BorderLayout.CENTER);
-
         loadSections();
-
-        
     }
 
     //load sections for the course from database and display as action cards
