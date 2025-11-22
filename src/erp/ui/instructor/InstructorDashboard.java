@@ -11,15 +11,19 @@ import java.awt.geom.RoundRectangle2D;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.Locale;
 import erp.ui.common.NavButton;
 import erp.ui.common.RoundedPanel;
-
+import erp.ui.instructor.ClassStats.SectionInfo;
 // Auth helpers
 import erp.auth.AuthContext;
 import erp.auth.Role;
+import erp.ui.common.RoundedButton;
+import java.util.List;
 
 public class InstructorDashboard extends JFrame {
 
@@ -42,6 +46,17 @@ public class InstructorDashboard extends JFrame {
     // Backward compat
     public InstructorDashboard(String displayName) {
         this(null, displayName);
+    }
+
+    public class SectionInfo {
+        public int sectionID;
+        public String courseID;
+        public String instructorID;
+        public String dayTime;
+        public String semester;
+        public int year;
+        public String room;
+        public int capacity;
     }
 
     public InstructorDashboard(String instrID, String displayName) {
@@ -212,15 +227,8 @@ public class InstructorDashboard extends JFrame {
         gc.weightx = 1;
         gc.weighty = 0;
 
-        RoundedPanel card1 = metricCard("Text1", "Subtitle");
-        RoundedPanel card2 = metricCard("Text2", "Subtitle");
-        RoundedPanel card3 = metricCard("Text3", "Subtitle");
-        gc.gridx = 0; gc.gridy = 0; grid.add(card1, gc);
-        gc.gridx = 1; gc.gridy = 0; grid.add(card2, gc);
-        gc.gridx = 2; gc.gridy = 0; grid.add(card3, gc);
-
         gc.gridx = 0; gc.gridy = 1; gc.gridwidth = 3; gc.weighty = 1;
-        grid.add(enrolledCoursesStrip(), gc);
+        grid.add(loadInstrSections(instrID), gc);
 
         JPanel centerStack = new JPanel();
         centerStack.setOpaque(false);
@@ -297,6 +305,34 @@ public class InstructorDashboard extends JFrame {
     }
 
     //TODO: db -> get department from instructor table for display
+    private JScrollPane loadInstrSections(String instructorID) {
+        List<SectionInfo> sections = fetchSectionsForInstructor(instructorID);
+
+        JPanel container = new JPanel(new GridBagLayout());
+        container.setOpaque(false);
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.insets = new Insets(12, 12, 12, 12);
+        gc.fill = GridBagConstraints.BOTH;
+        gc.weightx = 1;
+        gc.weighty = 0;
+
+        int row = 0;
+        for (SectionInfo si : sections) {
+            gc.gridx = 0; gc.gridy = row++; gc.gridwidth = 1; gc.weighty = 0;
+            container.add(metricCard(si.courseID + " - " + si.sectionID, "Course Section"), gc);
+            gc.gridx = 1; gc.weighty = 0;
+            container.add(metricCard(si.semester + " " + si.year, "Semester"), gc);
+            gc.gridx = 2; gc.weighty = 0;
+            container.add(metricCard(si.dayTime, "Schedule"), gc);
+            gc.gridx = 3; gc.weighty = 0;
+            container.add(metricCard(String.valueOf(si.capacity), "Capacity"), gc);
+        }
+
+        JScrollPane sp = new JScrollPane(container);
+        sp.setBorder(null);
+        sp.getViewport().setBackground(BG);
+        return sp;
+    }
 
     private static String todayString() {
         LocalDate d = LocalDate.now();
@@ -322,36 +358,50 @@ public class InstructorDashboard extends JFrame {
         return p;
     }
 
-    private JPanel enrolledCoursesStrip() {
-        JPanel row = new JPanel();
-        row.setOpaque(false);
-        row.setLayout(new GridLayout(1, 2, 16, 16));
+    private List<SectionInfo> fetchSectionsForInstructor(String instructorId) {
+        List<SectionInfo> list = new ArrayList<>();
 
-        RoundedPanel c1 = new RoundedPanel(18);
-        c1.setBackground(CARD);
-        c1.setLayout(new BorderLayout());
-        c1.setBorder(new EmptyBorder(18, 22, 18, 22));
-        JLabel t1 = new JLabel("Advanced Programming Section A");
-        t1.setFont(FontKit.semibold(16f));
-        t1.setForeground(TEXT_900);
-        c1.add(t1, BorderLayout.NORTH);
-        JButton view1 = pillButton("View");
-        c1.add(new JPanel(new FlowLayout(FlowLayout.LEFT)) {{ setOpaque(false); add(view1); }}, BorderLayout.SOUTH);
+        String sql = """
+            SELECT 
+                s.section_id,
+                s.course_id,
+                s.instructor_id,
+                s.day_time,
+                s.room,
+                s.capacity,
+                s.semester,
+                s.year
+            FROM sections s
+            JOIN courses c ON s.course_id = c.course_id
+            WHERE s.instructor_id = ?
+        """;
 
-        RoundedPanel c2 = new RoundedPanel(18);
-        c2.setBackground(CARD);
-        c2.setLayout(new BorderLayout());
-        c2.setBorder(new EmptyBorder(18, 22, 18, 22));
-        JLabel t2 = new JLabel("Operating Systems Section B");
-        t2.setFont(FontKit.semibold(16f));
-        t2.setForeground(TEXT_900);
-        c2.add(t2, BorderLayout.NORTH);
-        JButton view2 = pillButton("View");
-        c2.add(new JPanel(new FlowLayout(FlowLayout.LEFT)) {{ setOpaque(false); add(view2); }}, BorderLayout.SOUTH);
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        row.add(c1);
-        row.add(c2);
-        return row;
+            stmt.setLong(1, Long.parseLong(instructorId));
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    SectionInfo si = new SectionInfo();
+                    si.sectionID = rs.getInt("section_id");
+                    si.courseID = rs.getString("course_id");
+                    si.instructorID = instructorId;
+                    si.dayTime = rs.getString("day_time");
+                    si.room = rs.getString("room");
+                    si.capacity = rs.getInt("capacity");
+                    si.semester = rs.getString("semester");
+                    si.year = rs.getInt("year");
+                    
+                    list.add(si);
+                }
+            }
+        }
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return list;
     }
 
     private JButton pillButton(String text) {

@@ -49,8 +49,6 @@ public class ClassStats extends JFrame {
         FontKit.init();
         DatabaseConnection.init();
 
-        System.out.println("Loading stats for instructor: " + instrID);
-
         setTitle("IIITD ERP – Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1220, 840));
@@ -208,7 +206,7 @@ public class ClassStats extends JFrame {
             actions.setOpaque(false);
 
             RoundedButton viewBtn = new RoundedButton("View Stats");
-            viewBtn.addActionListener(e -> { new ViewStats("S01").setVisible(true);});
+            viewBtn.addActionListener(e -> { new ViewStats(sec.sectionID).setVisible(true);});
             viewBtn.setBackground(TEAL);
             viewBtn.setForeground(Color.WHITE);
             viewBtn.setFont(FontKit.semibold(14f));
