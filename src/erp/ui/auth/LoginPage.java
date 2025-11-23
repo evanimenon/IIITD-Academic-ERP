@@ -17,6 +17,8 @@ import erp.ui.admin.AdminDashboard;
 import java.util.Locale;
 import erp.auth.AuthContext;
 import erp.auth.Role;
+import erp.ui.student.StudentDashboard;
+import erp.ui.student.StudentLookupService;
 
 import erp.ui.common.RoundedButton;
 import erp.ui.common.RoundedTextField;
@@ -133,12 +135,34 @@ public class LoginPage extends JFrame {
 
                         switch (r) {
                             case STUDENT -> {
-                                // StudentDashboard has a convenience constructor that accepts displayName
-                                new StudentDashboard(display).setVisible(true);
+                                // Use auth username to find student row in erp_db.students
+                                String authUsername = session.username();
+
+                                StudentLookupService.StudentInfo info = StudentLookupService
+                                        .loadByAuthUsername(authUsername);
+
+                                // Defaults if we don't find a row (still let them in)
+                                String studentId = authUsername;
+                                String displayName = authUsername;
+
+                                if (info != null) {
+                                    studentId = info.getStudentId(); // actual PK in students table
+
+                                    // Prefer full_name, else roll_no, else username
+                                    if (info.getFullName() != null && !info.getFullName().isBlank()) {
+                                        displayName = info.getFullName();
+                                    } else if (info.getRollNo() != null && !info.getRollNo().isBlank()) {
+                                        displayName = info.getRollNo();
+                                    }
+                                }
+
+                                new StudentDashboard(studentId, displayName).setVisible(true);
                                 dispose();
                             }
+
                             case INSTRUCTOR -> {
-                                // InstructorDashboard expects (instrID, displayName) — use userId as instrID placeholder
+                                // InstructorDashboard expects (instrID, displayName) — use userId as instrID
+                                // placeholder
                                 new InstructorDashboard(String.valueOf(session.userId()),
                                         display).setVisible(true);
                                 dispose();
@@ -272,8 +296,6 @@ public class LoginPage extends JFrame {
             g2.dispose();
         }
     }
-
-    
 
     // Quick manual launch
     public static void main(String[] args) {
