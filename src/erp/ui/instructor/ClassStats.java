@@ -170,52 +170,61 @@ public class ClassStats extends JFrame {
 
         List<SectionInfo> sections = fetchSectionsForInstructor(instrID);
 
-        for (SectionInfo sec : sections) {
-            RoundedPanel card = new RoundedPanel(20);
-            card.setBackground(CARD);
-            card.setBorder(new EmptyBorder(20, 24, 20, 24));
-            card.setLayout(new BorderLayout());
+        if(sections.isEmpty()) {
+            JLabel empty = new JLabel("You are not assigned to any sections.");
+            empty.setFont(FontKit.regular(14f));
+            empty.setForeground(TEXT_600);
+            empty.setAlignmentX(Component.CENTER_ALIGNMENT);
+            content.add(empty);
+        }
+        else{
+            for (SectionInfo sec : sections) {
+                RoundedPanel card = new RoundedPanel(20);
+                card.setBackground(CARD);
+                card.setBorder(new EmptyBorder(20, 24, 20, 24));
+                card.setLayout(new BorderLayout());
 
-            // left column
-            JPanel left = new JPanel();
-            left.setOpaque(false);
-            left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
+                // left column
+                JPanel left = new JPanel();
+                left.setOpaque(false);
+                left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
 
-            JLabel title = new JLabel(sec.courseID + " - Section " + String.format("%02d", sec.sectionID));
-            title.setFont(FontKit.bold(20f));
-            title.setForeground(TEXT_900);
+                JLabel title = new JLabel(sec.courseID + " - Section " + String.format("%02d", sec.sectionID));
+                title.setFont(FontKit.bold(20f));
+                title.setForeground(TEXT_900);
 
-            JLabel subtitle = new JLabel("Room: " + sec.room + " | Time: " + sec.dayTime);
-            subtitle.setFont(FontKit.regular(15f));
-            subtitle.setForeground(TEXT_600);
+                JLabel subtitle = new JLabel("Room: " + sec.room + " | Time: " + sec.dayTime);
+                subtitle.setFont(FontKit.regular(15f));
+                subtitle.setForeground(TEXT_600);
 
-            JLabel sem = new JLabel("Semester: " + sec.semester);
-            sem.setFont(FontKit.regular(14f));
-            sem.setForeground(TEXT_600);
+                JLabel sem = new JLabel("Semester: " + sec.semester);
+                sem.setFont(FontKit.regular(14f));
+                sem.setForeground(TEXT_600);
 
-            left.add(title);
-            left.add(Box.createVerticalStrut(6));
-            left.add(subtitle);
-            left.add(Box.createVerticalStrut(4));
-            left.add(sem);
+                left.add(title);
+                left.add(Box.createVerticalStrut(6));
+                left.add(subtitle);
+                left.add(Box.createVerticalStrut(4));
+                left.add(sem);
 
-            card.add(left, BorderLayout.WEST);
+                card.add(left, BorderLayout.WEST);
 
-            // right column – action buttons
-            JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
-            actions.setOpaque(false);
+                // right column – action buttons
+                JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+                actions.setOpaque(false);
 
-            RoundedButton viewBtn = new RoundedButton("View Stats");
-            viewBtn.addActionListener(e -> { new ViewStats(sec.sectionID).setVisible(true);});
-            viewBtn.setBackground(TEAL);
-            viewBtn.setForeground(Color.WHITE);
-            viewBtn.setFont(FontKit.semibold(14f));
-            viewBtn.setFocusPainted(false);
-            viewBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
-            actions.add(viewBtn);
-            card.add(actions, BorderLayout.EAST);
-            content.add(card);
-            content.add(Box.createVerticalStrut(16));
+                RoundedButton viewBtn = new RoundedButton("View Stats");
+                viewBtn.addActionListener(e -> { new ViewStats(sec.sectionID).setVisible(true);});
+                viewBtn.setBackground(TEAL);
+                viewBtn.setForeground(Color.WHITE);
+                viewBtn.setFont(FontKit.semibold(14f));
+                viewBtn.setFocusPainted(false);
+                viewBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+                actions.add(viewBtn);
+                card.add(actions, BorderLayout.EAST);
+                content.add(card);
+                content.add(Box.createVerticalStrut(16));
+            }
         }
         root.add(new JScrollPane(content), BorderLayout.CENTER);
 

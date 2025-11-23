@@ -10,35 +10,31 @@ import java.awt.*;
 
 import erp.db.DatabaseConnection;
 import erp.db.Maintenance;
-import erp.ui.admin.AddStudent;
-import erp.ui.admin.AdminDashboard;
-import erp.ui.admin.ManageCourses;
 import erp.ui.auth.LoginPage;
 import erp.ui.common.FontKit;
 
 import erp.ui.common.NavButton;
 import erp.ui.common.RoundedButton;
 import erp.ui.common.RoundedPanel;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 
 public class GradeStudents extends JFrame {
 
     // ---- Simple local model to avoid DB ----
-    private static class SectionInfo {
-        String sectionID;
-        String courseCode;
-        String courseName;
-        String semester;
-
-        SectionInfo(String sectionID, String courseCode, String courseName, String semester) {
-            this.sectionID = sectionID;
-            this.courseCode = courseCode;
-            this.courseName = courseName;
-            this.semester = semester;
-        }
+    public class SectionInfo {
+        public int sectionID;
+        public String courseID;
+        public String instructorID;
+        public String dayTime;
+        public String semester;
+        public int year;
+        public String room;
+        public int capacity;
     }
 
     // Palette
@@ -170,92 +166,180 @@ public class GradeStudents extends JFrame {
 
         root.add(hero, BorderLayout.NORTH);
 
+
         // ---------- MAIN CONTENT ----------
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setOpaque(false);
         content.setBorder(new EmptyBorder(24, 32, 24, 32));
 
-        // --- TEMP DATA: Hardcoded list of sections ---
         List<SectionInfo> sections = new ArrayList<>();
-        sections.add(new SectionInfo("S01", "CSE201", "Data Structures & Algorithms", "Monsoon 2025"));
-        sections.add(new SectionInfo("S02", "CSE203", "Advanced Programming", "Monsoon 2025"));
-        sections.add(new SectionInfo("S05", "CSE222", "Operating Systems", "Winter 2025"));
+        sections = fetchSectionsForInstructor(instrID);
 
-        for (SectionInfo sec : sections) {
-            RoundedPanel card = new RoundedPanel(20);
-            card.setBackground(CARD);
-            card.setBorder(new EmptyBorder(20, 24, 20, 24));
-            card.setLayout(new BorderLayout());
-
-            // left column
-            JPanel left = new JPanel();
-            left.setOpaque(false);
-            left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
-
-            JLabel title = new JLabel(sec.courseCode + " – " + sec.sectionID);
-            title.setFont(FontKit.bold(20f));
-            title.setForeground(TEXT_900);
-
-            JLabel subtitle = new JLabel(sec.courseName);
-            subtitle.setFont(FontKit.regular(15f));
-            subtitle.setForeground(TEXT_600);
-
-            JLabel sem = new JLabel("Semester: " + sec.semester);
-            sem.setFont(FontKit.regular(14f));
-            sem.setForeground(TEXT_600);
-
-            left.add(title);
-            left.add(Box.createVerticalStrut(6));
-            left.add(subtitle);
-            left.add(Box.createVerticalStrut(4));
-            left.add(sem);
-
-            card.add(left, BorderLayout.WEST);
-
-            // right column – action buttons
-            JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
-            actions.setOpaque(false);
-
-            RoundedButton csvBtn = new RoundedButton("Upload CSV");
-            csvBtn.addActionListener(e -> { new CSVUploadPage(instrID, displayName).setVisible(true); dispose(); });
-            csvBtn.setBackground(TEAL);
-            csvBtn.setForeground(Color.WHITE);
-            csvBtn.setFont(FontKit.semibold(14f));
-            csvBtn.setFocusPainted(false);
-            csvBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
-
-            RoundedButton manualBtn = new RoundedButton("Manual Grading");
-            manualBtn.addActionListener(e -> { new ManualGradingPage(instrID, displayName).setVisible(true); dispose(); });
-            manualBtn.setBackground(TEAL_LIGHT);
-            manualBtn.setForeground(Color.WHITE);
-            manualBtn.setFont(FontKit.semibold(14f));
-            manualBtn.setFocusPainted(false);
-            manualBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
-
-            actions.add(csvBtn);
-            actions.add(manualBtn);
-
-            card.add(actions, BorderLayout.EAST);
-
-            content.add(card);
-            content.add(Box.createVerticalStrut(16));
+        if(sections.isEmpty()) {
+            JLabel empty = new JLabel("You are not assigned to any sections.");
+            empty.setFont(FontKit.regular(14f));
+            empty.setForeground(TEXT_600);
+            empty.setAlignmentX(Component.CENTER_ALIGNMENT);
+            content.add(empty);
         }
+        else{
+            for (SectionInfo sec : sections) {
+                RoundedPanel card = new RoundedPanel(20);
+                card.setBackground(CARD);
+                card.setBorder(new EmptyBorder(20, 24, 20, 24));
+                card.setLayout(new BorderLayout());
 
+                // left column
+                JPanel left = new JPanel();
+                left.setOpaque(false);
+                left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
+
+                JLabel title = new JLabel(sec.courseID + " – " + sec.sectionID);
+                title.setFont(FontKit.bold(20f));
+                title.setForeground(TEXT_900);
+
+                JLabel subtitle = new JLabel(getCourseName(sec.courseID));
+                subtitle.setFont(FontKit.regular(15f));
+                subtitle.setForeground(TEXT_600);
+
+                JLabel sem = new JLabel("Semester: " + sec.semester);
+                sem.setFont(FontKit.regular(14f));
+                sem.setForeground(TEXT_600);
+
+                left.add(title);
+                left.add(Box.createVerticalStrut(6));
+                left.add(subtitle);
+                left.add(Box.createVerticalStrut(4));
+                left.add(sem);
+
+                card.add(left, BorderLayout.WEST);
+
+                // right column – action buttons
+                JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+                actions.setOpaque(false);
+
+                RoundedButton csvBtn = new RoundedButton("Upload CSV");
+                csvBtn.addActionListener(e -> { new CSVUploadPage(instrID, displayName).setVisible(true); dispose(); });
+                csvBtn.setBackground(TEAL);
+                csvBtn.setForeground(Color.WHITE);
+                csvBtn.setFont(FontKit.semibold(14f));
+                csvBtn.setFocusPainted(false);
+                csvBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+
+                RoundedButton manualBtn = new RoundedButton("Manual Grading");
+                manualBtn.addActionListener(e -> { new ManualGradingPage(instrID, displayName).setVisible(true); dispose(); });
+                manualBtn.setBackground(TEAL_LIGHT);
+                manualBtn.setForeground(Color.WHITE);
+                manualBtn.setFont(FontKit.semibold(14f));
+                manualBtn.setFocusPainted(false);
+                manualBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+
+                actions.add(csvBtn);
+                actions.add(manualBtn);
+
+                card.add(actions, BorderLayout.EAST);
+
+                content.add(card);
+                content.add(Box.createVerticalStrut(16));
+            }
+        }
         root.add(new JScrollPane(content), BorderLayout.CENTER);
-
 
         if (Maintenance.isOn()) {
             RoundedPanel banner = new RoundedPanel(12);
             banner.setBackground(new Color(255, 235, 230)); // light red
             banner.setBorder(new EmptyBorder(12, 18, 12, 18));
 
-            JLabel msg = new JLabel("⚠️  Maintenance Mode is ON – Changes are disabled");
+            JLabel msg = new JLabel("⚠️  Maintenance Mode is ON Changes are disabled");
             msg.setFont(FontKit.semibold(14f));
             msg.setForeground(new Color(180, 60, 50));
             banner.add(msg);
 
             root.add(banner, BorderLayout.NORTH);
         }
+    }
+
+    private List<SectionInfo> fetchSectionsForInstructor(String instructorId) {
+        List<SectionInfo> list = new ArrayList<>();
+
+        String sql = """
+            SELECT 
+                s.section_id,
+                s.course_id,
+                s.instructor_id,
+                s.day_time,
+                s.room,
+                s.capacity,
+                s.semester,
+                s.year
+            FROM sections s
+            JOIN courses c ON s.course_id = c.course_id
+            WHERE s.instructor_id = ?
+        """;
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, Long.parseLong(instructorId));
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    SectionInfo si = new SectionInfo();
+                    si.sectionID = rs.getInt("section_id");
+                    si.courseID = rs.getString("course_id");
+                    si.instructorID = instructorId;
+                    si.dayTime = rs.getString("day_time");
+                    si.room = rs.getString("room");
+                    si.capacity = rs.getInt("capacity");
+                    si.semester = rs.getString("semester");
+                    si.year = rs.getInt("year");
+                    
+                    list.add(si);
+                }
+            }
+        }
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return list;
+    }
+
+    String getCourseName(String courseId) {
+        String name = "Unknown Course";
+        String sql = "SELECT title FROM courses WHERE course_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, courseId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    name = rs.getString("title");
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return name;
+    }
+
+    String getDepartment(String instructorId) {
+        String dept = "None"; // default
+
+        String sql = "SELECT department FROM instructors WHERE instructor_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, Long.parseLong(instructorId));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    dept = rs.getString("department");
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return dept;
     }
 }

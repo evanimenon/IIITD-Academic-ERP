@@ -7,7 +7,6 @@ import erp.ui.common.FontKit;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.geom.RoundRectangle2D;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import erp.ui.common.NavButton;
 import erp.ui.common.RoundedPanel;
-import erp.ui.instructor.ClassStats.SectionInfo;
+
 // Auth helpers
 import erp.auth.AuthContext;
 import erp.auth.Role;
@@ -35,9 +34,6 @@ public class InstructorDashboard extends JFrame {
     private static final Color TEXT_900   = new Color(24, 30, 37);
     private static final Color TEXT_600   = new Color(100, 116, 139);
     private static final Color CARD       = Color.WHITE;
-
-    // DB-derived
-    private String department = "CSE";
 
     // UI refs
     private JPanel rightDock;           // notifications dock
@@ -116,6 +112,7 @@ public class InstructorDashboard extends JFrame {
         name.setFont(FontKit.bold(18f));
         profile.add(name);
 
+        String department = getDepartment(instrID);
         JLabel meta = new JLabel("Department: " + department);
         meta.setAlignmentX(Component.CENTER_ALIGNMENT);
         meta.setForeground(new Color(210, 225, 221));
@@ -308,54 +305,73 @@ public class InstructorDashboard extends JFrame {
     private JScrollPane loadInstrSections(String instructorID) {
         List<SectionInfo> sections = fetchSectionsForInstructor(instructorID);
 
-        JPanel container = new JPanel(new GridBagLayout());
-        container.setOpaque(false);
-        GridBagConstraints gc = new GridBagConstraints();
-        gc.insets = new Insets(12, 12, 12, 12);
-        gc.fill = GridBagConstraints.BOTH;
-        gc.weightx = 1;
-        gc.weighty = 0;
+        JPanel content = new JPanel();
+        content.setOpaque(false);
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
-        int row = 0;
-        for (SectionInfo si : sections) {
-            gc.gridx = 0; gc.gridy = row++; gc.gridwidth = 1; gc.weighty = 0;
-            container.add(metricCard(si.courseID + " - " + si.sectionID, "Course Section"), gc);
-            gc.gridx = 1; gc.weighty = 0;
-            container.add(metricCard(si.semester + " " + si.year, "Semester"), gc);
-            gc.gridx = 2; gc.weighty = 0;
-            container.add(metricCard(si.dayTime, "Schedule"), gc);
-            gc.gridx = 3; gc.weighty = 0;
-            container.add(metricCard(String.valueOf(si.capacity), "Capacity"), gc);
+        if (sections.isEmpty()) {
+            JLabel empty = new JLabel("You are not assigned to any sections.");
+            empty.setFont(FontKit.regular(14f));
+            empty.setForeground(TEXT_600);
+            empty.setAlignmentX(Component.CENTER_ALIGNMENT);
+            content.add(empty);
+        } 
+        
+        else {
+            for (SectionInfo sec : sections) {
+                RoundedPanel card = new RoundedPanel(20);
+                card.setBackground(CARD);
+                card.setBorder(new EmptyBorder(20, 24, 20, 24));
+                card.setLayout(new BorderLayout());
+
+                JPanel left = new JPanel();
+                left.setOpaque(false);
+                left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
+
+                JLabel title = new JLabel(sec.courseID + " - Section " + String.format("%02d", sec.sectionID) + ": " + getCourseName(sec.courseID));
+                title.setFont(FontKit.bold(20f));
+                title.setForeground(TEXT_900);
+
+                JLabel subtitle = new JLabel("Room: " + sec.room + " | Time: " + sec.dayTime);
+                subtitle.setFont(FontKit.regular(15f));
+                subtitle.setForeground(TEXT_600);
+
+                left.add(title);
+                left.add(Box.createVerticalStrut(6));
+                left.add(subtitle);
+
+                card.add(left, BorderLayout.WEST);
+
+                JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+                actions.setOpaque(false);
+
+                RoundedButton viewBtn = new RoundedButton("View Section");
+                viewBtn.addActionListener(e -> new ViewStats(sec.sectionID).setVisible(true));
+                viewBtn.setBackground(TEAL);
+                viewBtn.setForeground(Color.WHITE);
+                viewBtn.setFont(FontKit.semibold(14f));
+                viewBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+                actions.add(viewBtn);
+
+                card.add(actions, BorderLayout.EAST);
+
+                content.add(card);
+                content.add(Box.createVerticalStrut(16));
+            }
         }
 
-        JScrollPane sp = new JScrollPane(container);
-        sp.setBorder(null);
-        sp.getViewport().setBackground(BG);
-        return sp;
+        JScrollPane sc = new JScrollPane(content);
+        sc.setBorder(null);
+        sc.getViewport().setBackground(BG);
+        sc.getVerticalScrollBar().setUnitIncrement(16);
+
+        return sc;
     }
+
 
     private static String todayString() {
         LocalDate d = LocalDate.now();
         return d.getDayOfMonth() + " " + d.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH) + " " + d.getYear();
-    }
-
-    private RoundedPanel metricCard(String value, String label) {
-        RoundedPanel p = new RoundedPanel(18);
-        p.setBackground(CARD);
-        p.setLayout(new GridBagLayout());
-        p.setBorder(new EmptyBorder(20, 22, 20, 22));
-        GridBagConstraints g = new GridBagConstraints();
-        g.gridx = 0; g.gridy = 0; g.anchor = GridBagConstraints.WEST;
-        JLabel v = new JLabel(value);
-        v.setFont(FontKit.bold(18f));
-        v.setForeground(TEXT_900);
-        p.add(v, g);
-        g.gridy = 1;
-        JLabel l = new JLabel(label);
-        l.setFont(FontKit.regular(13f));
-        l.setForeground(TEXT_600);
-        p.add(l, g);
-        return p;
     }
 
     private List<SectionInfo> fetchSectionsForInstructor(String instructorId) {
@@ -419,6 +435,44 @@ public class InstructorDashboard extends JFrame {
                 g2.dispose();
             }
         };
+    }
+
+    String getDepartment(String instructorId) {
+        String dept = "None"; // default
+
+        String sql = "SELECT department FROM instructors WHERE instructor_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, Long.parseLong(instructorId));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    dept = rs.getString("department");
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return dept;
+    }
+
+    String getCourseName(String courseId) {
+        String name = "Unknown Course";
+        String sql = "SELECT title FROM courses WHERE course_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, courseId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    name = rs.getString("title");
+                }
+            }
+        } 
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return name;
     }
 
     public static void main(String[] args) {
