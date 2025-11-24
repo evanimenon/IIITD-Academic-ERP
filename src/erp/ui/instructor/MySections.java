@@ -215,13 +215,23 @@ public class MySections extends JFrame {
                 actions.setOpaque(false);
 
                 RoundedButton viewBtn = new RoundedButton("View");
-                viewBtn.addActionListener(e -> { new SectionInfoPage("s01").setVisible(true);});
+                viewBtn.addActionListener(e -> { new SectionInfoPage(instrID, sec.sectionID, displayName).setVisible(true); dispose();});
                 viewBtn.setBackground(TEAL);
                 viewBtn.setForeground(Color.WHITE);
                 viewBtn.setFont(FontKit.semibold(14f));
                 viewBtn.setFocusPainted(false);
                 viewBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
                 actions.add(viewBtn);
+
+                RoundedButton manageBtn = new RoundedButton("Manage Components");
+                manageBtn.addActionListener(e -> { new ManageComponents(instrID, sec.sectionID, displayName).setVisible(true); dispose();});
+                manageBtn.setBackground(TEAL);
+                manageBtn.setForeground(Color.WHITE);
+                manageBtn.setFont(FontKit.semibold(14f));
+                manageBtn.setFocusPainted(false);
+                manageBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+                actions.add(manageBtn);
+                
                 card.add(actions, BorderLayout.EAST);
                 content.add(card);
                 content.add(Box.createVerticalStrut(16));

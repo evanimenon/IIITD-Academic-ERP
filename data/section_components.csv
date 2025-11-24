@@ -1,0 +1,5 @@
+id,section_id,component_name,weight
+40,2,Quizzes,30
+41,2,Midsem,20
+42,2,Endsem,30
+43,2,Assignments,20

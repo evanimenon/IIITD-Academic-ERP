@@ -225,7 +225,7 @@ public class InstructorDashboard extends JFrame {
         gc.weighty = 0;
 
         gc.gridx = 0; gc.gridy = 1; gc.gridwidth = 3; gc.weighty = 1;
-        grid.add(loadInstrSections(instrID), gc);
+        grid.add(loadInstrSections(instrID, displayName), gc);
 
         JPanel centerStack = new JPanel();
         centerStack.setOpaque(false);
@@ -301,8 +301,7 @@ public class InstructorDashboard extends JFrame {
         return p;
     }
 
-    //TODO: db -> get department from instructor table for display
-    private JScrollPane loadInstrSections(String instructorID) {
+    private JScrollPane loadInstrSections(String instructorID, String displayName) {
         List<SectionInfo> sections = fetchSectionsForInstructor(instructorID);
 
         JPanel content = new JPanel();
@@ -346,7 +345,7 @@ public class InstructorDashboard extends JFrame {
                 actions.setOpaque(false);
 
                 RoundedButton viewBtn = new RoundedButton("View Section");
-                viewBtn.addActionListener(e -> new ViewStats(sec.sectionID).setVisible(true));
+                viewBtn.addActionListener(e -> { new SectionInfoPage(instructorID, sec.sectionID, displayName).setVisible(true); dispose();});
                 viewBtn.setBackground(TEAL);
                 viewBtn.setForeground(Color.WHITE);
                 viewBtn.setFont(FontKit.semibold(14f));
