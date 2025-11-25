@@ -1,13 +1,12 @@
+// StudentTimetableFrame.java
 package erp.ui.student;
 
 import erp.db.DatabaseConnection;
 import erp.ui.common.FontKit;
-import erp.ui.common.TableHeader;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,93 +14,117 @@ import java.sql.ResultSet;
 
 public class StudentTimetableFrame extends StudentFrameBase {
 
-    private final String studentId;
+    private JTable table;
     private DefaultTableModel model;
 
     public StudentTimetableFrame(String studentId, String userDisplayName) {
         super(studentId, userDisplayName, Page.TIMETABLE);
-        this.studentId = studentId;
         setTitle("IIITD ERP – Time Table");
     }
 
     @Override
     protected JComponent buildMainContent() {
-        JPanel main = new JPanel(new BorderLayout(12, 12));
-        main.setOpaque(false);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        panel.setBorder(new EmptyBorder(8, 8, 8, 8));
 
-        JLabel title = new JLabel("My Timetable (Registered Sections)");
-        title.setFont(FontKit.bold(20f));
-        title.setBorder(new EmptyBorder(0, 0, 8, 0));
-        main.add(title, BorderLayout.NORTH);
+        JLabel title = new JLabel("Time Table");
+        title.setFont(FontKit.bold(22f));
+        title.setForeground(new Color(24, 30, 37));
+        panel.add(title, BorderLayout.NORTH);
 
         String[] cols = {
+                "Section ID",
                 "Course ID",
                 "Code",
                 "Title",
-                "Section ID",
                 "Day / Time",
                 "Room",
                 "Semester",
-                "Year"
+                "Year",
+                "Instructor"
         };
 
         model = new DefaultTableModel(cols, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
+            @Override public boolean isCellEditable(int row, int col) { return false; }
         };
-
-        JTable table = new JTable(model);
-        table.setFont(FontKit.regular(14f));
-        table.setRowHeight(26);
-        table.setShowHorizontalLines(true);
-        table.setGridColor(new Color(230, 233, 236));
-        table.setBackground(Color.WHITE);
-
-        JTableHeader hdr = table.getTableHeader();
-        hdr.setDefaultRenderer(new TableHeader());
+        table = new JTable(model);
+        table.setRowHeight(24);
+        table.setFillsViewportHeight(true);
 
         JScrollPane sp = new JScrollPane(table);
-        sp.setBorder(BorderFactory.createLineBorder(new Color(230, 233, 236), 1));
-        main.add(sp, BorderLayout.CENTER);
+        sp.setBorder(BorderFactory.createEmptyBorder(12, 0, 0, 0));
+        panel.add(sp, BorderLayout.CENTER);
 
         loadTimetable();
-        return main;
+
+        return panel;
     }
 
     private void loadTimetable() {
+        System.out.println("[DEBUG] Student ID in TimetableFrame = '" + this.studentId + "'");
+
         model.setRowCount(0);
 
+        if (this.studentId == null || this.studentId.isBlank()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No student id available in TimetableFrame.",
+                    "Debug",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
         final String sql =
-                "SELECT c.course_id, c.code, c.title, " +
-                "       s.section_id, s.day_time, s.room, s.semester, s.year " +
+                "SELECT s.section_id, c.course_id, c.code, c.title, " +
+                "       s.day_time, s.room, s.semester, s.year, " +
+                "       i.instructor_name " +
                 "FROM   erp_db.enrollments e " +
-                "JOIN   erp_db.sections s ON e.section_id = s.section_id " +
-                "JOIN   erp_db.courses c  ON s.course_id = c.course_id " +
+                "JOIN   erp_db.sections s ON s.section_id = e.section_id " +
+                "JOIN   erp_db.courses c ON c.course_id = s.course_id " +
+                "LEFT JOIN erp_db.instructors i ON i.instructor_id = s.instructor_id " +
                 "WHERE  e.student_id = ? " +
                 "  AND  e.status = 'REGISTERED' " +
-                "ORDER BY s.day_time, c.course_id";
+                "ORDER BY s.year, s.semester, s.day_time";
 
-        try (Connection c = DatabaseConnection.erp().getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, studentId);
+            ps.setString(1, this.studentId);
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    model.addRow(new Object[] {
+                    model.addRow(new Object[]{
+                            rs.getInt("section_id"),
                             rs.getString("course_id"),
                             rs.getString("code"),
                             rs.getString("title"),
-                            rs.getInt("section_id"),
                             rs.getString("day_time"),
                             rs.getString("room"),
                             rs.getString("semester"),
-                            rs.getInt("year")
+                            rs.getInt("year"),
+                            rs.getString("instructor_name")
                     });
                 }
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error loading timetable:\n" + ex.getMessage(),
-                    "Database Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error loading timetable:\n" + ex.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+
+        if (model.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No timetable entries found for student: " + this.studentId,
+                    "Time Table",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
         }
     }
 }

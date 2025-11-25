@@ -135,26 +135,31 @@ public class LoginPage extends JFrame {
 
                         switch (r) {
                             case STUDENT -> {
-                                // Use auth username to find student row in erp_db.students
                                 String authUsername = session.username();
 
                                 StudentLookupService.StudentInfo info = StudentLookupService
                                         .loadByAuthUsername(authUsername);
 
-                                // Defaults if we don't find a row (still let them in)
-                                String studentId = authUsername;
+                                String studentId = authUsername; // start with something non-null
                                 String displayName = authUsername;
 
                                 if (info != null) {
-                                    studentId = info.getStudentId(); // actual PK in students table
+                                    // 1) Pick a canonical studentId: prefer student_id, else roll_no, else username
+                                    if (info.getStudentId() != null && !info.getStudentId().isBlank()) {
+                                        studentId = info.getStudentId();
+                                    } else if (info.getRollNo() != null && !info.getRollNo().isBlank()) {
+                                        studentId = info.getRollNo();
+                                    }
 
-                                    // Prefer full_name, else roll_no, else username
+                                    // 2) Pick a nice display name
                                     if (info.getFullName() != null && !info.getFullName().isBlank()) {
                                         displayName = info.getFullName();
                                     } else if (info.getRollNo() != null && !info.getRollNo().isBlank()) {
                                         displayName = info.getRollNo();
                                     }
                                 }
+
+                                System.out.println("[DEBUG] Final studentId used in UI = '" + studentId + "'");
 
                                 new StudentDashboard(studentId, displayName).setVisible(true);
                                 dispose();

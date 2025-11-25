@@ -74,7 +74,8 @@ CREATE TABLE enrollments (
   enrollment_id INT NOT NULL AUTO_INCREMENT,
   student_id    VARCHAR(64) NOT NULL,
   section_id    INT         NOT NULL,
-  status ENUM('REGISTERED','DROPPED') NOT NULL DEFAULT 'REGISTERED',
+  status        ENUM('REGISTERED','DROPPED') NOT NULL DEFAULT 'REGISTERED',
+  final_grade   VARCHAR(8)  NULL,  -- e.g., A, A-, B+, default NULL
   PRIMARY KEY (enrollment_id),
   UNIQUE KEY uq_student_section (student_id, section_id),
   KEY idx_enr_student (student_id),
@@ -86,6 +87,7 @@ CREATE TABLE enrollments (
     FOREIGN KEY (section_id) REFERENCES sections(section_id)
     ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 
 -- GRADES (one row per component; composite PK)
 CREATE TABLE grades (
@@ -152,15 +154,18 @@ IGNORE 1 LINES
 SET section_id = NULLIF(@sid,'');
 
 -- enrollments.csv: enrollment_id (optional), student_id, section_id, status
+-- enrollments.csv: enrollment_id (optional), student_id, section_id, status, final_grade
 LOAD DATA LOCAL INFILE 'enrollments.csv'
 INTO TABLE enrollments
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
-(@eid, student_id, section_id, @st)
+(@eid, student_id, section_id, @st, @fg)
 SET enrollment_id = NULLIF(@eid,''),
-    status        = IFNULL(NULLIF(@st,''),'REGISTERED');
+    status        = IFNULL(NULLIF(@st,''),'REGISTERED'),
+    final_grade   = NULLIF(@fg,'');
+
 
 -- grades.csv: enrollment_id, component, score, final_grade
 LOAD DATA LOCAL INFILE 'grades.csv'

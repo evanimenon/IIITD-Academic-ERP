@@ -31,18 +31,21 @@ import com.lowagie.text.pdf.PdfWriter;
 public class TranscriptExporter {
 
     private static final String TRANSCRIPT_SQL =
-            "SELECT e.enrollment_id, e.status, " +
-            "       c.course_id, c.code, c.title, c.credits, " +
-            "       s.semester, s.year, " +
-            "       COALESCE(MAX(g.final_grade), '') AS final_grade " +
-            "FROM   erp_db.enrollments e " +
-            "JOIN   erp_db.sections s ON e.section_id = s.section_id " +
-            "JOIN   erp_db.courses c  ON s.course_id = c.course_id " +
-            "LEFT JOIN erp_db.grades g ON g.enrollment_id = e.enrollment_id " +
-            "WHERE  e.student_id = ? " +
-            "GROUP BY e.enrollment_id, e.status, c.course_id, c.code, c.title, " +
-            "         c.credits, s.semester, s.year " +
-            "ORDER BY s.year, s.semester, c.course_id";
+        "SELECT e.enrollment_id, e.status, " +
+        "       c.course_id, c.code, c.title, c.credits, " +
+        "       s.semester, s.year, " +
+        "       COALESCE(e.final_grade, " +
+        "                (SELECT MAX(g.final_grade) " +
+        "                 FROM erp_db.grades g " +
+        "                 WHERE g.enrollment_id = e.enrollment_id), " +
+        "                '') AS final_grade " +
+        "FROM   erp_db.enrollments e " +
+        "JOIN   erp_db.sections s ON e.section_id = s.section_id " +
+        "JOIN   erp_db.courses c  ON s.course_id = c.course_id " +
+        "WHERE  e.student_id = ? " +
+        "ORDER BY s.year, s.semester, c.course_id";
+
+
 
     public static void exportTranscriptCsv(Component parent, String studentId) {
         if (studentId == null || studentId.isBlank()) {
