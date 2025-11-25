@@ -223,7 +223,7 @@ public class SectionInfoPage extends JFrame {
         studentsCard.add(studentbanner, BorderLayout.NORTH);
 
         // === Table data (ID only for now) ===
-        String[] columnNames = {"Student ID"};
+        String[] columnNames = {"Student ID", "Final Grade"};
         String[][] rowData = new String[students.size()][1];
 
         for (int i = 0; i < students.size(); i++) {
@@ -243,8 +243,7 @@ public class SectionInfoPage extends JFrame {
         tableHeader.setBackground(new Color(245, 245, 245));
         tableHeader.setFont(FontKit.semibold(15f));
         tableHeader.setForeground(TEXT_900);
-
-        // Scrollpane to prevent card growing giant
+        
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 

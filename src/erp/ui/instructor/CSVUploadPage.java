@@ -344,7 +344,6 @@ public class CSVUploadPage extends JFrame {
 
     int calculateFinalGrade(String studentId, int sectionId) {
         double finalGrade = 0.0;
-
         String sql = "SELECT sc.weight, g.score " +
                     "FROM section_components sc " +
                     "JOIN enrollments e ON sc.section_id = e.section_id " +
@@ -364,7 +363,6 @@ public class CSVUploadPage extends JFrame {
 
                     Double score = rs.getObject("score", Double.class);
                     if (score == null) {
-                        // Skip component if no grade exists yet
                         continue;
                     }
 
@@ -372,26 +370,30 @@ public class CSVUploadPage extends JFrame {
                 }
             }
 
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        if (finalGrade < 0) finalGrade = 0;
-        return (int) Math.round(finalGrade);
-    }
-
-    private void insertfinalGrade(String studentId, int sectionId, int finalGrade) {
-        String sql = "INSERT INTO grades (final_grade) " +
-                     "VALUES (?) "+
-                     "ON DUPLICATE KEY UPDATE final_grade = ?";
-        try (Connection conn = DatabaseConnection.erp().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDouble(1, finalGrade);
-            stmt.setDouble(2, finalGrade);
-            stmt.executeUpdate();
         } 
         catch (SQLException ex) {
             ex.printStackTrace();
         }
-    }   
+        //fixing negative values
+        if (finalGrade < 0) finalGrade = 0;
+        return (int) Math.round(finalGrade);
+    }
+
+    private void insertfinalGrade(String studentId, int sectionId, double finalGrade) {
+        String sql = "UPDATE enrollments SET final_grade = ? WHERE student_id = ? AND section_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, finalGrade);
+            stmt.setString(2, studentId);
+            stmt.setInt(3, sectionId);
+            int updated = stmt.executeUpdate();
+            if (updated == 0) {
+                System.out.println("No final grade uploaded for " + studentId + " section " + sectionId);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+  
 }
