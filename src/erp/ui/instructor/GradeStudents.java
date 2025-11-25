@@ -45,7 +45,6 @@ public class GradeStudents extends JFrame {
     private static final Color TEXT_900   = new Color(24, 30, 37);
     private static final Color TEXT_600   = new Color(100, 116, 139);
     private static final Color CARD       = Color.WHITE;
-    private String department = "Computer Science"; // TODO: fetch from DB
 
     public GradeStudents(String instrID, String displayName) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
@@ -94,6 +93,7 @@ public class GradeStudents extends JFrame {
         name.setFont(FontKit.bold(18f));
         profile.add(name);
 
+        String department = getDepartment(instrID);
         JLabel meta = new JLabel("Department: " + department);
         meta.setAlignmentX(Component.CENTER_ALIGNMENT);
         meta.setForeground(new Color(210, 225, 221));
@@ -220,7 +220,7 @@ public class GradeStudents extends JFrame {
                 actions.setOpaque(false);
 
                 RoundedButton csvBtn = new RoundedButton("Upload CSV");
-                csvBtn.addActionListener(e -> { new CSVUploadPage(instrID, displayName).setVisible(true); dispose(); });
+                csvBtn.addActionListener(e -> { new CSVUploadPage(instrID, sec.sectionID,displayName).setVisible(true); dispose(); });
                 csvBtn.setBackground(TEAL);
                 csvBtn.setForeground(Color.WHITE);
                 csvBtn.setFont(FontKit.semibold(14f));
@@ -228,7 +228,7 @@ public class GradeStudents extends JFrame {
                 csvBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
 
                 RoundedButton manualBtn = new RoundedButton("Manual Grading");
-                manualBtn.addActionListener(e -> { new ManualGradingPage(instrID, displayName).setVisible(true); dispose(); });
+                manualBtn.addActionListener(e -> { new ManualGradingPage(instrID, sec.sectionID,displayName).setVisible(true); dispose(); });
                 manualBtn.setBackground(TEAL_LIGHT);
                 manualBtn.setForeground(Color.WHITE);
                 manualBtn.setFont(FontKit.semibold(14f));
@@ -306,7 +306,7 @@ public class GradeStudents extends JFrame {
         return list;
     }
 
-    String getCourseName(String courseId) {
+    private String getCourseName(String courseId) {
         String name = "Unknown Course";
         String sql = "SELECT title FROM courses WHERE course_id = ?";
 
@@ -324,7 +324,7 @@ public class GradeStudents extends JFrame {
         return name;
     }
 
-    String getDepartment(String instructorId) {
+    private String getDepartment(String instructorId) {
         String dept = "None"; // default
 
         String sql = "SELECT department FROM instructors WHERE instructor_id = ?";

@@ -4,6 +4,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import erp.db.DatabaseConnection;
 import erp.db.Maintenance;
@@ -11,6 +15,8 @@ import erp.ui.auth.LoginPage;
 import erp.ui.common.FontKit;
 import erp.ui.common.NavButton;
 import erp.ui.common.RoundedPanel;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ManualGradingPage extends JFrame {
     // Palette
@@ -21,13 +27,13 @@ public class ManualGradingPage extends JFrame {
     private static final Color TEXT_900   = new Color(24, 30, 37);
     private static final Color TEXT_600   = new Color(100, 116, 139);
     private static final Color CARD       = Color.WHITE;
-    private String department = "Computer Science"; // TODO: fetch from DB
-    public ManualGradingPage(String instrID, String displayName) {
+
+    public ManualGradingPage(String instrID, int sectionID, String displayName) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
         FontKit.init();
         DatabaseConnection.init();
 
-        setTitle("IIITD ERP – Manual Grading");
+        setTitle("IIITD ERP - Manual Grading");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1100, 760));
         setLocationRelativeTo(null);
@@ -69,6 +75,7 @@ public class ManualGradingPage extends JFrame {
         name.setFont(FontKit.bold(18f));
         profile.add(name);
 
+        String department = getDepartment(instrID);
         JLabel meta = new JLabel("Department: " + department);
         meta.setAlignmentX(Component.CENTER_ALIGNMENT);
         meta.setForeground(new Color(210, 225, 221));
@@ -156,9 +163,56 @@ public class ManualGradingPage extends JFrame {
         // MAIN TABLE
         JPanel main = new JPanel(new BorderLayout());
         main.setBackground(BG);
+        main.setBorder(new EmptyBorder(24, 24, 24, 24));
+        // load components for selected section
+        String[] cols = getComponents(sectionID);
 
-        String[] cols = { "Student ID", "Midsem", "Quiz 1", "Quiz 2", "Endsem", "Final Grade" };
-        Object[][] data = {};  // TODO: load from DB
+        // load student data - if students are graded, show grades and allow grade editing. If students are ungraded, allow grading.
+        String sql = "SELECT s.student_id " +
+                     "FROM students s " +
+                     "JOIN enrollments e ON s.student_id = e.student_id " +
+                     "WHERE e.section_id = ? " +
+                     "ORDER BY s.student_id ASC";
+        List<String[]> rows = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, sectionID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String studentId = rs.getString("student_id");
+                    List<String> row = new ArrayList<>();
+                    row.add(studentId);
+                    // for each component, get grade if exists
+                    for (int i = 1; i < cols.length - 1; i++) {
+                        String compName = cols[i];
+                        String gradeSql = "SELECT g.score " +
+                                          "FROM grades g " +
+                                          "JOIN enrollments e ON g.enrollment_id = e.enrollment_id " +
+                                          "JOIN section_components sc ON g.component_id = sc.component_id " +
+                                          "WHERE e.student_id = ? AND e.section_id = ? AND sc.component_name = ?";
+                        try (PreparedStatement gradeStmt = conn.prepareStatement(gradeSql)) {
+                            gradeStmt.setString(1, studentId);
+                            gradeStmt.setInt(2, sectionID);
+                            gradeStmt.setString(3, compName);
+                            try (ResultSet gradeRs = gradeStmt.executeQuery()) {
+                                if (gradeRs.next()) {
+                                    row.add(String.valueOf(gradeRs.getDouble("score")));
+                                } else {
+                                    row.add("");
+                                }
+                            }
+                        }
+                    }
+                    // calculate final grade
+                    int finalGrade = calculateFinalGrade(studentId, sectionID);
+                    row.add(String.valueOf(finalGrade));
+                    rows.add(row.toArray(new String[0]));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        String[][] data = rows.toArray(new String[0][]);
 
         DefaultTableModel model = new DefaultTableModel(data, cols) {
             @Override public boolean isCellEditable(int row, int col) {
@@ -186,7 +240,7 @@ public class ManualGradingPage extends JFrame {
         if (Maintenance.isOn()) saveBtn.setEnabled(false);
 
         saveBtn.addActionListener(e -> {
-            // TODO: Read table → store scores → recalc final grades
+            
             JOptionPane.showMessageDialog(this, "Grades updated.", "Success",
                     JOptionPane.INFORMATION_MESSAGE);
         });
@@ -194,4 +248,142 @@ public class ManualGradingPage extends JFrame {
         main.add(saveBtn, BorderLayout.SOUTH);
         root.add(main, BorderLayout.CENTER);
     }
+
+    private String getDepartment(String instructorId) {
+        String dept = "None"; // default
+
+        String sql = "SELECT department FROM instructors WHERE instructor_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, Long.parseLong(instructorId));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    dept = rs.getString("department");
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return dept;
+    }
+
+    String getEnrollmentID(String studentId, int sectionId) {
+        String enrollId = null;
+
+        String sql = "SELECT enrollment_id FROM enrollments WHERE student_id = ? AND section_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, studentId);
+            stmt.setInt(2, sectionId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    enrollId = rs.getString("enrollment_id");
+                }
+            }
+        } 
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return enrollId;
+    }
+
+    int getcomponentID(String componentName, int sectionId) {
+        int compId = -1;
+        String sql = "SELECT component_id FROM section_components WHERE component_name = ? AND section_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, componentName);
+            stmt.setInt(2, sectionId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    compId = rs.getInt("component_id");
+                }
+            }
+        } 
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return compId;
+    }
+
+    int calculateFinalGrade(String studentId, int sectionId) {
+        double finalGrade = 0.0;
+
+        String sql = "SELECT sc.weight, g.score " +
+                    "FROM section_components sc " +
+                    "JOIN enrollments e ON sc.section_id = e.section_id " +
+                    "LEFT JOIN grades g ON e.enrollment_id = g.enrollment_id " +
+                    "AND sc.component_id = g.component_id " +
+                    "WHERE e.student_id = ? AND e.section_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, studentId);
+            stmt.setInt(2, sectionId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    double weightage = rs.getDouble("weight");
+
+                    Double score = rs.getObject("score", Double.class);
+                    if (score == null) {
+                        // Skip component if no grade exists yet
+                        continue;
+                    }
+
+                    finalGrade += (score * weightage) / 100.0;
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        if (finalGrade < 0) finalGrade = 0;
+        return (int) Math.round(finalGrade);
+    }
+
+    private void insertfinalGrade(String studentId, int sectionId, int finalGrade) {
+        String sql = "INSERT INTO grades (final_grade) " +
+                     "VALUES (?) "+
+                     "ON DUPLICATE KEY UPDATE final_grade = ?";
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, finalGrade);
+            stmt.setDouble(2, finalGrade);
+            stmt.executeUpdate();
+        } 
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }  
+
+    private String[] getComponents(int sectionId) {
+        String sql = "SELECT component_name FROM section_components WHERE section_id = ?";
+        List<String> components = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, sectionId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    components.add(rs.getString("component_name"));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        // Prepare columns array
+        String[] cols = new String[components.size() + 2];
+        cols[0] = "Student ID";
+        for (int i = 0; i < components.size(); i++) {
+            cols[i + 1] = components.get(i);
+        }
+        cols[cols.length - 1] = "Final Grade";
+        return cols;
+    }
+    
 }

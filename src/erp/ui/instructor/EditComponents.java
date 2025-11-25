@@ -22,7 +22,7 @@ import erp.ui.common.RoundedPanel;
 import erp.ui.common.RoundedTextField;
 
 
-public class ManageComponents extends JFrame {
+public class EditComponents extends JFrame {
 
     public class SectionInfo {
         public int sectionID;
@@ -48,14 +48,10 @@ public class ManageComponents extends JFrame {
     private String instrID;
     private String displayName;
     private final List<RoundedTextField[]> fields = new ArrayList<>();
-    private final List<RoundedTextField[]> newFields = new ArrayList<>();
-
-    private List<String[]> existing;
-
     private RoundedPanel form;
     private JPanel formRows;
 
-    public ManageComponents(String instrID, int SectionID, String displayName) {
+    public EditComponents(String instrID, int SectionID, String displayName) {
         this.instrID = instrID;
         this.sectionID = SectionID;
         this.displayName = displayName;
@@ -185,6 +181,7 @@ public class ManageComponents extends JFrame {
         main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
         root.add(new JScrollPane(main), BorderLayout.CENTER);
 
+        // --- Section Header (simple text, NOT card) ---
         SectionInfo section = getSectionDetails(sectionID);
         String courseName = getCourseName(section.courseID);
 
@@ -212,128 +209,63 @@ public class ManageComponents extends JFrame {
         main.add(sep2); 
         main.add(Box.createVerticalStrut(24));
 
-        // ---------- EXISTING COMPONENTS ----------
-        existing = getComponents(sectionID);
-        RoundedPanel existingCard = new RoundedPanel(20);
-        existingCard.setBackground(Color.WHITE);
-        existingCard.setLayout(new BorderLayout());
-        existingCard.setBorder(new EmptyBorder(24, 28, 28, 28));
-
-        JLabel existingTitle = new JLabel("Current Components");
-        existingTitle.setOpaque(true);
-        existingTitle.setBackground(TEAL_DARK);
-        existingTitle.setForeground(Color.WHITE);
-        existingTitle.setFont(FontKit.semibold(18f));
-        existingTitle.setBorder(new EmptyBorder(10, 14, 10, 14));
-        existingCard.add(existingTitle, BorderLayout.NORTH);
-        main.add(Box.createVerticalStrut(16));
+        // ---------- FORM ----------
+        RoundedPanel form = new RoundedPanel(20);
+        form.setBackground(Color.WHITE);
+        form.setBorder(new EmptyBorder(32, 40, 32, 40));
+        form.setLayout(new GridBagLayout());
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.insets = new Insets(12, 12, 12, 12);
+        gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.weightx = 1;
 
         // Fields
-        JPanel existingRows = new JPanel(new GridBagLayout());
-        existingRows.setOpaque(false);
-        existingCard.add(existingRows, BorderLayout.CENTER);
-
-        GridBagConstraints gc = new GridBagConstraints();
-        gc.insets = new Insets(12, 10, 12, 10);
-        gc.anchor = GridBagConstraints.WEST;
-
-        
+        List<String[]> existing = getComponents(sectionID);
         for(String[] comp : existing) {
-            RoundedTextField componentField   = new RoundedTextField(20, "Enter component name");
-            RoundedTextField weightField = new RoundedTextField(20, "Enter weight (%)");
-            RoundedTextField[] row = new RoundedTextField[]{componentField, weightField};
+            RoundedTextField component   = new RoundedTextField(20, "Enter component name");
+            RoundedTextField weight = new RoundedTextField(20, "Enter weight (%)");
+            RoundedTextField[] row = new RoundedTextField[]{component, weight};
             fields.add(row);
             gc.gridy++;
             gc.gridx = 0;
-            existingRows.add(componentField, gc);
-
+            form.add(component, gc);
             gc.gridx = 1;
-            existingRows.add(weightField, gc);
-
+            form.add(weight, gc);
             //button to remove component
             RoundedButton deleteBtn = new RoundedButton("Remove");
             deleteBtn.addActionListener(e -> {
                 fields.remove(row);
-                existingCard.remove(componentField);
-                existingCard.remove(weightField);
-                existingCard.remove(deleteBtn);
-                existingCard.revalidate();
-                existingCard.repaint();
-                deletecomponent(sectionID, componentField.getText().trim());
-                new ManageComponents(instrID, sectionID, displayName).setVisible(true);
-                dispose();
+                form.remove(component);
+                form.remove(weight);
+                form.remove(deleteBtn);
+                form.revalidate();
+                form.repaint();
+                deletecomponent(sectionID, component.getText().trim());
             });
-            loadcomponent(comp, componentField, weightField);
+            loadcomponent(comp, component, weight);
             gc.gridx = 2;
-            existingRows.add(deleteBtn, gc);
+            form.add(deleteBtn, gc);
         }
         gc.gridy = 0;
         gc.gridx = 2;
         gc.gridwidth = 2;
         gc.anchor = GridBagConstraints.EAST;
-        main.add(existingCard);
-        main.add(Box.createVerticalStrut(32));
 
-        // ---------- ADD COMPONENT FORM ----------
-        form = new RoundedPanel(18);
-        form.setBackground(Color.WHITE);
-        form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
-        form.setBorder(new EmptyBorder(20, 20, 20, 20));
-
-        formRows = new JPanel();
-        formRows.setOpaque(false);
-        formRows.setLayout(new BoxLayout(formRows, BoxLayout.Y_AXIS));
-        form.add(formRows);
-
-        form.setVisible(false);
-
-        JPanel componentActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 16, 0));
-        componentActions.setOpaque(false);
-
-        RoundedButton addBtn = new RoundedButton(" + Add Component ");
-        addBtn.setBackground(TEAL_DARK);
-        addBtn.setForeground(Color.WHITE);
-        addBtn.addActionListener(e -> addrow(formRows));
-        componentActions.add(addBtn);
-
-        main.add(form);
-        main.add(Box.createVerticalStrut(16));
-
-        main.add(componentActions);
-        main.add(Box.createVerticalStrut(32));
-
-        // Divider
-        JSeparator sep3 = new JSeparator();
-        sep3.setForeground(new Color(60, 120, 116));
-        sep3.setMaximumSize(new Dimension(1500, 1));
-        main.add(sep3); 
-        main.add(Box.createVerticalStrut(24));
-
-        // ---------- ACTION BUTTONS ----------
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 16, 0));
-        actions.setOpaque(false);
+        JPanel btns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 16, 0));
+        btns.setOpaque(false);
 
         RoundedButton cancel = new RoundedButton("Cancel");
         cancel.addActionListener(e -> {
-            new MySections(instrID, displayName).setVisible(true);
+            new ManageComponents(instrID, sectionID, displayName).setVisible(true);
             dispose();
         });
-        actions.add(cancel);
-
-        RoundedButton save = new RoundedButton("Save Changes");
-        save.setBackground(TEAL_DARK);
-        save.setForeground(Color.WHITE);
-        save.addActionListener(e -> saveAll());
-        actions.add(save);
-
-        main.add(actions);
-        main.add(Box.createVerticalStrut(32));
-        
-        root.add(main, BorderLayout.CENTER);
+        form.add(btns, gc);
+        main.add(form);
+        main.add(Box.createVerticalStrut(24));
 
         if (Maintenance.isOn()) {
             RoundedPanel banner = new RoundedPanel(12);
-            banner.setBackground(new Color(255, 235, 230));
+            banner.setBackground(new Color(255, 235, 230)); // light red
             banner.setBorder(new EmptyBorder(12, 18, 12, 18));
 
             JLabel msg = new JLabel("⚠️  Maintenance Mode is ON - Changes are disabled");
@@ -343,6 +275,7 @@ public class ManageComponents extends JFrame {
 
             root.add(banner, BorderLayout.NORTH);
         }
+
     }
 
     private void loadcomponent(String[] comp, RoundedTextField component, RoundedTextField weight) {
@@ -371,22 +304,35 @@ public class ManageComponents extends JFrame {
         }
     }
 
-    private void addrow(JPanel formRows) {
-        if (!form.isVisible()) {
-            form.setVisible(true);
+    private void saveAll(List<RoundedTextField[]> fields) {
+        String sql = "INSERT INTO section_components (section_id, component_name, weight) VALUES (?, ?, ?)";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            for (RoundedTextField[] row : fields) {
+                String comp = row[0].getText().trim();
+                String wStr = row[1].getText().trim();
+                if (comp.isEmpty() || wStr.isEmpty()) continue;
+
+                float weight = Float.parseFloat(wStr);
+
+                stmt.setInt(1, sectionID);
+                stmt.setString(2, comp);
+                stmt.setFloat(3, weight);
+                stmt.addBatch();
+            }
+
+            stmt.executeBatch();
+            JOptionPane.showMessageDialog(this, "Components added!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            new ManageComponents(instrID, sectionID, displayName).setVisible(true);
+            dispose();
+
+        } 
+        catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error saving", "DB Error", JOptionPane.ERROR_MESSAGE);
         }
-        RoundedTextField comp = new RoundedTextField(20, "Component Name");
-        RoundedTextField weight = new RoundedTextField(10, "Weight (%)");
-
-        JPanel row = new JPanel(new GridLayout(1, 2, 16, 0));
-        row.setOpaque(false);
-        row.add(comp);
-        row.add(weight);
-
-        newFields.add(new RoundedTextField[]{comp, weight});
-        formRows.add(row);
-        formRows.revalidate();
-        formRows.repaint();
     }
 
     List<String[]> getComponents(int sectionId) {
@@ -403,50 +349,11 @@ public class ManageComponents extends JFrame {
                     });
                 }
             }
-        } catch (SQLException ex) { ex.printStackTrace(); }
+        } 
+        catch (SQLException ex) { 
+            ex.printStackTrace(); 
+        }
         return list;
-    }
-
-    private void saveAll() {
-        List<RoundedTextField[]> allFields = new ArrayList<>();
-        allFields.addAll(fields);
-        allFields.addAll(newFields);
-
-        String deleteSQL = "DELETE FROM section_components WHERE section_id = ?";
-        try (Connection conn = DatabaseConnection.erp().getConnection();
-            PreparedStatement deleteStmt = conn.prepareStatement(deleteSQL)) {
-            deleteStmt.setInt(1, sectionID);
-            deleteStmt.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        String insertSQL = "INSERT INTO section_components (section_id, component_name, weight) VALUES (?, ?, ?)";
-        try (Connection conn = DatabaseConnection.erp().getConnection();
-            PreparedStatement insertStmt = conn.prepareStatement(insertSQL)) {
-
-            for (RoundedTextField[] row : allFields) {
-                String comp = row[0].getText().trim();
-                String wStr = row[1].getText().trim();
-                if (comp.isEmpty() || wStr.isEmpty()) continue;
-
-                float weight = Float.parseFloat(wStr);
-                insertStmt.setInt(1, sectionID);
-                insertStmt.setString(2, comp);
-                insertStmt.setFloat(3, weight);
-                insertStmt.addBatch();
-            }
-
-            insertStmt.executeBatch();
-            JOptionPane.showMessageDialog(this, "Changes saved!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-            new ManageComponents(instrID, sectionID, displayName).setVisible(true);
-            dispose();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error saving", "DB Error", JOptionPane.ERROR_MESSAGE);
-        }
     }
 
     SectionInfo getSectionDetails(int sectionId) {

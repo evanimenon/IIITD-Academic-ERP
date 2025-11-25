@@ -5,6 +5,10 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import erp.auth.AuthContext;
@@ -25,9 +29,11 @@ public class CSVUploadPage extends JFrame {
     private static final Color TEXT_900   = new Color(24, 30, 37);
     private static final Color TEXT_600   = new Color(100, 116, 139);
     private static final Color CARD       = Color.WHITE;
-    private String department = "Computer Science"; // TODO: fetch from DB
 
-    public CSVUploadPage(String instrID, String displayName) {
+    private int sectionID;
+
+    public CSVUploadPage(String instrID, int sectionID, String displayName) {
+        this.sectionID = sectionID;
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
         FontKit.init();
         DatabaseConnection.init();
@@ -75,6 +81,7 @@ public class CSVUploadPage extends JFrame {
         name.setFont(FontKit.bold(18f));
         profile.add(name);
 
+        String department = getDepartment(instrID);
         JLabel meta = new JLabel("Department: " + department);
         meta.setAlignmentX(Component.CENTER_ALIGNMENT);
         meta.setForeground(new Color(210, 225, 221));
@@ -135,7 +142,7 @@ public class CSVUploadPage extends JFrame {
         hero.setBorder(new EmptyBorder(24, 28, 24, 28));
         hero.setLayout(new BorderLayout());
 
-        JLabel h1 = new JLabel("📁 Upload CSV – Bulk Grading");
+        JLabel h1 = new JLabel("📁 Upload CSV - Bulk Grading");
         h1.setFont(FontKit.bold(26f));
         h1.setForeground(Color.WHITE);
         hero.add(h1, BorderLayout.WEST);
@@ -153,7 +160,7 @@ public class CSVUploadPage extends JFrame {
             banner.setBackground(new Color(255, 235, 230));
             banner.setBorder(new EmptyBorder(12, 16, 12, 16));
 
-            JLabel msg = new JLabel("⚠️ Maintenance Mode is ON – CSV Upload Disabled");
+            JLabel msg = new JLabel("⚠️ Maintenance Mode is ON - Changes are Disabled");
             msg.setFont(FontKit.semibold(14f));
             msg.setForeground(new Color(180, 60, 50));
             banner.add(msg);
@@ -178,7 +185,7 @@ public class CSVUploadPage extends JFrame {
         card.add(Box.createVerticalStrut(16));
 
         JLabel note = new JLabel("<html>Expected format:<br>"
-                + "<b>student_id, midsem, quiz1, quiz2, …, endsem</b></html>");
+                + "<b>student_id, midsem, quiz1, quiz2, …, endsem (your defined components)</b></html>");
         note.setFont(FontKit.regular(15f));
         note.setForeground(Color.GRAY);
         note.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -206,31 +213,185 @@ public class CSVUploadPage extends JFrame {
 
     private void handleUpload(String instrID) {
         JFileChooser fc = new JFileChooser();
-        int result = fc.showOpenDialog(this);
-
-        if (result != JFileChooser.APPROVE_OPTION) return;
+        if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
 
         File file = fc.getSelectedFile();
 
-        try {
+        try (Connection conn = DatabaseConnection.erp().getConnection()) {
+            conn.setAutoCommit(false);
+
             List<String> lines = Files.readAllLines(file.toPath());
-            if (lines.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "File is empty.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
+            if (lines.isEmpty()) throw new RuntimeException("File empty");
+
+            String[] columns = lines.get(0).split(","); // header
+            int componentCount = columns.length - 1;
+
+            String sql = "INSERT INTO grades (enrollment_id, component_id, score) " +
+                        "VALUES (?, ?, ?) " +
+                        "ON DUPLICATE KEY UPDATE score = VALUES(score)";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                for (int i = 1; i < lines.size(); i++) {
+                    String[] values = lines.get(i).split(",");
+                    String studentID = values[0].trim();
+
+                    String enrollID = getEnrollmentID(studentID, sectionID);
+                    if (enrollID == null) {
+                        throw new Exception("Student not enrolled: " + studentID);
+                    }
+
+                    for (int j = 1; j < columns.length; j++) {
+                        String markStr = values[j].trim();
+                        if (markStr.isEmpty()) continue;
+
+                        double mark = Double.parseDouble(markStr);
+
+                        int componentID = getcomponentID(columns[j].trim(), sectionID);
+                        if (componentID == -1) {
+                            throw new Exception("Unknown component: " + columns[j]);
+                        }
+
+                        stmt.setString(1, enrollID);
+                        stmt.setInt(2, componentID);
+                        stmt.setDouble(3, mark);
+                        stmt.addBatch();
+                    }
+                }
+
+                stmt.executeBatch();
+                conn.commit();
+            }
+            
+            for (int i = 1; i < lines.size(); i++) {
+                String[] values = lines.get(i).split(",");
+                String studentID = values[0].trim();
+                int finalGrade = calculateFinalGrade(studentID, sectionID);
+                insertfinalGrade(studentID, sectionID, finalGrade);
             }
 
-            // TODO: Validate CSV structure
-            // TODO: Insert marks into DB
-            // TODO: Recompute final grades
-
             JOptionPane.showMessageDialog(this,
-                    "CSV uploaded successfully.\nAll grades updated.",
+                    "Grades uploaded and updated successfully.",
                     "Success", JOptionPane.INFORMATION_MESSAGE);
+                
+            
 
         } 
         catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error reading file.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Upload Failed", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    int getcomponentID(String componentName, int sectionId) {
+        int compId = -1;
+        String sql = "SELECT component_id FROM section_components WHERE component_name = ? AND section_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, componentName);
+            stmt.setInt(2, sectionId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    compId = rs.getInt("component_id");
+                }
+            }
+        } 
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return compId;
+    }
+
+    String getEnrollmentID(String studentId, int sectionId) {
+        String enrollId = null;
+
+        String sql = "SELECT enrollment_id FROM enrollments WHERE student_id = ? AND section_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, studentId);
+            stmt.setInt(2, sectionId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    enrollId = rs.getString("enrollment_id");
+                }
+            }
+        } 
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return enrollId;
+    }
+
+    String getDepartment(String instructorId) {
+        String dept = "None";
+        String sql = "SELECT department FROM instructors WHERE instructor_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, Long.parseLong(instructorId));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    dept = rs.getString("department");
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return dept;
+    }
+
+    int calculateFinalGrade(String studentId, int sectionId) {
+        double finalGrade = 0.0;
+
+        String sql = "SELECT sc.weight, g.score " +
+                    "FROM section_components sc " +
+                    "JOIN enrollments e ON sc.section_id = e.section_id " +
+                    "LEFT JOIN grades g ON e.enrollment_id = g.enrollment_id " +
+                    "AND sc.component_id = g.component_id " +
+                    "WHERE e.student_id = ? AND e.section_id = ?";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, studentId);
+            stmt.setInt(2, sectionId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    double weightage = rs.getDouble("weight");
+
+                    Double score = rs.getObject("score", Double.class);
+                    if (score == null) {
+                        // Skip component if no grade exists yet
+                        continue;
+                    }
+
+                    finalGrade += (score * weightage) / 100.0;
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        if (finalGrade < 0) finalGrade = 0;
+        return (int) Math.round(finalGrade);
+    }
+
+    private void insertfinalGrade(String studentId, int sectionId, int finalGrade) {
+        String sql = "INSERT INTO grades (final_grade) " +
+                     "VALUES (?) "+
+                     "ON DUPLICATE KEY UPDATE final_grade = ?";
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, finalGrade);
+            stmt.setDouble(2, finalGrade);
+            stmt.executeUpdate();
+        } 
+        catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }   
 }
