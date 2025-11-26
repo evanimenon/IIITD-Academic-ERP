@@ -21,6 +21,9 @@ public abstract class InstructorFrameBase extends JFrame {
     protected static final Color TEAL_LIGHT = new Color(55, 115, 110);
     protected static final Color BG         = new Color(246, 247, 248);
 
+    // Maintenance-mode flag
+    protected final boolean maintenanceMode;
+
     public enum Page {
         HOME, SECTIONS, GRADES
     }
@@ -76,6 +79,8 @@ public abstract class InstructorFrameBase extends JFrame {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ignored) {}
         FontKit.init();
+        maintenanceMode = erp.db.MaintenanceService.isMaintenanceOn();
+
         DatabaseConnection.init();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -211,8 +216,50 @@ public abstract class InstructorFrameBase extends JFrame {
         body.setOpaque(false);
         body.setBackground(BG);
         body.setBorder(new EmptyBorder(24, 24, 24, 24));
+
+        if (maintenanceMode) {
+            body.add(buildMaintenanceBanner(), BorderLayout.NORTH);
+        }
+
         body.add(buildMainContent(), BorderLayout.CENTER);
         return body;
+    }
+
+    // ---- Maintenance helpers ----
+
+    protected boolean isReadOnly() {
+        return maintenanceMode;
+    }
+
+    /**
+     * Disable all passed buttons while maintenanceMode is ON.
+     */
+    protected void enforceReadOnlyOnButtons(JButton... buttons) {
+        if (!maintenanceMode || buttons == null) return;
+        for (JButton b : buttons) {
+            if (b == null) continue;
+            b.setEnabled(false);
+            b.setToolTipText("Disabled: system is in maintenance mode");
+        }
+    }
+
+    private JComponent buildMaintenanceBanner() {
+        JPanel banner = new JPanel(new BorderLayout());
+        banner.setBorder(new EmptyBorder(0, 0, 12, 0));
+        banner.setOpaque(false);
+
+        JPanel pill = new JPanel(new BorderLayout());
+        pill.setBackground(new Color(254, 243, 199));
+        pill.setBorder(new EmptyBorder(8, 12, 8, 12));
+
+        JLabel text = new JLabel(
+                "System is in maintenance mode. Editing is temporarily disabled by an administrator.");
+        text.setFont(FontKit.regular(13f));
+        text.setForeground(new Color(120, 53, 15));
+
+        pill.add(text, BorderLayout.CENTER);
+        banner.add(pill, BorderLayout.CENTER);
+        return banner;
     }
 
     protected abstract JComponent buildMainContent();

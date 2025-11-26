@@ -309,12 +309,10 @@ public abstract class AdminFrameBase extends JFrame {
                             AdminFrameBase.this.dispose();
                         }
                         case MAINTENANCE -> {
-                            JOptionPane.showMessageDialog(
-                                    AdminFrameBase.this,
-                                    "Maintenance & backup tools will be implemented in the next phase.",
-                                    "Maintenance",
-                                    JOptionPane.INFORMATION_MESSAGE);
+                            new AdminMaintenanceFrame(adminId, userDisplayName).setVisible(true);
+                            AdminFrameBase.this.dispose();
                         }
+
                     }
                 }
 

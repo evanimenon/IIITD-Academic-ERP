@@ -19,6 +19,9 @@ public abstract class StudentFrameBase extends JFrame {
     protected static final Color TEAL_LIGHT = new Color(55, 115, 110);
     protected static final Color BG = new Color(246, 247, 248);
 
+    // Maintenance-mode flag (read once per frame)
+    protected final boolean maintenanceMode;
+
     public enum Page {
         HOME, CATALOG, REGISTRATIONS, TIMETABLE
     }
@@ -51,6 +54,8 @@ public abstract class StudentFrameBase extends JFrame {
         }
 
         FontKit.init();
+        // Check maintenance flag once
+        maintenanceMode = erp.db.MaintenanceService.isMaintenanceOn();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("IIITD ERP");
@@ -138,11 +143,7 @@ public abstract class StudentFrameBase extends JFrame {
         nav.add(home);
         nav.add(Box.createVerticalStrut(8));
 
-        /*
-         * -------------------------
-         * REGISTRATION → CourseCatalog
-         * -------------------------
-         */
+        // REGISTRATION → CourseCatalog
         NavButton registration = new NavButton("Registration", active == Page.CATALOG);
         registration.addActionListener(e -> {
             if (active != Page.CATALOG) {
@@ -154,11 +155,7 @@ public abstract class StudentFrameBase extends JFrame {
         nav.add(registration);
         nav.add(Box.createVerticalStrut(8));
 
-        /*
-         * -------------------------
-         * MY COURSES → MyRegistrationsFrame
-         * -------------------------
-         */
+        // MY COURSES → MyRegistrationsFrame
         NavButton myCourses = new NavButton("My Courses", active == Page.REGISTRATIONS);
         myCourses.addActionListener(e -> {
             if (active != Page.REGISTRATIONS) {
@@ -207,8 +204,51 @@ public abstract class StudentFrameBase extends JFrame {
         body.setOpaque(false);
         body.setBackground(BG);
         body.setBorder(new EmptyBorder(24, 24, 24, 24));
+
+        if (maintenanceMode) {
+            body.add(buildMaintenanceBanner(), BorderLayout.NORTH);
+        }
+
         body.add(buildMainContent(), BorderLayout.CENTER);
         return body;
+    }
+
+    // ---- Maintenance helpers ----
+
+    protected boolean isReadOnly() {
+        return maintenanceMode;
+    }
+
+    /**
+     * Convenience: give this any buttons that perform writes (add/drop, save, etc.)
+     * and they will automatically be disabled when maintenanceMode is ON.
+     */
+    protected void enforceReadOnlyOnButtons(JButton... buttons) {
+        if (!maintenanceMode || buttons == null) return;
+        for (JButton b : buttons) {
+            if (b == null) continue;
+            b.setEnabled(false);
+            b.setToolTipText("Disabled: system is in maintenance mode");
+        }
+    }
+
+    private JComponent buildMaintenanceBanner() {
+        JPanel banner = new JPanel(new BorderLayout());
+        banner.setBorder(new EmptyBorder(0, 0, 12, 0));
+        banner.setOpaque(false);
+
+        JPanel pill = new JPanel(new BorderLayout());
+        pill.setBackground(new Color(254, 243, 199)); // amber-100
+        pill.setBorder(new EmptyBorder(8, 12, 8, 12));
+
+        JLabel text = new JLabel(
+                "System is in maintenance mode. Editing is temporarily disabled by an administrator.");
+        text.setFont(FontKit.regular(13f));
+        text.setForeground(new Color(120, 53, 15)); // amber-900
+
+        pill.add(text, BorderLayout.CENTER);
+        banner.add(pill, BorderLayout.CENTER);
+        return banner;
     }
 
     protected abstract JComponent buildMainContent();

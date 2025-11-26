@@ -40,11 +40,14 @@ import java.util.Set;
  * - Shows only sections taught by the current instructor.
  * - Compact card layout.
  * - Clicking a card navigates (in-place) to a "Section Gradebook" view within
- * the same frame using CardLayout.
+ *   the same frame using CardLayout.
  * - Gradebook view shows:
- * • Summary stats + charts
- * • Students (rows) x section components (cols) with editable scores,
- * search bar, and CSV import/export.
+ *   • Summary stats + charts
+ *   • Students (rows) x section components (cols) with editable scores,
+ *     search bar, and CSV import/export.
+ *
+ * When maintenance mode is ON (from InstructorFrameBase.isReadOnly()),
+ * all editing actions (Save, Import, table editing) are disabled.
  */
 public class MySections extends InstructorFrameBase {
 
@@ -287,20 +290,20 @@ public class MySections extends InstructorFrameBase {
                 "ORDER BY course_id, section_id";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, Long.parseLong(instrId));
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     SectionInfo s = new SectionInfo();
-                    s.sectionID = rs.getInt("section_id");
-                    s.courseID = rs.getString("course_id");
-                    s.dayTime = rs.getString("day_time");
-                    s.room = rs.getString("room");
-                    s.capacity = rs.getInt("capacity");
-                    s.semester = rs.getString("semester");
-                    s.year = rs.getInt("year");
+                    s.sectionID   = rs.getInt("section_id");
+                    s.courseID    = rs.getString("course_id");
+                    s.dayTime     = rs.getString("day_time");
+                    s.room        = rs.getString("room");
+                    s.capacity    = rs.getInt("capacity");
+                    s.semester    = rs.getString("semester");
+                    s.year        = rs.getInt("year");
                     list.add(s);
                 }
             }
@@ -374,6 +377,14 @@ public class MySections extends InstructorFrameBase {
         importBtn.addActionListener(e -> importGradesFromCsv());
         exportImportPanel.add(importBtn);
 
+        // --- Maintenance mode: disable editing actions ---
+        if (isReadOnly()) {
+            saveBtn.setEnabled(false);
+            saveBtn.setToolTipText("Disabled during maintenance mode");
+            importBtn.setEnabled(false);
+            importBtn.setToolTipText("Disabled during maintenance mode");
+        }
+
         topBar.add(exportImportPanel, BorderLayout.EAST);
 
         root.add(topBar, BorderLayout.NORTH);
@@ -439,6 +450,12 @@ public class MySections extends InstructorFrameBase {
 
         sorter = new TableRowSorter<>(gradebookModel);
         gradebookTable.setRowSorter(sorter);
+
+        // Maintenance mode: make table non-editable from UI side too
+        if (isReadOnly()) {
+            gradebookTable.setDefaultEditor(Object.class, null);
+            gradebookTable.setToolTipText("Editing disabled during maintenance mode");
+        }
 
         // Filter logic
         searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -536,15 +553,15 @@ public class MySections extends InstructorFrameBase {
                 "ORDER BY id";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-                PreparedStatement stmt = conn.prepareStatement(cmpSql)) {
+             PreparedStatement stmt = conn.prepareStatement(cmpSql)) {
 
             stmt.setInt(1, sectionId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     ComponentInfo c = new ComponentInfo();
                     c.componentId = rs.getInt("id");
-                    c.name = rs.getString("component_name");
-                    c.weight = rs.getInt("weight");
+                    c.name        = rs.getString("component_name");
+                    c.weight      = rs.getInt("weight");
                     gradebookComponents.add(c);
                 }
             }
@@ -561,16 +578,16 @@ public class MySections extends InstructorFrameBase {
                 "ORDER BY s.roll_no";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-                PreparedStatement stmt = conn.prepareStatement(stuSql)) {
+             PreparedStatement stmt = conn.prepareStatement(stuSql)) {
 
             stmt.setInt(1, sectionId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     StudentRow row = new StudentRow();
-                    row.enrollId = rs.getString("enrollment_id");
+                    row.enrollId  = rs.getString("enrollment_id");
                     row.studentId = rs.getString("student_id");
-                    row.rollNo = String.valueOf(rs.getInt("roll_no"));
-                    row.name = rs.getString("full_name");
+                    row.rollNo    = String.valueOf(rs.getInt("roll_no"));
+                    row.name      = rs.getString("full_name");
                     gradebookStudents.add(row);
                 }
             }
@@ -585,15 +602,15 @@ public class MySections extends InstructorFrameBase {
                 "WHERE e.section_id = ?";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-                PreparedStatement stmt = conn.prepareStatement(grdSql)) {
+             PreparedStatement stmt = conn.prepareStatement(grdSql)) {
 
             stmt.setInt(1, sectionId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     String enrollId = rs.getString("enrollment_id");
-                    int compId = rs.getInt("component_id");
-                    String score = rs.getString("score");
-                    String key = enrollId + ":" + compId;
+                    int compId      = rs.getInt("component_id");
+                    String score    = rs.getString("score");
+                    String key      = enrollId + ":" + compId;
                     gradesByKey.put(key, score == null ? "" : score);
                 }
             }
@@ -631,7 +648,11 @@ public class MySections extends InstructorFrameBase {
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            // Only component columns editable
+            // When maintenance mode is ON, nothing is editable
+            if (MySections.this.isReadOnly()) {
+                return false;
+            }
+            // Only component columns editable otherwise
             return columnIndex >= 2 && columnIndex < 2 + gradebookComponents.size();
         }
 
@@ -696,7 +717,7 @@ public class MySections extends InstructorFrameBase {
             // Delete grade if user cleared the cell
             String delSql = "DELETE FROM grades WHERE enrollment_id = ? AND component_id = ?";
             try (Connection conn = DatabaseConnection.erp().getConnection();
-                    PreparedStatement stmt = conn.prepareStatement(delSql)) {
+                 PreparedStatement stmt = conn.prepareStatement(delSql)) {
                 stmt.setString(1, enrollId);
                 stmt.setInt(2, componentId);
                 stmt.executeUpdate();
@@ -797,6 +818,15 @@ public class MySections extends InstructorFrameBase {
     }
 
     private void importGradesFromCsv() {
+        // HARD BLOCK: no imports in maintenance mode
+        if (isReadOnly()) {
+            JOptionPane.showMessageDialog(this,
+                    "System is in maintenance mode. Importing grades is disabled.",
+                    "Maintenance Mode",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         if (gradebookStudents.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No students to import for.", "Import CSV",
                     JOptionPane.INFORMATION_MESSAGE);
@@ -1034,9 +1064,9 @@ public class MySections extends InstructorFrameBase {
     }
 
     private JComponent buildChartCard(String title,
-            List<String> labels,
-            List<Double> values,
-            String yCaption) {
+                                      List<String> labels,
+                                      List<Double> values,
+                                      String yCaption) {
         RoundedPanel card = new RoundedPanel(20);
         card.setBackground(Color.WHITE);
         card.setBorder(new EmptyBorder(18, 18, 18, 18));
@@ -1163,7 +1193,7 @@ public class MySections extends InstructorFrameBase {
         String sql = "SELECT department FROM instructors WHERE instructor_id = ?";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, Long.parseLong(instrId));
             try (ResultSet rs = stmt.executeQuery()) {
@@ -1202,6 +1232,15 @@ public class MySections extends InstructorFrameBase {
     }
 
     private void saveGrades() {
+        // HARD BLOCK: saving is disabled in maintenance mode
+        if (isReadOnly()) {
+            JOptionPane.showMessageDialog(this,
+                    "System is in maintenance mode. Saving grades is disabled.",
+                    "Maintenance Mode",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         if (dirtyKeys.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                     "No changes to save.",

@@ -16,15 +16,14 @@ import java.util.List;
 import java.util.Set;
 
 import erp.db.DatabaseConnection;
-import erp.db.Maintenance;
 import erp.ui.common.FontKit;
 import erp.ui.common.RoundedPanel;
 
 public class CourseCatalog extends StudentFrameBase {
 
-    private static final Color BORDER_COLOR = new Color(230, 233, 236);
-    private static final Color BG_LIGHT = new Color(246, 248, 252);
-    private static final Color CARD_SELECTED = new Color(220, 241, 239);
+    private static final Color BORDER_COLOR   = new Color(230, 233, 236);
+    private static final Color BG_LIGHT       = new Color(246, 248, 252);
+    private static final Color CARD_SELECTED  = new Color(220, 241, 239);
     private static final String SEARCH_PLACEHOLDER = "Search courses...";
 
     /**
@@ -41,20 +40,20 @@ public class CourseCatalog extends StudentFrameBase {
         final boolean registered; // true if this student has REGISTERED enrollment for this course
 
         CourseRecord(String courseId, String code, String title, String instructors,
-                int credits, int capacity, int enrolled, boolean registered) {
-            this.courseId = courseId;
-            this.code = code;
-            this.title = title;
+                     int credits, int capacity, int enrolled, boolean registered) {
+            this.courseId    = courseId;
+            this.code        = code;
+            this.title       = title;
             this.instructors = instructors;
-            this.credits = credits;
-            this.capacity = capacity;
-            this.enrolled = enrolled;
-            this.registered = registered;
+            this.credits     = credits;
+            this.capacity    = capacity;
+            this.enrolled    = enrolled;
+            this.registered  = registered;
         }
     }
 
     private JTextField searchField;
-    private JPanel cardsContainer;
+    private JPanel     cardsContainer;
     private List<CourseRecord> courses;
     private CourseCard selectedCard;
 
@@ -67,19 +66,7 @@ public class CourseCatalog extends StudentFrameBase {
         // IMPORTANT: we don't keep our own studentId; we let StudentFrameBase own it.
         super(studentId, userDisplayName, Page.CATALOG);
         setTitle("IIITD ERP – Course Catalog");
-
-        if (Maintenance.isOn()) {
-            RoundedPanel banner = new RoundedPanel(12);
-            banner.setBackground(new Color(255, 235, 230)); // light red
-            banner.setBorder(new EmptyBorder(12, 18, 12, 18));
-
-            JLabel msg = new JLabel("⚠️  Maintenance Mode is ON – Changes are disabled");
-            msg.setFont(FontKit.semibold(14f));
-            msg.setForeground(new Color(180, 60, 50));
-            banner.add(msg);
-
-            root.add(banner, BorderLayout.NORTH);
-        }
+        // Maintenance banner is now handled by StudentFrameBase.buildBody()
     }
 
     @Override
@@ -152,17 +139,9 @@ public class CourseCatalog extends StudentFrameBase {
 
         // search behaviour
         searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            public void insertUpdate(javax.swing.event.DocumentEvent e) {
-                rebuildCards();
-            }
-
-            public void removeUpdate(javax.swing.event.DocumentEvent e) {
-                rebuildCards();
-            }
-
-            public void changedUpdate(javax.swing.event.DocumentEvent e) {
-                rebuildCards();
-            }
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { rebuildCards(); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { rebuildCards(); }
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { rebuildCards(); }
         });
 
         loadCourses();
@@ -255,6 +234,8 @@ public class CourseCatalog extends StudentFrameBase {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     setSelectedCard(CourseCard.this);
+
+                    // Double-click → try add/drop
                     if (e.getClickCount() >= 2) {
                         handleCardAction(record);
                     }
@@ -296,18 +277,24 @@ public class CourseCatalog extends StudentFrameBase {
     }
 
     private void setSelectedCard(CourseCard card) {
-        if (selectedCard == card)
-            return;
-        if (selectedCard != null)
-            selectedCard.setSelected(false);
+        if (selectedCard == card) return;
+        if (selectedCard != null) selectedCard.setSelected(false);
         selectedCard = card;
-        if (selectedCard != null)
-            selectedCard.setSelected(true);
+        if (selectedCard != null) selectedCard.setSelected(true);
     }
 
-    // Double-click: Register or Drop based on record.registered
     // Double-click: Register or Drop using modern dialogs
     private void handleCardAction(CourseRecord rec) {
+        // 🔒 Block in maintenance mode
+        if (isReadOnly()) {
+            ModernResultDialog.showMessage(
+                    this,
+                    ModernResultDialog.Type.ERROR,
+                    "Maintenance mode",
+                    "You cannot add or drop courses while the system is in maintenance mode.");
+            return;
+        }
+
         // studentId here should come from StudentFrameBase
         if (studentId == null || studentId.isBlank()) {
             ModernResultDialog.showMessage(
@@ -348,7 +335,6 @@ public class CourseCatalog extends StudentFrameBase {
             title = alreadyRegistered ? "Course Dropped" : "Course Added";
         } else if (type == ModernResultDialog.Type.CAPACITY_FULL) {
             title = "Course Capacity Full!";
-            // optional: override message text to be short & strong:
             resultMsg = "Course capacity is full! You cannot register for this course.";
         } else {
             title = "Action Failed";
@@ -401,25 +387,15 @@ public class CourseCatalog extends StudentFrameBase {
             return Color.BLACK;
         String prefix = courseId.substring(0, 3).toUpperCase();
 
-        // ABC-Black, BIO-Green, CSE-Blue, DES-Purple, ECE-Yellow, ECO-Light green,
-        // MTH-Red
         switch (prefix) {
-            case "BIO":
-                return new Color(16, 185, 129); // green
-            case "CSE":
-                return new Color(59, 130, 246); // blue
-            case "DES":
-                return new Color(139, 92, 246); // purple
-            case "ECE":
-                return new Color(234, 179, 8); // yellow
-            case "ECO":
-                return new Color(22, 163, 74); // light green
-            case "MTH":
-                return new Color(248, 113, 113); // red
-            case "ABC":
-                return Color.BLACK;
-            default:
-                return new Color(148, 163, 184); // neutral grey
+            case "BIO": return new Color(16, 185, 129);   // green
+            case "CSE": return new Color(59, 130, 246);   // blue
+            case "DES": return new Color(139, 92, 246);   // purple
+            case "ECE": return new Color(234, 179, 8);    // yellow
+            case "ECO": return new Color(22, 163, 74);    // light green
+            case "MTH": return new Color(248, 113, 113);  // red
+            case "ABC": return Color.BLACK;
+            default:    return new Color(148, 163, 184);  // neutral grey
         }
     }
 
@@ -442,7 +418,7 @@ public class CourseCatalog extends StudentFrameBase {
                     "  AND e.status = 'REGISTERED'";
 
             try (Connection conn = DatabaseConnection.erp().getConnection();
-                    PreparedStatement ps = conn.prepareStatement(regSql)) {
+                 PreparedStatement ps = conn.prepareStatement(regSql)) {
 
                 ps.setString(1, studentId);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -475,8 +451,8 @@ public class CourseCatalog extends StudentFrameBase {
                 "ORDER BY c.course_id ASC";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 String courseId = rs.getString("course_id");
@@ -513,7 +489,7 @@ public class CourseCatalog extends StudentFrameBase {
         cardsContainer.removeAll();
         selectedCard = null;
 
-        List<CourseRecord> top = new ArrayList<>(); // registered
+        List<CourseRecord> top    = new ArrayList<>(); // registered
         List<CourseRecord> bottom = new ArrayList<>(); // not registered
 
         if (courses != null) {
@@ -567,13 +543,16 @@ public class CourseCatalog extends StudentFrameBase {
             return true;
 
         String haystack = (rec.courseId + " " +
-                rec.code + " " +
-                rec.title + " " +
-                (rec.instructors == null ? "" : rec.instructors))
-                .toLowerCase();
+                           rec.code + " " +
+                           rec.title + " " +
+                           (rec.instructors == null ? "" : rec.instructors))
+                           .toLowerCase();
 
         return haystack.contains(filter);
     }
+
+    // ── Modern confirm + result dialogs (unchanged) ─────────────────────────
+    // ... keep ModernConfirmDialog & ModernResultDialog exactly as in your version ...
 
     /**
      * Modern "Are you sure?" dialog for Add / Drop.
@@ -583,10 +562,10 @@ public class CourseCatalog extends StudentFrameBase {
         private boolean accepted = false;
 
         ModernConfirmDialog(JFrame parent,
-                String action, // "Add" or "Drop"
-                String courseTitle,
-                String courseId,
-                String courseCode) {
+                            String action, // "Add" or "Drop"
+                            String courseTitle,
+                            String courseId,
+                            String courseCode) {
 
             super(parent, true); // modal
             setUndecorated(true);
@@ -601,7 +580,6 @@ public class CourseCatalog extends StudentFrameBase {
             card.setBackground(Color.WHITE);
             card.setBorder(new EmptyBorder(16, 24, 20, 24));
 
-            // Top illustration-ish header
             JPanel header = new JPanel(new BorderLayout());
             header.setOpaque(false);
             header.setBorder(new EmptyBorder(0, 0, 12, 0));
@@ -622,7 +600,6 @@ public class CourseCatalog extends StudentFrameBase {
             header.add(iconWrapper, BorderLayout.NORTH);
             card.add(header, BorderLayout.NORTH);
 
-            // Center text
             JPanel center = new JPanel();
             center.setOpaque(false);
             center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
@@ -653,13 +630,11 @@ public class CourseCatalog extends StudentFrameBase {
 
             card.add(center, BorderLayout.CENTER);
 
-            // Buttons area
             JPanel buttons = new JPanel();
             buttons.setOpaque(false);
             buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
             buttons.setBorder(new EmptyBorder(10, 0, 0, 0));
 
-            // primary: Accept
             JButton primary = new JButton(action.equalsIgnoreCase("Drop") ? "Drop" : "Add");
             primary.setFont(FontKit.semibold(13f));
             primary.setForeground(Color.WHITE);
@@ -675,7 +650,6 @@ public class CourseCatalog extends StudentFrameBase {
                 dispose();
             });
 
-            // secondary: Close
             JButton secondary = new JButton("Close");
             secondary.setFont(FontKit.regular(13f));
             secondary.setForeground(new Color(107, 114, 128));
@@ -709,10 +683,6 @@ public class CourseCatalog extends StudentFrameBase {
         }
     }
 
-    /**
-     * Result dialog (success / capacity full / generic failure) with modern
-     * styling.
-     */
     private static class ModernResultDialog extends JDialog {
 
         enum Type {
@@ -722,9 +692,9 @@ public class CourseCatalog extends StudentFrameBase {
         }
 
         private ModernResultDialog(JFrame parent,
-                Type type,
-                String title,
-                String message) {
+                                   Type type,
+                                   String title,
+                                   String message) {
             super(parent, true);
             setUndecorated(true);
             setBackground(new Color(0, 0, 0, 0));
@@ -746,7 +716,6 @@ public class CourseCatalog extends StudentFrameBase {
             card.setBackground(Color.WHITE);
             card.setBorder(new EmptyBorder(0, 0, 16, 0));
 
-            // Top colored header (like your second image)
             JPanel header = new JPanel(new BorderLayout());
             header.setBackground(accent);
             header.setBorder(new EmptyBorder(10, 20, 14, 20));
@@ -770,7 +739,6 @@ public class CourseCatalog extends StudentFrameBase {
 
             card.add(header, BorderLayout.NORTH);
 
-            // Center text
             JPanel center = new JPanel();
             center.setOpaque(false);
             center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
@@ -787,7 +755,6 @@ public class CourseCatalog extends StudentFrameBase {
 
             card.add(center, BorderLayout.CENTER);
 
-            // Buttons area
             JPanel buttons = new JPanel();
             buttons.setOpaque(false);
             buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
@@ -829,5 +796,4 @@ public class CourseCatalog extends StudentFrameBase {
             d.setVisible(true);
         }
     }
-
 }
