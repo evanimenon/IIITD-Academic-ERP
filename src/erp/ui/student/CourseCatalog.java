@@ -830,9 +830,4 @@ public class CourseCatalog extends StudentFrameBase {
         }
     }
 
-    // Optional dev main
-    public static void main(String[] args) {
-        erp.db.DatabaseConnection.init();
-        SwingUtilities.invokeLater(() -> new CourseCatalog("Student 123").setVisible(true));
-    }
 }

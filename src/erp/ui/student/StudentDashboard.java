@@ -476,8 +476,4 @@ public class StudentDashboard extends StudentFrameBase {
         return p;
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() ->
-                new StudentDashboard("stu1", "Student 123").setVisible(true));
-    }
 }
