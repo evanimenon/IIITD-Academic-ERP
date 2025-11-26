@@ -8,6 +8,10 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import erp.auth.AuthService;
 import erp.ui.common.FontKit;
@@ -17,12 +21,15 @@ import erp.ui.admin.AdminDashboard;
 import java.util.Locale;
 import erp.auth.AuthContext;
 import erp.auth.Role;
+import erp.db.DatabaseConnection;
 import erp.ui.student.StudentDashboard;
 import erp.ui.student.StudentLookupService;
 
 import erp.ui.common.RoundedButton;
 import erp.ui.common.RoundedTextField;
 import erp.ui.common.RoundedPasswordField;
+
+import java.sql.Timestamp;
 
 public class LoginPage extends JFrame {
 
@@ -126,8 +133,26 @@ public class LoginPage extends JFrame {
                 String pwStr = new String(pw);
                 java.util.Arrays.fill(pw, '\0');
 
+                boolean firstLogin = checkFirstLogin(user);
+                if (firstLogin) {
+                    SwingUtilities.invokeLater(() -> {
+                        new ChangePassword(user).setVisible(true);
+                        dispose();
+                    });
+                    return;
+                }
+
                 try {
+                    boolean locked = isLocked(user);
+                    if(locked){
+                        SwingUtilities.invokeLater(() -> {
+                            showError("Account is locked. Try again later.");
+                        });
+                        return;
+                    }
+                
                     var session = new AuthService().login(user, pwStr);
+                    resetWrongAttempts(user);
 
                     // store session centrally for auth checks elsewhere
                     AuthContext.setSession(session);
@@ -188,12 +213,25 @@ public class LoginPage extends JFrame {
                         }
                     });
 
-                } catch (AuthService.AuthException ex) {
+                } 
+                catch (AuthService.AuthException ex) {
                     SwingUtilities.invokeLater(() -> showError(ex.getMessage()));
-                } catch (Exception ex) {
+                    updateWrongAttempts(user);
+                    int wrong = getWrongAttempts(user);
+                    if(wrong>=5){
+                        lockAcc(user);
+                    }
+                } 
+                catch (Exception ex) {
                     ex.printStackTrace();
                     SwingUtilities.invokeLater(() -> showError("Incorrect username or password."));
-                } finally {
+                    updateWrongAttempts(user);
+                    int wrong = getWrongAttempts(user);
+                    if(wrong>=5){
+                        lockAcc(user);
+                    }
+                } 
+                finally {
                     SwingUtilities.invokeLater(() -> {
                         signIn.setEnabled(true);
                         setCursor(Cursor.getDefaultCursor());
@@ -202,6 +240,83 @@ public class LoginPage extends JFrame {
             }, "login-thread").start();
         });
     }
+
+    private void updateWrongAttempts(String usr) {
+        String sql = "UPDATE users_auth SET failed_attempts = failed_attempts + 1 WHERE username = ?";
+        try (Connection conn = DatabaseConnection.auth().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, usr);
+            stmt.executeUpdate();
+        } 
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int getWrongAttempts(String usr) {
+        String sql = "SELECT failed_attempts FROM users_auth WHERE username = ?";
+        try (Connection conn = DatabaseConnection.auth().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, usr);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("failed_attempts");
+            }
+        } 
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    private void lockAcc(String usr) {
+        String sql = "UPDATE users_auth SET locked_until = NOW() + INTERVAL 1 MINUTE WHERE username = ?";
+        try (Connection conn = DatabaseConnection.auth().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, usr);
+            stmt.executeUpdate();
+            SwingUtilities.invokeLater(() -> showError("Account locked for 1 minute due to too many failed attempts."));
+        } 
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isLocked(String user){
+        String checkLockSQL = "SELECT NOW(), locked_until FROM users_auth WHERE username = ?";
+        try (Connection conn = DatabaseConnection.auth().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(checkLockSQL)) {
+            stmt.setString(1, user);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Timestamp now = rs.getTimestamp("NOW()");
+                Timestamp lockedUntil = rs.getTimestamp("locked_until");
+                if (lockedUntil != null && lockedUntil.after(now)) {
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            }
+            return false;
+        } 
+        catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    private void resetWrongAttempts(String usr) {
+        String sql = "UPDATE users_auth SET failed_attempts = 0, locked_until = NULL WHERE username = ?";
+        try (Connection conn = DatabaseConnection.auth().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, usr);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void showError(String msg) {
         if (msg == null || msg.isBlank()) {
@@ -304,6 +419,27 @@ public class LoginPage extends JFrame {
             g2.fill(new RoundRectangle2D.Double(pad, pad, w - 2 * pad, h - 2 * pad, arc, arc));
             g2.dispose();
         }
+    }
+
+    private boolean checkFirstLogin(String username) {
+        boolean first = false;
+        String sql = "SELECT last_login FROM users_auth WHERE username = ?";
+        try (Connection conn = DatabaseConnection.auth().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                String lastLogin = rs.getString("last_login");
+                // first login if value is null OR 0000-00-00
+                if(lastLogin == null || lastLogin.toString().startsWith("0000-00-00")){
+                    first = true;
+                }
+            }
+        } 
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return first;
     }
 
     // Quick manual launch

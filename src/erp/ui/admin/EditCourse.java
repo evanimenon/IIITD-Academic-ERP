@@ -120,7 +120,7 @@ public class EditCourse extends JFrame {
         name.setFont(FontKit.bold(18f));
         profile.add(name);
 
-        JLabel meta = new JLabel("Year, Program");
+        JLabel meta = new JLabel("Admin");
         meta.setAlignmentX(Component.CENTER_ALIGNMENT);
         meta.setForeground(new Color(210, 225, 221));
         meta.setFont(FontKit.regular(14f));

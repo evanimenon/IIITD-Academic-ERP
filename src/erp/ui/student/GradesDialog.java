@@ -64,44 +64,60 @@ public class GradesDialog extends JDialog {
 
     private void loadGrades() {
         model.setRowCount(0);
-        String overall = null;
 
-        final String sql =
-                "SELECT component, score, final_grade " +
-                "FROM erp_db.grades " +
-                "WHERE enrollment_id = ? " +
-                "ORDER BY component";
+        final String gradeSql =
+            "SELECT g.component_id, g.score " +
+            "FROM erp_db.grades g " +
+            "WHERE g.enrollment_id = ? " +
+            "ORDER BY g.component_id";
 
-        try (Connection c = DatabaseConnection.erp().getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        final String overallSql =
+            "SELECT final_grade FROM erp_db.enrollments WHERE enrollment_id = ?";
 
-            ps.setInt(1, enrollmentId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    String comp = rs.getString("component");
-                    Double score = rs.getObject("score") == null ? null : rs.getDouble("score");
-                    String fg = rs.getString("final_grade");
+        try (Connection c = DatabaseConnection.erp().getConnection()) {
 
-                    if (fg != null && !fg.isBlank()) {
-                        overall = fg; // last non-null wins; you can refine if needed
+            // load component scores
+            try (PreparedStatement ps = c.prepareStatement(gradeSql)) {
+                ps.setInt(1, enrollmentId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        int compId = rs.getInt("component_id");
+                        Double score = rs.getObject("score") == null ? null : rs.getDouble("score");
+
+                        model.addRow(new Object[] {
+                            compId,
+                            score == null ? "" : score
+                        });
                     }
-
-                    model.addRow(new Object[] {
-                            comp,
-                            score == null ? "" : score,
-                            fg == null ? "" : fg
-                    });
                 }
             }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error loading grades:\n" + ex.getMessage(),
-                    "Database Error", JOptionPane.ERROR_MESSAGE);
+
+            // load overall course grade
+            String overall = null;
+            try (PreparedStatement ps2 = c.prepareStatement(overallSql)) {
+                ps2.setInt(1, enrollmentId);
+                try (ResultSet rs2 = ps2.executeQuery()) {
+                    if (rs2.next())
+                        overall = rs2.getString("final_grade");
+                }
+            }
+
+            if (overall == null || overall.isEmpty())
+                overall = "Not yet set";
+
+            finalGradeLabel.setText("Final course grade: " + overall);
+        }
+        catch (Exception ex) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Error loading grades:\n" + ex.getMessage(),
+                "Database Error",
+                JOptionPane.ERROR_MESSAGE
+            );
             ex.printStackTrace();
         }
-
-        if (overall == null) overall = "Not yet set";
-        finalGradeLabel.setText("Final course grade: " + overall);
     }
+
 
     public static void showForEnrollment(Frame owner, int enrollmentId) {
         GradesDialog dlg = new GradesDialog(owner, enrollmentId);

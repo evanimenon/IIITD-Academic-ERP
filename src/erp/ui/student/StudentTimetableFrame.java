@@ -178,7 +178,8 @@ public class StudentTimetableFrame extends StudentFrameBase {
                 }
             }
 
-        } catch (Exception ex) {
+        } 
+        catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
