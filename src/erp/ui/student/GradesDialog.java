@@ -10,6 +10,7 @@ import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class GradesDialog extends JDialog {
 
@@ -85,7 +86,7 @@ public class GradesDialog extends JDialog {
                         Double score = rs.getObject("score") == null ? null : rs.getDouble("score");
 
                         model.addRow(new Object[] {
-                            compId,
+                            getComponentName(compId),
                             score == null ? "" : score
                         });
                     }
@@ -116,6 +117,26 @@ public class GradesDialog extends JDialog {
             );
             ex.printStackTrace();
         }
+    }
+
+    private String getComponentName(int compID) {
+        final String sql = "SELECT component_name FROM section_components WHERE component_id = ?";
+        String compName = "NA";
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, compID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    compName = rs.getString("component_name");
+                }
+            }
+
+        } 
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return compName;
     }
 
 
