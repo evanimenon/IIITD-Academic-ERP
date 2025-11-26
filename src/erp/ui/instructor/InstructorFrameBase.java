@@ -22,10 +22,10 @@ public abstract class InstructorFrameBase extends JFrame {
     protected static final Color BG         = new Color(246, 247, 248);
 
     public enum Page {
-        HOME, SECTIONS, GRADES, STATS
+        HOME, SECTIONS, GRADES
     }
 
-    // Persistent instructor id across all instructor frames
+    // Keep for compatibility, but we now *resolve* from AuthContext
     protected static String currentInstructorId;
 
     protected final String instructorId;
@@ -34,7 +34,7 @@ public abstract class InstructorFrameBase extends JFrame {
     protected JLabel metaLabel; // "Department: X"
 
     protected InstructorFrameBase(String instrID, String displayName, Page activePage) {
-        // Auth guard – only instructors
+        // --- Auth guard – only instructors ---
         Role actual = AuthContext.getRole();
         if (actual != Role.INSTRUCTOR) {
             JOptionPane.showMessageDialog(
@@ -47,13 +47,31 @@ public abstract class InstructorFrameBase extends JFrame {
             throw new IllegalStateException("Unauthorized access to InstructorFrameBase");
         }
 
-        // Track current instructor id
-        if (instrID != null && !instrID.isBlank()) {
-            currentInstructorId = instrID;
+        // --- Resolve instructor id from args OR session ---
+        String resolvedId = instrID;
+        if (resolvedId == null || resolvedId.isBlank()) {
+            Integer uid = AuthContext.getUserId();  // helper you added in AuthContext
+            if (uid != null) {
+                resolvedId = String.valueOf(uid);
+            }
         }
-        this.instructorId = currentInstructorId;
-        this.userDisplayName = displayName;
+        currentInstructorId = resolvedId;   // keep static in sync
+        this.instructorId = resolvedId;
 
+        // --- Resolve display name from args OR session ---
+        String resolvedName = displayName;
+        if (resolvedName == null || resolvedName.isBlank()) {
+            String fromSession = AuthContext.getUsername(); // another helper in AuthContext
+            if (fromSession != null && !fromSession.isBlank()) {
+                resolvedName = fromSession;
+            }
+        }
+        if (resolvedName == null || resolvedName.isBlank()) {
+            resolvedName = "Instructor";
+        }
+        this.userDisplayName = resolvedName;
+
+        // --- Look & feel / shared infra ---
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ignored) {}
@@ -74,7 +92,7 @@ public abstract class InstructorFrameBase extends JFrame {
         root.add(buildBody(), BorderLayout.CENTER);
     }
 
-    // Sidebar with nav + profile (same layout as student, but instructor-specific pages)
+    // Sidebar with nav + profile
     private JComponent buildSidebar(Page active) {
         JPanel sidebar = new JPanel(new BorderLayout());
         sidebar.setBackground(TEAL_DARK);
@@ -148,34 +166,23 @@ public abstract class InstructorFrameBase extends JFrame {
         NavButton sectionsBtn = new NavButton("My Sections", active == Page.SECTIONS);
         sectionsBtn.addActionListener(e -> {
             if (active != Page.SECTIONS) {
-                new MySections(instructorId, userDisplayName).setVisible(true);
+                new MySections().setVisible(true);
                 dispose();
             }
         });
         nav.add(sectionsBtn);
         nav.add(Box.createVerticalStrut(8));
 
-        // GRADE STUDENTS
-        NavButton gradeBtn = new NavButton("Grade Students", active == Page.GRADES);
-        gradeBtn.addActionListener(e -> {
-            if (active != Page.GRADES) {
-                new GradeStudents(instructorId, userDisplayName).setVisible(true);
-                dispose();
-            }
-        });
-        nav.add(gradeBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-        // CLASS STATS
-        NavButton statsBtn = new NavButton("Class Stats", active == Page.STATS);
-        statsBtn.addActionListener(e -> {
-            if (active != Page.STATS) {
-                new ClassStats(instructorId, userDisplayName).setVisible(true);
-                dispose();
-            }
-        });
-        nav.add(statsBtn);
-        nav.add(Box.createVerticalStrut(40));
+        // If you re-enable GradeStudents later, it’ll still work:
+        // NavButton gradeBtn = new NavButton("Grade Students", active == Page.GRADES);
+        // gradeBtn.addActionListener(e -> {
+        //     if (active != Page.GRADES) {
+        //         new GradeStudents(instructorId, userDisplayName).setVisible(true);
+        //         dispose();
+        //     }
+        // });
+        // nav.add(gradeBtn);
+        // nav.add(Box.createVerticalStrut(40));
 
         JSeparator sep = new JSeparator();
         sep.setForeground(new Color(60, 120, 116));
@@ -210,7 +217,7 @@ public abstract class InstructorFrameBase extends JFrame {
 
     protected abstract JComponent buildMainContent();
 
-    // --- Hover nav button (same behavior as StudentFrameBase.NavButton) ---
+    // --- Hover nav button ---
     public static class NavButton extends JButton {
         private final boolean selected;
         private boolean hover;
@@ -250,11 +257,9 @@ public abstract class InstructorFrameBase extends JFrame {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             if (hover || selected) {
-                // pill background on hover/selected
                 g2.setColor(new Color(255, 255, 255, selected ? 70 : 40));
                 g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 16, 16));
 
-                // subtle left accent bar
                 g2.setColor(new Color(204, 252, 246, 190));
                 g2.fillRoundRect(4, 6, 4, getHeight() - 12, 8, 8);
             }

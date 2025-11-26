@@ -124,25 +124,20 @@ public class ManageComponents extends JFrame {
         nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
         nav.setBorder(new EmptyBorder(16, 0, 16, 0));
 
-        NavButton homeBtn = new NavButton("  🏠  Home", false);
+        NavButton homeBtn = new NavButton("Home", false);
         homeBtn.addActionListener(e -> { new InstructorDashboard(instrID, displayName).setVisible(true); dispose(); });
         nav.add(homeBtn);
         nav.add(Box.createVerticalStrut(8));
 
-        NavButton sectionBtn = new NavButton("  📚  My Sections", true);
-        sectionBtn.addActionListener(e -> { new MySections(instrID, displayName).setVisible(true); dispose(); });
+        NavButton sectionBtn = new NavButton("My Sections", true);
+        sectionBtn.addActionListener(e -> { new MySections().setVisible(true); dispose(); });
         nav.add(sectionBtn);
         nav.add(Box.createVerticalStrut(8));
 
-        NavButton gradeBtn = new NavButton("  ✒️  Grade Students", false);
-        gradeBtn.addActionListener(e -> { new GradeStudents(instrID,displayName).setVisible(true); dispose(); });
-        nav.add(gradeBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-        NavButton classStatBtn= new NavButton("  📊  Class Stats", false);
-        classStatBtn.addActionListener(e -> { new ClassStats(instrID,displayName).setVisible(true); dispose(); });
-        nav.add(classStatBtn);
-        nav.add(Box.createVerticalStrut(40));
+        // NavButton gradeBtn = new NavButton("Grade Students", false);
+        // gradeBtn.addActionListener(e -> { new GradeStudents(instrID,displayName).setVisible(true); dispose(); });
+        // nav.add(gradeBtn);
+        // nav.add(Box.createVerticalStrut(8));
 
         JSeparator sep = new JSeparator();
         sep.setForeground(new Color(60, 120, 116));
@@ -150,10 +145,10 @@ public class ManageComponents extends JFrame {
         nav.add(sep);
         nav.add(Box.createVerticalStrut(40));
 
-        nav.add(new NavButton("  ⚙️  Settings", false));
+        nav.add(new NavButton("Settings", false));
         nav.add(Box.createVerticalStrut(8));
 
-        NavButton logoutBtn = new NavButton("  🚪  Log Out", false);
+        NavButton logoutBtn = new NavButton("Log Out", false);
         logoutBtn.addActionListener(e -> { new LoginPage().setVisible(true); dispose(); });
         nav.add(logoutBtn);
 
@@ -166,7 +161,7 @@ public class ManageComponents extends JFrame {
         hero.setBorder(new EmptyBorder(24, 28, 24, 28));
         hero.setLayout(new BorderLayout());
 
-        JLabel h1 = new JLabel("📚  Manage Components");
+        JLabel h1 = new JLabel("Manage Components");
         h1.setFont(FontKit.bold(28f));
         h1.setForeground(Color.WHITE);
         hero.add(h1, BorderLayout.WEST);
@@ -315,7 +310,7 @@ public class ManageComponents extends JFrame {
 
         RoundedButton cancel = new RoundedButton("Cancel");
         cancel.addActionListener(e -> {
-            new MySections(instrID, displayName).setVisible(true);
+            new MySections().setVisible(true);
             dispose();
         });
         actions.add(cancel);

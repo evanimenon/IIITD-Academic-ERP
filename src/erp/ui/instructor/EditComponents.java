@@ -120,25 +120,15 @@ public class EditComponents extends JFrame {
         nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
         nav.setBorder(new EmptyBorder(16, 0, 16, 0));
 
-        NavButton homeBtn = new NavButton("  🏠  Home", false);
+        NavButton homeBtn = new NavButton("Home", false);
         homeBtn.addActionListener(e -> { new InstructorDashboard(instrID, displayName).setVisible(true); dispose(); });
         nav.add(homeBtn);
         nav.add(Box.createVerticalStrut(8));
 
-        NavButton sectionBtn = new NavButton("  📚  My Sections", true);
-        sectionBtn.addActionListener(e -> { new MySections(instrID, displayName).setVisible(true); dispose(); });
+        NavButton sectionBtn = new NavButton("My Sections", true);
+        sectionBtn.addActionListener(e -> { new MySections().setVisible(true); dispose(); });
         nav.add(sectionBtn);
         nav.add(Box.createVerticalStrut(8));
-
-        NavButton gradeBtn = new NavButton("  ✒️  Grade Students", false);
-        gradeBtn.addActionListener(e -> { new GradeStudents(instrID,displayName).setVisible(true); dispose(); });
-        nav.add(gradeBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-        NavButton classStatBtn= new NavButton("  📊  Class Stats", false);
-        classStatBtn.addActionListener(e -> { new ClassStats(instrID,displayName).setVisible(true); dispose(); });
-        nav.add(classStatBtn);
-        nav.add(Box.createVerticalStrut(40));
 
         JSeparator sep = new JSeparator();
         sep.setForeground(new Color(60, 120, 116));
@@ -146,10 +136,10 @@ public class EditComponents extends JFrame {
         nav.add(sep);
         nav.add(Box.createVerticalStrut(40));
 
-        nav.add(new NavButton("  ⚙️  Settings", false));
+        nav.add(new NavButton("Settings", false));
         nav.add(Box.createVerticalStrut(8));
 
-        NavButton logoutBtn = new NavButton("  🚪  Log Out", false);
+        NavButton logoutBtn = new NavButton("Log Out", false);
         logoutBtn.addActionListener(e -> { new LoginPage().setVisible(true); dispose(); });
         nav.add(logoutBtn);
 

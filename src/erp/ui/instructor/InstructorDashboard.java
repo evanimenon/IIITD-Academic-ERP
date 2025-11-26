@@ -17,15 +17,6 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
-/**
- * InstructorDashboard
- *
- * New version:
- *  - Extends InstructorFrameBase so that sidebar/menu/nav are defined only once.
- *  - Uses the same overall layout and visual language as StudentDashboard:
- *      hero banner at the top + metrics row + 2-column grid below.
- *  - All instructor-specific content lives inside buildMainContent().
- */
 public class InstructorDashboard extends InstructorFrameBase {
 
     private static final Color TEXT_900 = new Color(24, 30, 37);
@@ -39,14 +30,12 @@ public class InstructorDashboard extends InstructorFrameBase {
         super(instructorId, displayName, Page.HOME);
         setTitle("IIITD ERP – Instructor Dashboard");
 
-        // Update sidebar meta with department information.
         String dept = getDepartmentSafe(instructorId);
         if (metaLabel != null) {
             metaLabel.setText("Department: " + dept);
         }
     }
 
-    // Fallback constructor using the current static instructor id if needed
     public InstructorDashboard(String displayName) {
         this(currentInstructorId, displayName);
     }
@@ -56,17 +45,14 @@ public class InstructorDashboard extends InstructorFrameBase {
         JPanel main = new JPanel(new BorderLayout());
         main.setOpaque(false);
 
-        // Hero banner pinned to the top (same structure as student dashboard)
         main.add(buildHero(), BorderLayout.NORTH);
 
-        // Grid with metrics + two-column layout
         JPanel grid = new JPanel(new GridBagLayout());
         grid.setOpaque(false);
         GridBagConstraints gc = new GridBagConstraints();
         gc.insets = new Insets(16, 16, 16, 16);
         gc.fill = GridBagConstraints.BOTH;
 
-        // Row 0: metrics row spanning both columns
         gc.gridx = 0;
         gc.gridy = 0;
         gc.weightx = 1.0;
@@ -74,7 +60,6 @@ public class InstructorDashboard extends InstructorFrameBase {
         gc.gridwidth = 2;
         grid.add(buildMetricsRow(), gc);
 
-        // Row 1, col 0: Today's teaching schedule
         gc.gridx = 0;
         gc.gridy = 1;
         gc.weightx = 1.4;
@@ -82,7 +67,6 @@ public class InstructorDashboard extends InstructorFrameBase {
         gc.gridwidth = 1;
         grid.add(buildTodayTeachingCard(), gc);
 
-        // Row 1, col 1: Right column (quick actions + upcoming items)
         gc.gridx = 1;
         gc.gridy = 1;
         gc.weightx = 0.8;
@@ -97,8 +81,6 @@ public class InstructorDashboard extends InstructorFrameBase {
         main.add(sc, BorderLayout.CENTER);
         return main;
     }
-
-    // --- Hero --------------------------------------------------------------
 
     private JComponent buildHero() {
         RoundedPanel hero = new RoundedPanel(24);
@@ -129,11 +111,10 @@ public class InstructorDashboard extends InstructorFrameBase {
 
         hero.add(heroLeft, BorderLayout.CENTER);
 
-        // Right side: bell toggle with notifications popup (mirrors StudentDashboard)
         JPanel heroRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         heroRight.setOpaque(false);
 
-        bellToggle = new JToggleButton("\uD83D\uDD14"); // bell emoji
+        bellToggle = new JToggleButton("\uD83D\uDD14");
         bellToggle.setFocusPainted(false);
         bellToggle.setBorderPainted(false);
         bellToggle.setContentAreaFilled(false);
@@ -149,13 +130,10 @@ public class InstructorDashboard extends InstructorFrameBase {
         return hero;
     }
 
-    // --- Metrics row -------------------------------------------------------
-
     private JComponent buildMetricsRow() {
         JPanel row = new JPanel(new GridLayout(1, 3, 16, 0));
         row.setOpaque(false);
 
-        // For now these are simple placeholders; we can wire real counts later.
         row.add(metricCard("0", "Sections this semester"));
         row.add(metricCard("0", "Students across sections"));
         row.add(metricCard("-", "Items to grade"));
@@ -188,8 +166,6 @@ public class InstructorDashboard extends InstructorFrameBase {
         return p;
     }
 
-    // --- Left column: today's teaching schedule ----------------------------
-
     private JComponent buildTodayTeachingCard() {
         RoundedPanel card = new RoundedPanel(20);
         card.setBackground(CARD);
@@ -217,7 +193,6 @@ public class InstructorDashboard extends InstructorFrameBase {
         list.setOpaque(false);
         list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
 
-        // Placeholder rows for now – we can hook this to timetable later.
         list.add(scheduleRow("CSE101 – Introduction to Programming", "09:00 – 10:30 • C-101"));
         list.add(Box.createVerticalStrut(12));
         list.add(scheduleRow("BIO201 – Foundations of Biology II", "11:00 – 12:30 • B-204"));
@@ -250,8 +225,6 @@ public class InstructorDashboard extends InstructorFrameBase {
         row.add(text, BorderLayout.CENTER);
         return row;
     }
-
-    // --- Right column ------------------------------------------------------
 
     private JComponent buildRightColumn() {
         JPanel col = new JPanel();
@@ -292,17 +265,11 @@ public class InstructorDashboard extends InstructorFrameBase {
         btnRow.setOpaque(false);
 
         btnRow.add(primaryPillButton("My Sections", e -> {
-            new MySections(instructorId, userDisplayName).setVisible(true);
+            new MySections().setVisible(true);
             SwingUtilities.getWindowAncestor(card).dispose();
         }));
-        btnRow.add(primaryPillButton("Grade Students", e -> {
-            new GradeStudents(instructorId, userDisplayName).setVisible(true);
-            SwingUtilities.getWindowAncestor(card).dispose();
-        }));
-        btnRow.add(primaryPillButton("Class Stats", e -> {
-            new ClassStats(instructorId, userDisplayName).setVisible(true);
-            SwingUtilities.getWindowAncestor(card).dispose();
-        }));
+
+        // Class Stats is now accessed per-section from the gradebook, not as a global quick action.
 
         card.add(btnRow, BorderLayout.CENTER);
         return card;
@@ -391,8 +358,6 @@ public class InstructorDashboard extends InstructorFrameBase {
         return row;
     }
 
-    // --- Notifications popup -----------------------------------------------
-
     private void toggleNotifications() {
         if (notificationsPopup == null) {
             notificationsPopup = buildNotificationsPopup();
@@ -473,8 +438,6 @@ public class InstructorDashboard extends InstructorFrameBase {
         return p;
     }
 
-    // --- Helpers -----------------------------------------------------------
-
     private static String todayString() {
         LocalDate d = LocalDate.now();
         return d.getDayOfMonth() + " " +
@@ -507,8 +470,4 @@ public class InstructorDashboard extends InstructorFrameBase {
         return dept;
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() ->
-                new InstructorDashboard("1000001", "Instructor 123").setVisible(true));
-    }
 }

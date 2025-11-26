@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -39,8 +41,10 @@ import java.util.Set;
  * - Compact card layout.
  * - Clicking a card navigates (in-place) to a "Section Gradebook" view within
  * the same frame using CardLayout.
- * - Gradebook view shows students (rows) x section components (cols) with
- * editable scores, search bar, and CSV import/export.
+ * - Gradebook view shows:
+ * • Summary stats + charts
+ * • Students (rows) x section components (cols) with editable scores,
+ * search bar, and CSV import/export.
  */
 public class MySections extends InstructorFrameBase {
 
@@ -93,8 +97,8 @@ public class MySections extends InstructorFrameBase {
     private JTable gradebookTable;
     private TableRowSorter<GradebookTableModel> sorter;
 
-    public MySections(String instructorId, String displayName) {
-        super(instructorId, displayName, Page.SECTIONS);
+    public MySections() {
+        super(null, null, Page.SECTIONS);
         setTitle("IIITD ERP – My Sections");
 
         if (metaLabel != null) {
@@ -357,7 +361,6 @@ public class MySections extends InstructorFrameBase {
         saveBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         saveBtn.setBorder(new EmptyBorder(8, 16, 8, 16));
         saveBtn.addActionListener(e -> saveGrades());
-
         exportImportPanel.add(saveBtn);
 
         // Export / Import (secondary buttons)
@@ -375,7 +378,7 @@ public class MySections extends InstructorFrameBase {
 
         root.add(topBar, BorderLayout.NORTH);
 
-        // Center: header + search + table in a card
+        // Center: header + stats + search + table in a card
         RoundedPanel card = new RoundedPanel(18);
         card.setBackground(CARD);
         card.setBorder(new EmptyBorder(20, 22, 20, 22));
@@ -416,6 +419,14 @@ public class MySections extends InstructorFrameBase {
         header.add(searchPanel, BorderLayout.EAST);
 
         card.add(header, BorderLayout.NORTH);
+
+        // ------------ Stats + Table center area -------------
+        JPanel center = new JPanel(new BorderLayout());
+        center.setOpaque(false);
+
+        // Stats block (summary + charts)
+        JComponent statsPanel = buildStatsPanel();
+        center.add(statsPanel, BorderLayout.NORTH);
 
         // JTable for gradebook
         gradebookModel = new GradebookTableModel();
@@ -471,7 +482,9 @@ public class MySections extends InstructorFrameBase {
         tableScroll.getViewport().setBackground(Color.WHITE);
         tableScroll.getVerticalScrollBar().setUnitIncrement(16);
 
-        card.add(tableScroll, BorderLayout.CENTER);
+        center.add(tableScroll, BorderLayout.CENTER);
+
+        card.add(center, BorderLayout.CENTER);
 
         root.add(card, BorderLayout.CENTER);
 
@@ -578,7 +591,7 @@ public class MySections extends InstructorFrameBase {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     String enrollId = rs.getString("enrollment_id");
-                    String compId = rs.getString("component_id");
+                    int compId = rs.getInt("component_id");
                     String score = rs.getString("score");
                     String key = enrollId + ":" + compId;
                     gradesByKey.put(key, score == null ? "" : score);
@@ -729,144 +742,148 @@ public class MySections extends InstructorFrameBase {
     // -------------------------------------------------------------------------
 
     private void exportGradesToCsv() {
-    if (gradebookStudents.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "No students to export.", "Export CSV",
-                JOptionPane.INFORMATION_MESSAGE);
-        return;
-    }
-
-    JFileChooser chooser = new JFileChooser();
-    chooser.setDialogTitle("Export grades as CSV");
-    int result = chooser.showSaveDialog(this);
-    if (result != JFileChooser.APPROVE_OPTION) return;
-
-    File file = chooser.getSelectedFile();
-    if (!file.getName().toLowerCase().endsWith(".csv")) {
-        file = new File(file.getParentFile(), file.getName() + ".csv");
-    }
-
-    try (BufferedWriter w = new BufferedWriter(new FileWriter(file))) {
-        // Header
-        StringBuilder header = new StringBuilder();
-        header.append("Roll No,Full Name");
-        for (ComponentInfo c : gradebookComponents) {
-            header.append(",").append(escapeCsv(c.name));
+        if (gradebookStudents.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No students to export.", "Export CSV",
+                    JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
-        header.append(",Final Grade");
-        w.write(header.toString());
-        w.newLine();
 
-        // Rows
-        for (StudentRow s : gradebookStudents) {
-            StringBuilder line = new StringBuilder();
-            line.append(escapeCsv(s.rollNo)).append(",")
-                .append(escapeCsv(s.name));
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Export grades as CSV");
+        int result = chooser.showSaveDialog(this);
+        if (result != JFileChooser.APPROVE_OPTION)
+            return;
 
+        File file = chooser.getSelectedFile();
+        if (!file.getName().toLowerCase().endsWith(".csv")) {
+            file = new File(file.getParentFile(), file.getName() + ".csv");
+        }
+
+        try (BufferedWriter w = new BufferedWriter(new FileWriter(file))) {
+            // Header
+            StringBuilder header = new StringBuilder();
+            header.append("Roll No,Full Name");
             for (ComponentInfo c : gradebookComponents) {
-                String key = s.enrollId + ":" + c.componentId;
-                String val = gradesByKey.getOrDefault(key, "");
-                line.append(",").append(escapeCsv(val));
+                header.append(",").append(escapeCsv(c.name));
             }
-
-            double pct = computeFinalPercentage(s);
-            String finalStr = Double.isNaN(pct) ? "" : String.format("%.1f", pct);
-            line.append(",").append(escapeCsv(finalStr));
-
-            w.write(line.toString());
+            header.append(",Final Grade");
+            w.write(header.toString());
             w.newLine();
-        }
-    } catch (IOException ex) {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Failed to export CSV: " + ex.getMessage(),
-                "Export CSV", JOptionPane.ERROR_MESSAGE);
-    }
-}
 
+            // Rows
+            for (StudentRow s : gradebookStudents) {
+                StringBuilder line = new StringBuilder();
+                line.append(escapeCsv(s.rollNo)).append(",")
+                        .append(escapeCsv(s.name));
+
+                for (ComponentInfo c : gradebookComponents) {
+                    String key = s.enrollId + ":" + c.componentId;
+                    String val = gradesByKey.getOrDefault(key, "");
+                    line.append(",").append(escapeCsv(val));
+                }
+
+                double pct = computeFinalPercentage(s);
+                String finalStr = Double.isNaN(pct) ? "" : String.format("%.1f", pct);
+                line.append(",").append(escapeCsv(finalStr));
+
+                w.write(line.toString());
+                w.newLine();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to export CSV: " + ex.getMessage(),
+                    "Export CSV", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     private void importGradesFromCsv() {
-    if (gradebookStudents.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "No students to import for.", "Import CSV",
-                JOptionPane.INFORMATION_MESSAGE);
-        return;
-    }
-
-    JFileChooser chooser = new JFileChooser();
-    chooser.setDialogTitle("Import grades from CSV");
-    int result = chooser.showOpenDialog(this);
-    if (result != JFileChooser.APPROVE_OPTION) return;
-
-    File file = chooser.getSelectedFile();
-    Map<String, Integer> rollToRow = new HashMap<>();
-    for (int i = 0; i < gradebookStudents.size(); i++) {
-        rollToRow.put(gradebookStudents.get(i).rollNo, i);
-    }
-
-    Map<String, Integer> compNameToId = new HashMap<>();
-    for (ComponentInfo c : gradebookComponents) {
-        compNameToId.put(c.name, c.componentId);
-    }
-
-    try (BufferedReader r = new BufferedReader(new FileReader(file))) {
-        String header = r.readLine();
-        if (header == null) {
-            JOptionPane.showMessageDialog(this, "Empty CSV file.", "Import CSV",
-                    JOptionPane.WARNING_MESSAGE);
+        if (gradebookStudents.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No students to import for.", "Import CSV",
+                    JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
-        String[] cols = header.split(",", -1);
-        if (cols.length < 2) {
-            JOptionPane.showMessageDialog(this, "Invalid CSV header.", "Import CSV",
-                    JOptionPane.WARNING_MESSAGE);
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Import grades from CSV");
+        int result = chooser.showOpenDialog(this);
+        if (result != JFileChooser.APPROVE_OPTION)
             return;
+
+        File file = chooser.getSelectedFile();
+        Map<String, Integer> rollToRow = new HashMap<>();
+        for (int i = 0; i < gradebookStudents.size(); i++) {
+            rollToRow.put(gradebookStudents.get(i).rollNo, i);
         }
 
-        // Map CSV column index -> componentId (ignore Final/Final Grade)
-        Map<Integer, Integer> colToComponentId = new HashMap<>();
-        for (int i = 2; i < cols.length; i++) {
-            String name = unescapeCsv(cols[i].trim());
-            if (name.equalsIgnoreCase("Final") || name.equalsIgnoreCase("Final Grade")) {
-                continue;
+        Map<String, Integer> compNameToId = new HashMap<>();
+        for (ComponentInfo c : gradebookComponents) {
+            compNameToId.put(c.name, c.componentId);
+        }
+
+        try (BufferedReader r = new BufferedReader(new FileReader(file))) {
+            String header = r.readLine();
+            if (header == null) {
+                JOptionPane.showMessageDialog(this, "Empty CSV file.", "Import CSV",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
             }
-            if (compNameToId.containsKey(name)) {
-                colToComponentId.put(i, compNameToId.get(name));
+
+            String[] cols = header.split(",", -1);
+            if (cols.length < 2) {
+                JOptionPane.showMessageDialog(this, "Invalid CSV header.", "Import CSV",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
             }
-        }
 
-        String line;
-        while ((line = r.readLine()) != null) {
-            if (line.isBlank()) continue;
-            String[] parts = line.split(",", -1);
-            if (parts.length < 2) continue;
-
-            String roll = unescapeCsv(parts[0].trim());
-            Integer rowIdx = rollToRow.get(roll);
-            if (rowIdx == null) continue;
-
-            StudentRow s = gradebookStudents.get(rowIdx);
-
-            for (int i = 2; i < parts.length; i++) {
-                Integer compId = colToComponentId.get(i);
-                if (compId == null) continue;
-                String value = unescapeCsv(parts[i].trim());
-                String key   = s.enrollId + ":" + compId;
-                gradesByKey.put(key, value);
-                dirtyKeys.add(key);            // mark as changed
+            // Map CSV column index -> componentId (ignore Final/Final Grade)
+            Map<Integer, Integer> colToComponentId = new HashMap<>();
+            for (int i = 2; i < cols.length; i++) {
+                String name = unescapeCsv(cols[i].trim());
+                if (name.equalsIgnoreCase("Final") || name.equalsIgnoreCase("Final Grade")) {
+                    continue;
+                }
+                if (compNameToId.containsKey(name)) {
+                    colToComponentId.put(i, compNameToId.get(name));
+                }
             }
-        }
 
-        // Persist to DB
-        saveGrades();
-        if (gradebookModel != null) {
-            gradebookModel.fireTableDataChanged();
+            String line;
+            while ((line = r.readLine()) != null) {
+                if (line.isBlank())
+                    continue;
+                String[] parts = line.split(",", -1);
+                if (parts.length < 2)
+                    continue;
+
+                String roll = unescapeCsv(parts[0].trim());
+                Integer rowIdx = rollToRow.get(roll);
+                if (rowIdx == null)
+                    continue;
+
+                StudentRow s = gradebookStudents.get(rowIdx);
+
+                for (int i = 2; i < parts.length; i++) {
+                    Integer compId = colToComponentId.get(i);
+                    if (compId == null)
+                        continue;
+                    String value = unescapeCsv(parts[i].trim());
+                    String key = s.enrollId + ":" + compId;
+                    gradesByKey.put(key, value);
+                    dirtyKeys.add(key); // mark as changed
+                }
+            }
+
+            // Persist to DB
+            saveGrades();
+            if (gradebookModel != null) {
+                gradebookModel.fireTableDataChanged();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to import CSV: " + ex.getMessage(),
+                    "Import CSV", JOptionPane.ERROR_MESSAGE);
         }
-    } catch (IOException ex) {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Failed to import CSV: " + ex.getMessage(),
-                "Import CSV", JOptionPane.ERROR_MESSAGE);
     }
-}
-
 
     private String escapeCsv(String val) {
         if (val == null)
@@ -885,6 +902,253 @@ public class MySections extends InstructorFrameBase {
             val = val.substring(1, val.length() - 1).replace("\"\"", "\"");
         }
         return val;
+    }
+
+    // -------------------------------------------------------------------------
+    // Stats panel (shown above the table)
+    // -------------------------------------------------------------------------
+
+    private JComponent buildStatsPanel() {
+        JPanel outer = new JPanel();
+        outer.setOpaque(false);
+        outer.setLayout(new BoxLayout(outer, BoxLayout.Y_AXIS));
+        outer.setBorder(new EmptyBorder(8, 0, 16, 0));
+
+        int total = gradebookStudents.size();
+        int withGrades = 0;
+        double sumFinal = 0.0;
+
+        for (StudentRow s : gradebookStudents) {
+            double pct = computeFinalPercentage(s);
+            if (!Double.isNaN(pct)) {
+                withGrades++;
+                sumFinal += pct;
+            }
+        }
+
+        double mean = (withGrades == 0) ? Double.NaN : (sumFinal / withGrades);
+        String meanStr = Double.isNaN(mean) ? "-" : String.format(Locale.US, "%.1f %%", mean);
+
+        // Summary row
+        JPanel summaryRow = new JPanel(new GridLayout(1, 3, 16, 0));
+        summaryRow.setOpaque(false);
+        summaryRow.add(metricCard(String.valueOf(total), "Students in section"));
+        summaryRow.add(metricCard(meanStr, "Mean final percentage"));
+        summaryRow.add(metricCard(String.valueOf(withGrades), "Students with grades"));
+
+        outer.add(summaryRow);
+        outer.add(Box.createVerticalStrut(18));
+
+        // Component averages
+        List<String> compLabels = new ArrayList<>();
+        List<Double> compValues = new ArrayList<>();
+        for (ComponentInfo c : gradebookComponents) {
+            double sum = 0.0;
+            int count = 0;
+            for (StudentRow s : gradebookStudents) {
+                String key = s.enrollId + ":" + c.componentId;
+                String val = gradesByKey.get(key);
+                if (val == null || val.isBlank())
+                    continue;
+                try {
+                    double score = Double.parseDouble(val);
+                    sum += score;
+                    count++;
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            compLabels.add(c.name);
+            compValues.add(count == 0 ? 0.0 : (sum / count));
+        }
+
+        // Final grade brackets
+        Map<String, Integer> brackets = new LinkedHashMap<>();
+        brackets.put("≥ 80%", 0);
+        brackets.put("70–79%", 0);
+        brackets.put("60–69%", 0);
+        brackets.put("50–59%", 0);
+        brackets.put("< 50%", 0);
+
+        for (StudentRow s : gradebookStudents) {
+            double pct = computeFinalPercentage(s);
+            if (Double.isNaN(pct))
+                continue;
+            if (pct >= 80) {
+                brackets.put("≥ 80%", brackets.get("≥ 80%") + 1);
+            } else if (pct >= 70) {
+                brackets.put("70–79%", brackets.get("70–79%") + 1);
+            } else if (pct >= 60) {
+                brackets.put("60–69%", brackets.get("60–69%") + 1);
+            } else if (pct >= 50) {
+                brackets.put("50–59%", brackets.get("50–59%") + 1);
+            } else {
+                brackets.put("< 50%", brackets.get("< 50%") + 1);
+            }
+        }
+
+        List<String> bracketLabels = new ArrayList<>();
+        List<Double> bracketValues = new ArrayList<>();
+        for (Map.Entry<String, Integer> e : brackets.entrySet()) {
+            bracketLabels.add(e.getKey());
+            bracketValues.add(e.getValue().doubleValue());
+        }
+
+        JPanel chartsRow = new JPanel();
+        chartsRow.setOpaque(false);
+        chartsRow.setLayout(new GridLayout(1, 2, 16, 0));
+        chartsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
+        chartsRow.setPreferredSize(new Dimension(Integer.MAX_VALUE, 250));
+        chartsRow.add(buildChartCard("Average score per component",
+                compLabels, compValues, "Average score"));
+        chartsRow.add(buildChartCard("Final grade distribution",
+                bracketLabels, bracketValues, "Number of students"));
+
+        outer.add(chartsRow);
+
+        return outer;
+    }
+
+    private RoundedPanel metricCard(String value, String label) {
+        RoundedPanel p = new RoundedPanel(18);
+        p.setBackground(Color.WHITE);
+        p.setLayout(new GridBagLayout());
+        p.setBorder(new EmptyBorder(18, 22, 18, 22));
+
+        GridBagConstraints g = new GridBagConstraints();
+        g.gridx = 0;
+        g.gridy = 0;
+        g.anchor = GridBagConstraints.WEST;
+
+        JLabel v = new JLabel(value);
+        v.setFont(FontKit.bold(20f));
+        v.setForeground(new Color(24, 30, 37));
+        p.add(v, g);
+
+        g.gridy = 1;
+        JLabel l = new JLabel(label);
+        l.setFont(FontKit.regular(13f));
+        l.setForeground(new Color(100, 116, 139));
+        p.add(l, g);
+
+        return p;
+    }
+
+    private JComponent buildChartCard(String title,
+            List<String> labels,
+            List<Double> values,
+            String yCaption) {
+        RoundedPanel card = new RoundedPanel(20);
+        card.setBackground(Color.WHITE);
+        card.setBorder(new EmptyBorder(18, 18, 18, 18));
+        card.setLayout(new BorderLayout());
+
+        JLabel t = new JLabel(title);
+        t.setFont(FontKit.semibold(15f));
+        t.setForeground(new Color(24, 30, 37));
+        card.add(t, BorderLayout.NORTH);
+
+        BarChartPanel chart = new BarChartPanel(labels, values, yCaption);
+        card.add(chart, BorderLayout.CENTER);
+
+        return card;
+    }
+
+    // Simple reusable bar chart
+    private static class BarChartPanel extends JPanel {
+        private final List<String> labels;
+        private final List<Double> values;
+        private final String yCaption;
+
+        BarChartPanel(List<String> labels, List<Double> values, String yCaption) {
+            this.labels = labels;
+            this.values = values;
+            this.yCaption = yCaption;
+            setOpaque(false);
+
+            setPreferredSize(new Dimension(200, 180));
+            setMinimumSize(new Dimension(200, 150));
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int w = getWidth();
+            int h = getHeight();
+            int left = 48, right = 16, top = 24, bottom = 48;
+            int chartW = w - left - right;
+            int chartH = h - top - bottom;
+
+            g2.setColor(new Color(148, 163, 184));
+            g2.drawLine(left, top, left, top + chartH);
+            g2.drawLine(left, top + chartH, left + chartW, top + chartH);
+
+            if (labels == null || labels.isEmpty()
+                    || values == null || values.isEmpty()) {
+                String msg = "No data";
+                FontMetrics fm = g2.getFontMetrics();
+                int sw = fm.stringWidth(msg);
+                g2.drawString(msg, (w - sw) / 2, h / 2);
+                g2.dispose();
+                return;
+            }
+
+            double maxVal = 0.0;
+            for (Double v : values) {
+                if (v != null && v > maxVal)
+                    maxVal = v;
+            }
+            if (maxVal <= 0)
+                maxVal = 1.0;
+
+            int n = labels.size();
+            int gap = 12;
+            int barSpace = chartW / Math.max(n, 1);
+            int barW = Math.max(10, barSpace - gap);
+
+            g2.setFont(FontKit.regular(11f));
+            FontMetrics fm = g2.getFontMetrics();
+
+            for (int i = 0; i < n; i++) {
+                double val = (i < values.size() && values.get(i) != null)
+                        ? values.get(i)
+                        : 0.0;
+                int barH = (int) Math.round((val / maxVal) * chartH);
+                int x = left + i * barSpace + (barSpace - barW) / 2;
+                int y = top + chartH - barH;
+
+                // bar body
+                g2.setColor(new Color(59, 130, 246));
+                g2.fillRoundRect(x, y, barW, barH, 8, 8);
+
+                g2.setColor(new Color(30, 64, 175));
+                g2.drawRoundRect(x, y, barW, barH, 8, 8);
+
+                // value label
+                String vs = (maxVal <= 10)
+                        ? String.format(Locale.US, "%.1f", val)
+                        : String.format(Locale.US, "%.0f", val);
+                int vsw = fm.stringWidth(vs);
+                g2.setColor(new Color(55, 65, 81));
+                g2.drawString(vs, x + (barW - vsw) / 2, y - 4);
+
+                // x-axis label
+                String lbl = labels.get(i);
+                int lx = x + (barW - fm.stringWidth(lbl)) / 2;
+                int ly = top + chartH + fm.getAscent() + 4;
+                g2.setColor(new Color(100, 116, 139));
+                g2.drawString(lbl, lx, ly);
+            }
+
+            // y caption
+            g2.setColor(new Color(148, 163, 184));
+            g2.drawString(yCaption, left, top - 6);
+
+            g2.dispose();
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -938,47 +1202,46 @@ public class MySections extends InstructorFrameBase {
     }
 
     private void saveGrades() {
-    if (dirtyKeys.isEmpty()) {
+        if (dirtyKeys.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "No changes to save.",
+                    "Save Grades",
+                    JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        int choice = JOptionPane.showConfirmDialog(
+                this,
+                "You are about to save " + dirtyKeys.size() + " updated grade value(s).\n" +
+                        "Are you sure you want to continue?",
+                "Confirm Save",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (choice != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        for (String key : dirtyKeys) {
+            String[] parts = key.split(":");
+            if (parts.length != 2)
+                continue;
+            String enrollId = parts[0];
+            int compId;
+            try {
+                compId = Integer.parseInt(parts[1]);
+            } catch (NumberFormatException ex) {
+                continue;
+            }
+            String value = gradesByKey.getOrDefault(key, "");
+            upsertGrade(enrollId, compId, value);
+        }
+
+        dirtyKeys.clear();
         JOptionPane.showMessageDialog(this,
-                "No changes to save.",
+                "Grades saved successfully.",
                 "Save Grades",
                 JOptionPane.INFORMATION_MESSAGE);
-        return;
     }
-
-    int choice = JOptionPane.showConfirmDialog(
-            this,
-            "You are about to save " + dirtyKeys.size() + " updated grade value(s).\n" +
-            "Are you sure you want to continue?",
-            "Confirm Save",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE
-    );
-
-    if (choice != JOptionPane.YES_OPTION) {
-        return;
-    }
-
-    for (String key : dirtyKeys) {
-        String[] parts = key.split(":");
-        if (parts.length != 2) continue;
-        String enrollId = parts[0];
-        int compId;
-        try {
-            compId = Integer.parseInt(parts[1]);
-        } catch (NumberFormatException ex) {
-            continue;
-        }
-        String value = gradesByKey.getOrDefault(key, "");
-        upsertGrade(enrollId, compId, value);
-    }
-
-    dirtyKeys.clear();
-    JOptionPane.showMessageDialog(this,
-            "Grades saved successfully.",
-            "Save Grades",
-            JOptionPane.INFORMATION_MESSAGE);
-}
-
 
 }
