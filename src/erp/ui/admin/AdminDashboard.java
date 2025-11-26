@@ -1,349 +1,214 @@
 package erp.ui.admin;
 
-import erp.ui.common.FontKit;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.time.LocalDate;
-import java.time.format.TextStyle;
-import java.util.Locale;
 
-import erp.ui.common.RoundedPanel;
-import erp.ui.common.NavButton;
-
-import erp.auth.AuthContext;
-import erp.auth.Role;
-import erp.ui.auth.LoginPage;
 import erp.db.Maintenance;
+import erp.ui.common.FontKit;
+import erp.ui.common.RoundedPanel;
+import erp.ui.common.RoundedButton;
 
-public class AdminDashboard extends JFrame {
+public class AdminDashboard extends AdminFrameBase {
 
-    // Palette
-    private static final Color TEAL_DARK = new Color(39, 96, 92);
-    private static final Color TEAL = new Color(28, 122, 120);
-    private static final Color TEAL_LIGHT = new Color(55, 115, 110);
-    private static final Color BG = new Color(246, 247, 248);
-    private static final Color TEXT_900 = new Color(24, 30, 37);
-    private static final Color TEXT_600 = new Color(100, 116, 139);
-    private static final Color CARD = Color.WHITE;
+    // Palette for cards / text
+    private static final Color BG        = new Color(246, 247, 248);
+    private static final Color TEXT_900  = new Color(24, 30, 37);
+    private static final Color TEXT_600  = new Color(100, 116, 139);
+    private static final Color CARD      = Color.WHITE;
 
-    private static boolean MAINTENANCE_MODE = false;
-
-    private RoundedPanel actionCard(String title, String desc, Runnable onClick) {
-        RoundedPanel card = new RoundedPanel(20);
-        card.setBackground(CARD);
-        card.setLayout(new BorderLayout());
-        card.setBorder(new EmptyBorder(20, 24, 20, 24));
-
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(FontKit.bold(18f));
-        titleLabel.setForeground(TEXT_900);
-
-        JLabel descLabel = new JLabel("<html><p style='width:240px;'>" + desc + "</p></html>");
-        descLabel.setFont(FontKit.regular(14f));
-        descLabel.setForeground(TEXT_600);
-
-        card.add(titleLabel, BorderLayout.NORTH);
-        card.add(descLabel, BorderLayout.CENTER);
-
-        // hover + click behavior
-        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        card.addMouseListener(new MouseAdapter() {
-            Color normal = CARD;
-            Color hover = new Color(238, 241, 245);
-            @Override public void mouseEntered(MouseEvent e) {
-                card.setBackground(hover); card.repaint();
-            }
-            @Override public void mouseExited(MouseEvent e) {
-                card.setBackground(normal); card.repaint();
-            }
-            @Override public void mouseClicked(MouseEvent e) {
-                onClick.run();
-            }
-        });
-
-        return card;
+    // Old usage from LoginPage: new AdminDashboard(display)
+    public AdminDashboard(String displayName) {
+        this(null, displayName);
     }
 
-    private RoundedPanel maintenanceCard() {
-        RoundedPanel card = new RoundedPanel(20);
-        card.setBackground(TEAL);
-        card.setLayout(new BorderLayout());
-        card.setBorder(new EmptyBorder(20, 24, 20, 24));
-
-        JLabel label = new JLabel("🔧 Maintenance Mode");
-        label.setFont(FontKit.bold(18f));
-        label.setForeground(CARD);
-
-        JLabel status = new JLabel(MAINTENANCE_MODE ? "ON" : "OFF", SwingConstants.RIGHT);
-        status.setFont(FontKit.semibold(16f));
-        status.setForeground(MAINTENANCE_MODE ? new Color(34, 197, 94) : new Color(229, 72, 77));
-
-        card.add(label, BorderLayout.WEST);
-        card.add(status, BorderLayout.EAST);
-
-        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        card.addMouseListener(new MouseAdapter() {
-            final Color normal = card.getBackground();
-            final Color hover  = normal.darker();
-            @Override public void mouseEntered(MouseEvent e) {
-                card.setBackground(hover);
-                card.repaint();
-            }
-            @Override public void mouseExited(MouseEvent e) {
-                card.setBackground(normal);
-                card.repaint();
-            }
-            @Override public void mouseClicked(MouseEvent e) {
-                MAINTENANCE_MODE = !MAINTENANCE_MODE;
-                if(MAINTENANCE_MODE){
-                    status.setText("ON");
-                    status.setForeground(new Color(34, 197, 94));
-                    erp.db.Maintenance.turnOn();
-                    JOptionPane.showMessageDialog(card, "Maintenance mode enabled");
-                } 
-                else {
-                    status.setText("OFF");
-                    status.setForeground(new Color(229, 72, 77));
-                    erp.db.Maintenance.turnOff();
-                    JOptionPane.showMessageDialog(card, "Maintenance mode disabled");
-                }
-            }
-        });
-        return card;
-    }
-
-
-    public AdminDashboard(String userDisplayName) {
-        setTitle("IIITD ERP – Dashboard");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(1200, 800));
-        setLocationRelativeTo(null);
-
-        // Authorization guard: only allow ADMIN role to proceed
-        Role actual = AuthContext.getRole();
-        if (actual != Role.ADMIN) {
-            JOptionPane.showMessageDialog(null, "You are not authorized to access the Admin Dashboard.");
-            // Clear any session and redirect to login
-            AuthContext.clear();
-            new LoginPage().setVisible(true);
-            // Ensure we don't continue constructing the frame
-            dispose();
-            return;
+    public AdminDashboard(String adminId, String displayName) {
+        super(adminId, displayName, Page.HOME);
+        setTitle("IIITD ERP – Admin Dashboard");
+        if (metaLabel != null) {
+            metaLabel.setText("System Administrator");
         }
+    }
 
-        // app bg
-        JPanel root = new JPanel(new BorderLayout());
-        root.setBackground(BG);
-        setContentPane(root);
-
-        // --- Sidebar ---
-        JPanel sidebar = new JPanel();
-        sidebar.setBackground(TEAL_DARK);
-        sidebar.setPreferredSize(new Dimension(280, 0));
-        sidebar.setLayout(new BorderLayout());
-        sidebar.setBorder(new EmptyBorder(24, 16, 24, 16));
-
-        // Profile block (Top part of sidebar)
-        JPanel profile = new JPanel();
-        profile.setOpaque(false);
-        profile.setLayout(new BoxLayout(profile, BoxLayout.Y_AXIS));
-        EmptyBorder br = new EmptyBorder(8, 8, 32, 8);
-        profile.setBorder(br);
-
-        // Circular Avatar with rounded corner panel
-        JPanel avatarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        avatarPanel.setOpaque(false);
-
-        JLabel avatar = new JLabel() {
-            @Override protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(230, 233, 236));
-                // Draw a circle
-                g2.fillOval(0, 0, getWidth(), getHeight());
-                g2.dispose();
-            }
-            @Override public Dimension getPreferredSize() { return new Dimension(100, 100); }
-        };
-
-        avatarPanel.add(avatar);
-        profile.add(avatarPanel);
-        profile.add(Box.createVerticalStrut(16));
-
-        JLabel name = new JLabel(userDisplayName);
-        name.setAlignmentX(Component.CENTER_ALIGNMENT);
-        name.setForeground(Color.WHITE);
-        name.setFont(FontKit.bold(18f));
-        profile.add(name);
-
-        JLabel meta = new JLabel("Year, ID");
-        meta.setAlignmentX(Component.CENTER_ALIGNMENT);
-        meta.setForeground(new Color(210, 225, 221));
-        meta.setFont(FontKit.regular(14f));
-        profile.add(meta);
-
-        profile.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(TEAL_LIGHT, 1),
-            new EmptyBorder(8, 8, 32, 8)
-        ));
-
-        sidebar.add(profile, BorderLayout.NORTH);
-
-        // Nav
-        JPanel nav = new JPanel();
-        nav.setOpaque(false);
-        nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
-        nav.setBorder(new EmptyBorder(16, 0, 16, 0));
-
-        // Navigation Links
-
-        NavButton dashboardBtn = new NavButton("🏠 Home", true);
-        dashboardBtn.addActionListener(e -> {
-            new AdminDashboard(userDisplayName).setVisible(true);
-            AdminDashboard.this.dispose();
-        });
-        nav.add(dashboardBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-        NavButton addUserBtn = new NavButton("👤 Add User", false);
-        addUserBtn.addActionListener(e -> {
-            new AddStudent(userDisplayName).setVisible(true);
-            AdminDashboard.this.dispose();
-        });
-        nav.add(addUserBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-        NavButton manageCoursesBtn = new NavButton("📘 Manage Courses", false);
-        manageCoursesBtn.addActionListener(e -> {
-            new ManageCourses(userDisplayName).setVisible(true);
-            AdminDashboard.this.dispose();
-        });
-        nav.add(manageCoursesBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-        NavButton assignInstBtn = new NavButton("👨 Assign Instructor", false);
-        assignInstBtn.addActionListener(e -> {
-            new AssignInstructor(userDisplayName).setVisible(true);
-            AdminDashboard.this.dispose();
-        });
-        nav.add(assignInstBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-
-        // Separator
-        nav.add(new JSeparator() {{
-            setForeground(new Color(60, 120, 116));
-            setBackground(new Color(60, 120, 116));
-            setMaximumSize(new Dimension(240, 1));
-            setAlignmentX(Component.CENTER_ALIGNMENT);
-        }});
-        nav.add(Box.createVerticalStrut(40));
-        nav.add(new NavButton("  \u00A0⚙️ \u00A0Settings", false));
-        nav.add(Box.createVerticalStrut(8));
-
-        NavButton logoutNav = new NavButton("  \u00A0🚪 \u00A0Log Out", false);
-        logoutNav.addActionListener(e -> {
-            AuthContext.clear();
-            new LoginPage().setVisible(true);
-            AdminDashboard.this.dispose();
-        });
-        nav.add(logoutNav);
-
-        sidebar.add(nav, BorderLayout.CENTER);
-        root.add(sidebar, BorderLayout.WEST);
-
-        // ---- Main area ----
-        JPanel main = new JPanel();
+    @Override
+    protected JComponent buildMainContent() {
+        JPanel main = new JPanel(new BorderLayout());
         main.setOpaque(false);
-        main.setLayout(new BorderLayout());
-        main.setBorder(new EmptyBorder(24, 24, 24, 24));
-        root.add(main, BorderLayout.CENTER);
 
-        // Hero banner
+        // header stack: hero + optional maintenance banner
+        JPanel headerStack = new JPanel();
+        headerStack.setOpaque(false);
+        headerStack.setLayout(new BoxLayout(headerStack, BoxLayout.Y_AXIS));
+
         RoundedPanel hero = new RoundedPanel(24);
         hero.setBackground(TEAL_DARK);
         hero.setBorder(new EmptyBorder(24, 28, 24, 28));
-        main.add(hero, BorderLayout.NORTH);
-        hero.setLayout(new BorderLayout(16, 0));
+        hero.setLayout(new BorderLayout());
 
-        // left stack
-        JPanel heroLeft = new JPanel();
-        heroLeft.setOpaque(false);
-        heroLeft.setLayout(new BoxLayout(heroLeft, BoxLayout.Y_AXIS));
-
-        JLabel date = new JLabel(todayString());
-        date.setForeground(new Color(196, 234, 229));
-        date.setFont(FontKit.semibold(14f));
-        heroLeft.add(date);
-        heroLeft.add(Box.createVerticalStrut(8));
-
-        JLabel h1 = new JLabel("Welcome Back " + userDisplayName + "!");
+        JLabel h1 = new JLabel("Admin Dashboard");
+        h1.setFont(FontKit.bold(28f));
         h1.setForeground(Color.WHITE);
-        h1.setFont(FontKit.bold(34f));
-        heroLeft.add(h1);
+        hero.add(h1, BorderLayout.WEST);
 
-        JLabel subtitle = new JLabel("Manage users, courses, and system maintenance");
-        subtitle.setForeground(new Color(210, 233, 229));
-        subtitle.setFont(FontKit.regular(16f));
-        heroLeft.add(subtitle);
+        JLabel sub = new JLabel("Manage users, courses, and instructor assignments");
+        sub.setFont(FontKit.regular(14f));
+        sub.setForeground(new Color(210, 233, 229));
+        hero.add(sub, BorderLayout.SOUTH);
 
+        headerStack.add(hero);
 
-        hero.add(heroLeft, BorderLayout.CENTER);
+        if (Maintenance.isOn()) {
+            headerStack.add(Box.createVerticalStrut(12));
+            RoundedPanel banner = new RoundedPanel(12);
+            banner.setBackground(new Color(255, 235, 230)); // light red
+            banner.setBorder(new EmptyBorder(12, 18, 12, 18));
 
-        // right graphic placeholder circle
-        JLabel heroCircle = new JLabel() {
-            @Override protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(228, 234, 236));
-                int d = Math.min(getWidth(), getHeight());
-                g2.fillOval(getWidth()/2 - d/2, getHeight()/2 - d/2, d, d);
-                g2.dispose();
-            }
-            @Override public Dimension getPreferredSize() { return new Dimension(120, 120); }
-        };
-        heroCircle.setOpaque(false);
-        hero.add(heroCircle, BorderLayout.EAST);
+            JLabel msg = new JLabel("⚠️  Maintenance Mode is ON – Changes may be restricted");
+            msg.setFont(FontKit.semibold(14f));
+            msg.setForeground(new Color(180, 60, 50));
+            banner.add(msg);
 
-        // ---- Content (Quick Actions) ----
-        JPanel quick = new JPanel(new GridLayout(2, 2, 20, 20));
-        quick.setOpaque(false);
-        quick.setBorder(new EmptyBorder(30, 0, 0, 0));
+            headerStack.add(banner);
+        }
 
-        quick.add(actionCard("👤 Add New User", "Create student/instructor accounts", () -> {
-            new AddUser(userDisplayName).setVisible(true);
-            AdminDashboard.this.dispose();
-        }));
+        main.add(headerStack, BorderLayout.NORTH);
 
-        quick.add(actionCard("📘 Manage Courses", "Create or edit courses and sections", () -> {
-            new ManageCourses(userDisplayName).setVisible(true);
-            AdminDashboard.this.dispose();
-        }));
+        // center content – simple 3-card grid
+        JPanel grid = new JPanel(new GridBagLayout());
+        grid.setOpaque(false);
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.insets = new Insets(16, 16, 16, 16);
+        gc.fill = GridBagConstraints.BOTH;
+        gc.weightx = 1;
+        gc.weighty = 1;
 
-        quick.add(actionCard("👨 Assign Instructor", "Link instructors to sections", () -> {
-            new AssignInstructor(userDisplayName).setVisible(true);
-            AdminDashboard.this.dispose();
-        }));
+        gc.gridx = 0; gc.gridy = 0;
+        grid.add(buildUsersCard(), gc);
 
-        quick.add(maintenanceCard());
-        main.add(quick, BorderLayout.CENTER);
+        gc.gridx = 1; gc.gridy = 0;
+        grid.add(buildCoursesCard(), gc);
+
+        gc.gridx = 2; gc.gridy = 0;
+        grid.add(buildAssignCard(), gc);
+
+        JPanel centerWrapper = new JPanel(new BorderLayout());
+        centerWrapper.setOpaque(false);
+        centerWrapper.add(grid, BorderLayout.CENTER);
+
+        JScrollPane sc = new JScrollPane(centerWrapper);
+        sc.setBorder(null);
+        sc.getViewport().setBackground(BG);
+        sc.getVerticalScrollBar().setUnitIncrement(16);
+
+        main.add(sc, BorderLayout.CENTER);
+        return main;
     }
 
-    private static String todayString() {
-        LocalDate d = LocalDate.now();
-        String day = String.valueOf(d.getDayOfMonth());
-        String month = d.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-        String year = String.valueOf(d.getYear());
-        return day + " " + month + " " + year;
+    private RoundedPanel baseCard(String title, String desc) {
+        RoundedPanel card = new RoundedPanel(20);
+        card.setBackground(CARD);
+        card.setBorder(new EmptyBorder(20, 22, 20, 22));
+        card.setLayout(new BorderLayout());
+
+        JPanel header = new JPanel();
+        header.setOpaque(false);
+        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+
+        JLabel t = new JLabel(title);
+        t.setFont(FontKit.semibold(16f));
+        t.setForeground(TEXT_900);
+
+        JLabel d = new JLabel("<html>" + desc + "</html>");
+        d.setFont(FontKit.regular(13f));
+        d.setForeground(TEXT_600);
+
+        header.add(t);
+        header.add(Box.createVerticalStrut(6));
+        header.add(d);
+
+        card.add(header, BorderLayout.NORTH);
+        return card;
     }
 
-    // Quick manual launch
+    private JComponent buildUsersCard() {
+        RoundedPanel card = baseCard(
+                "Manage Users",
+                "Create, update, and deactivate student, instructor, and admin accounts."
+        );
+
+        RoundedButton btn = new RoundedButton("Go to Users");
+        btn.setBackground(TEAL);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(FontKit.semibold(14f));
+        btn.setFocusPainted(false);
+        btn.setBorder(new EmptyBorder(8, 16, 8, 16));
+        btn.addActionListener(e -> {
+            new AddUser(adminId, userDisplayName).setVisible(true);
+            dispose();
+        });
+
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        actions.setOpaque(false);
+        actions.add(btn);
+
+        card.add(actions, BorderLayout.SOUTH);
+        return card;
+    }
+
+    private JComponent buildCoursesCard() {
+        RoundedPanel card = baseCard(
+                "Manage Courses",
+                "Add or edit courses in the catalog; update credits and meta-data."
+        );
+
+        RoundedButton btn = new RoundedButton("Go to Courses");
+        btn.setBackground(TEAL);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(FontKit.semibold(14f));
+        btn.setFocusPainted(false);
+        btn.setBorder(new EmptyBorder(8, 16, 8, 16));
+        btn.addActionListener(e -> {
+            new ManageCourses(adminId, userDisplayName).setVisible(true);
+            dispose();
+        });
+
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        actions.setOpaque(false);
+        actions.add(btn);
+
+        card.add(actions, BorderLayout.SOUTH);
+        return card;
+    }
+
+    private JComponent buildAssignCard() {
+        RoundedPanel card = baseCard(
+                "Assign Instructors",
+                "Map instructors to offered sections for the current term."
+        );
+
+        RoundedButton btn = new RoundedButton("Assign Now");
+        btn.setBackground(TEAL);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(FontKit.semibold(14f));
+        btn.setFocusPainted(false);
+        btn.setBorder(new EmptyBorder(8, 16, 8, 16));
+        btn.addActionListener(e -> {
+            new AssignInstructor(adminId, userDisplayName).setVisible(true);
+            dispose();
+        });
+
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        actions.setOpaque(false);
+        actions.add(btn);
+
+        card.add(actions, BorderLayout.SOUTH);
+        return card;
+    }
+
     public static void main(String[] args) {
-        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
-        FontKit.init();
-        SwingUtilities.invokeLater(() -> new AdminDashboard("Admin 123").setVisible(true));
+        // For quick manual testing (without auth context it will fail the guard)
+        SwingUtilities.invokeLater(() ->
+                new AdminDashboard("admin1", "Admin User").setVisible(true)
+        );
     }
 }

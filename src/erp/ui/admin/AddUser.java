@@ -1,337 +1,83 @@
 package erp.ui.admin;
 
-import erp.ui.common.FontKit;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.basic.BasicComboBoxUI;
-
 import java.awt.*;
-import java.awt.geom.RoundRectangle2D;
 
-import erp.ui.common.RoundedTextField;
-import erp.db.Maintenance;
-import erp.ui.common.RoundedPasswordField;
-import erp.ui.common.NavButton;
-import erp.ui.common.RoundedButton;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
+import erp.ui.common.FontKit;
 import erp.ui.common.RoundedPanel;
+import erp.ui.common.RoundedButton;
 
-public class AddUser extends JFrame {
+public class AddUser extends AdminFrameBase {
 
-    private static final Color TEAL_DARK = new Color(39, 96, 92);
-    private static final Color TEAL = new Color(28, 122, 120);
-    private static final Color TEAL_LIGHT = new Color(55, 115, 110);
-    private static final Color BG = new Color(246, 247, 248);
+    private static final Color BG       = new Color(246, 247, 248);
     private static final Color TEXT_900 = new Color(24, 30, 37);
     private static final Color TEXT_600 = new Color(100, 116, 139);
-    private static final Color CARD = Color.WHITE;
+    private static final Color CARD     = Color.WHITE;
 
-    private RoundedPanel actionCard(String title, String desc, Runnable onClick) {
-        RoundedPanel card = new RoundedPanel(20);
-        card.setBackground(CARD);
-        card.setLayout(new BorderLayout());
-        card.setBorder(new EmptyBorder(20, 24, 20, 24));
-
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(FontKit.bold(18f));
-        titleLabel.setForeground(TEXT_900);
-
-        JLabel descLabel = new JLabel("<html><p style='width:240px;'>" + desc + "</p></html>");
-        descLabel.setFont(FontKit.regular(14f));
-        descLabel.setForeground(TEXT_600);
-
-        card.add(titleLabel, BorderLayout.NORTH);
-        card.add(descLabel, BorderLayout.CENTER);
-
-        // hover + click behavior
-        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        card.addMouseListener(new MouseAdapter() {
-            Color normal = CARD;
-            Color hover = new Color(238, 241, 245);
-            @Override public void mouseEntered(MouseEvent e) {
-                card.setBackground(hover); card.repaint();
-            }
-            @Override public void mouseExited(MouseEvent e) {
-                card.setBackground(normal); card.repaint();
-            }
-            @Override public void mouseClicked(MouseEvent e) {
-                onClick.run();
-            }
-        });
-
-        return card;
+    // convenience constructor if somewhere you still call new AddUser(displayName)
+    public AddUser(String displayName) {
+        this(null, displayName);
     }
 
-    public AddUser(String adminName) {
-        setTitle("IIITD ERP – Add User");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setMinimumSize(new Dimension(1220, 840));
-        setLocationRelativeTo(null);
+    public AddUser(String adminId, String displayName) {
+        super(adminId, displayName, Page.USERS);
+        setTitle("IIITD ERP – Manage Users");
+        if (metaLabel != null) {
+            metaLabel.setText("System Administrator");
+        }
+    }
 
-        JPanel root = new JPanel(new BorderLayout());
-        root.setBackground(BG);
-        setContentPane(root);
+    @Override
+    protected JComponent buildMainContent() {
+        JPanel main = new JPanel(new BorderLayout());
+        main.setOpaque(false);
 
-        // --- Sidebar ---
-        JPanel sidebar = new JPanel();
-        sidebar.setBackground(TEAL_DARK);
-        sidebar.setPreferredSize(new Dimension(280, 0));
-        sidebar.setLayout(new BorderLayout());
-        sidebar.setBorder(new EmptyBorder(24, 16, 24, 16));
-
-        // Profile block (Top part of sidebar)
-        JPanel profile = new JPanel();
-        profile.setOpaque(false);
-        profile.setLayout(new BoxLayout(profile, BoxLayout.Y_AXIS));
-        EmptyBorder br = new EmptyBorder(8, 8, 32, 8);
-        profile.setBorder(br);
-
-        // Circular Avatar with rounded corner panel
-        JPanel avatarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        avatarPanel.setOpaque(false);
-
-        JLabel avatar = new JLabel() {
-            @Override protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(230, 233, 236));
-                // Draw a circle
-                g2.fillOval(0, 0, getWidth(), getHeight());
-                g2.dispose();
-            }
-            @Override public Dimension getPreferredSize() { return new Dimension(100, 100); }
-        };
-
-        avatarPanel.add(avatar);
-        profile.add(avatarPanel);
-        profile.add(Box.createVerticalStrut(16));
-
-        JLabel name = new JLabel(adminName);
-        name.setAlignmentX(Component.CENTER_ALIGNMENT);
-        name.setForeground(Color.WHITE);
-        name.setFont(FontKit.bold(18f));
-        profile.add(name);
-
-        JLabel meta = new JLabel("Year, Program");
-        meta.setAlignmentX(Component.CENTER_ALIGNMENT);
-        meta.setForeground(new Color(210, 225, 221));
-        meta.setFont(FontKit.regular(14f));
-        profile.add(meta);
-
-        // Rounded corners for the entire profile block (visual style enhancement)
-        profile.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(TEAL_LIGHT, 1),
-            new EmptyBorder(8, 8, 32, 8)
-        ));
-
-        sidebar.add(profile, BorderLayout.NORTH);
-
-        // Nav
-        JPanel nav = new JPanel();
-        nav.setOpaque(false);
-        nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
-        nav.setBorder(new EmptyBorder(16, 0, 16, 0));
-
-        // Navigation Links
-        NavButton dashboardBtn = new NavButton("🏠 Home", false);
-        dashboardBtn.addActionListener(e -> {
-            new AdminDashboard(adminName).setVisible(true);
-            AddUser.this.dispose();
-        });
-        nav.add(dashboardBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-        NavButton addUserBtn = new NavButton("👤 Add User", true);
-        addUserBtn.addActionListener(e -> {
-            new AddUser(adminName).setVisible(true);
-            AddUser.this.dispose();
-        });
-        nav.add(addUserBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-        NavButton manageCoursesBtn = new NavButton("📘 Manage Courses", false);
-        manageCoursesBtn.addActionListener(e -> {
-            new ManageCourses(adminName).setVisible(true);
-            AddUser.this.dispose();
-        });
-        nav.add(manageCoursesBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-        NavButton assignInstBtn = new NavButton("👨 Assign Instructor", false);
-        assignInstBtn.addActionListener(e -> {
-            new AssignInstructor(adminName).setVisible(true);
-            AddUser.this.dispose();
-        });
-        nav.add(assignInstBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-
-        // Separator
-        nav.add(new JSeparator() {{
-            setForeground(new Color(60, 120, 116));
-            setBackground(new Color(60, 120, 116));
-            setMaximumSize(new Dimension(240, 1));
-            setAlignmentX(Component.CENTER_ALIGNMENT);
-        }});
-        nav.add(Box.createVerticalStrut(40));
-        nav.add(new NavButton("  ⚙️  Settings", false));
-        nav.add(Box.createVerticalStrut(8));
-        nav.add(new NavButton("  🚪  Log Out", false)); // Used door emoji for log out
-
-        sidebar.add(nav, BorderLayout.CENTER);
-        root.add(sidebar, BorderLayout.WEST);
-
-        // --- Top banner ---
+        // Hero bar
         RoundedPanel hero = new RoundedPanel(24);
         hero.setBackground(TEAL_DARK);
         hero.setBorder(new EmptyBorder(24, 28, 24, 28));
         hero.setLayout(new BorderLayout());
 
-        JLabel h1 = new JLabel("👤 Add New User");
-        h1.setFont(FontKit.bold(28f));
+        JLabel h1 = new JLabel("Manage Users");
+        h1.setFont(FontKit.bold(24f));
         h1.setForeground(Color.WHITE);
         hero.add(h1, BorderLayout.WEST);
 
-        JLabel adminLabel = new JLabel("Logged in as " + adminName);
-        adminLabel.setFont(FontKit.regular(14f));
-        adminLabel.setForeground(new Color(200, 230, 225));
-        hero.add(adminLabel, BorderLayout.EAST);
+        JLabel right = new JLabel("Logged in as " + userDisplayName);
+        right.setFont(FontKit.regular(13f));
+        right.setForeground(new Color(200, 230, 225));
+        hero.add(right, BorderLayout.EAST);
 
-        root.add(hero, BorderLayout.NORTH);
+        main.add(hero, BorderLayout.NORTH);
 
-        if (Maintenance.isOn()) {
-            RoundedPanel banner = new RoundedPanel(12);
-            banner.setBackground(new Color(255, 235, 230)); // light red
-            banner.setBorder(new EmptyBorder(12, 18, 12, 18));
+        // Content: put your old AddUser form here
+        JPanel content = new JPanel();
+        content.setOpaque(false);
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBorder(new EmptyBorder(24, 8, 24, 8));
 
-            JLabel msg = new JLabel("⚠️  Maintenance Mode is ON – Changes are disabled");
-            msg.setFont(FontKit.semibold(14f));
-            msg.setForeground(new Color(180, 60, 50));
-            banner.add(msg);
+        // --- Example simple card placeholder ---
+        RoundedPanel card = new RoundedPanel(20);
+        card.setBackground(CARD);
+        card.setBorder(new EmptyBorder(20, 24, 20, 24));
+        card.setLayout(new BorderLayout());
 
-            root.add(banner, BorderLayout.NORTH);
-        }
+        JLabel label = new JLabel("User management UI goes here");
+        label.setFont(FontKit.regular(14f));
+        label.setForeground(TEXT_600);
+        card.add(label, BorderLayout.CENTER);
 
+        content.add(card);
+        content.add(Box.createVerticalStrut(16));
+        // ---------------------------------------
 
-        // Main container center area
-        JPanel mainArea = new JPanel(new BorderLayout());
-        mainArea.setOpaque(false);
+        JScrollPane sc = new JScrollPane(content);
+        sc.setBorder(null);
+        sc.getViewport().setBackground(BG);
+        sc.getVerticalScrollBar().setUnitIncrement(16);
 
-        // Section title
-        JLabel title = new JLabel("Select User Type to Add");
-        title.setFont(FontKit.semibold(24f));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBorder(new EmptyBorder(20, 0, 20, 0));
-        mainArea.add(title, BorderLayout.NORTH);
-
-        // Cards panel (3 cards)
-        JPanel cards = new JPanel(new GridLayout(1, 2, 20, 20));
-        cards.setOpaque(false);
-        cards.setBorder(new EmptyBorder(20, 40, 40, 40));
-
-        // --- STUDENT CARD ---
-        cards.add(actionCard("🎓 Add Student",
-                            "Create a new student account",
-                            () -> {
-                                new AddStudent(adminName).setVisible(true);
-                                AddUser.this.dispose();
-                            }));
-
-        // --- INSTRUCTOR CARD ---
-        cards.add(actionCard("👨 Add Instructor",
-                            "Add a faculty/instructor account",
-                            () -> {
-                                new AddInstructor(adminName).setVisible(true);
-                                AddUser.this.dispose();
-                            }));
-
-        mainArea.add(cards, BorderLayout.CENTER);
-
-        // finally add to frame
-        root.add(mainArea, BorderLayout.CENTER);
-    }
-
-    public static class RoundedComboBox<E> extends JComboBox<E> {
-        private final Color bg = new Color(0xD9, 0xD9, 0xD9);
-        private final Color text = new Color(24, 30, 37);
-        private final Color placeholderColor = new Color(140, 148, 160);
-        private String placeholder = "";
-
-        public RoundedComboBox() {
-            super();
-            setup();
-        }
-
-        public RoundedComboBox(E[] items) {
-            super(items);
-            setup();
-        }
-
-        private void setup() {
-            setOpaque(false);
-            setBorder(new EmptyBorder(12, 16, 12, 16));
-            setFont(FontKit.regular(16f));
-            setForeground(text);
-            setBackground(bg);
-
-            setUI(new BasicComboBoxUI() {
-                @Override protected JButton createArrowButton() {
-                    JButton arrow = new JButton("▼");
-                    arrow.setBorder(null);
-                    arrow.setFont(FontKit.regular(12f));
-                    arrow.setOpaque(false);
-                    arrow.setContentAreaFilled(false);
-                    arrow.setFocusPainted(false);
-                    arrow.setForeground(new Color(100, 116, 139));
-                    return arrow;
-                }
-
-                @Override public void paintCurrentValueBackground(Graphics g, Rectangle bounds, boolean hasFocus) {
-                    // no grey highlight
-                }
-            });
-
-            // remove default border
-            setBorder(new EmptyBorder(12, 16, 12, 16));
-        }
-
-        public void setPlaceholder(String text) {
-            this.placeholder = text;
-            repaint();
-        }
-
-        @Override protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            // Rounded background
-            g2.setColor(bg);
-            g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 16, 16));
-
-            g2.dispose();
-            super.paintComponent(g);
-
-            // Placeholder
-            if (getSelectedIndex() == -1 || getSelectedItem() == null || getSelectedItem().toString().trim().isEmpty()) {
-                Graphics2D g3 = (Graphics2D) g.create();
-                g3.setColor(placeholderColor);
-                g3.setFont(getFont());
-                Insets ins = getInsets();
-                g3.drawString(placeholder, ins.left, getHeight() / 2 + getFont().getSize() / 2 - 3);
-                g3.dispose();
-            }
-        }
-    }
-
-    // For manual test
-    public static void main(String[] args) {
-        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
-        FontKit.init();
-        SwingUtilities.invokeLater(() -> new AddUser("Admin 123").setVisible(true));
+        main.add(sc, BorderLayout.CENTER);
+        return main;
     }
 }
