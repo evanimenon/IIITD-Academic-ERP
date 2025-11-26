@@ -4,7 +4,6 @@ import erp.ui.auth.LoginPage;
 import erp.ui.common.FontKit;
 import erp.auth.AuthContext;
 import erp.auth.Role;
-import erp.db.DatabaseConnection;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -13,253 +12,352 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 
+/**
+ * Shared base frame for all Admin UIs.
+ * - Sidebar on the left
+ * - CardLayout contentPanel in the center
+ * - Pages: HOME, USERS, COURSES, MAINTENANCE
+ */
 public abstract class AdminFrameBase extends JFrame {
 
-    // Shared palette
-    protected static final Color TEAL_DARK  = new Color(39, 96, 92);
-    protected static final Color TEAL       = new Color(28, 122, 120);
+    // Palette
+    protected static final Color TEAL_DARK = new Color(39, 96, 92);
+    protected static final Color TEAL = new Color(28, 122, 120);
     protected static final Color TEAL_LIGHT = new Color(55, 115, 110);
-    protected static final Color BG         = new Color(246, 247, 248);
+    protected static final Color BG = new Color(246, 247, 248);
+
+    protected static final Color SIDEBAR_BG = new Color(20, 66, 61);
+    protected static final Color SIDEBAR_TEXT = new Color(226, 244, 241);
 
     public enum Page {
-        HOME, USERS, COURSES, ASSIGN, SETTINGS
+        HOME,
+        USERS,
+        COURSES,
+        ASSIGN,
+        MAINTENANCE
     }
-
-    // Persistent admin id across all admin frames (if you ever need it)
-    protected static String currentAdminId;
 
     protected final String adminId;
     protected final String userDisplayName;
-    protected final JPanel root = new JPanel(new BorderLayout());
-    protected JLabel metaLabel; // e.g., "System Administrator"
+    protected final Page activePage;
+
+    protected JLabel metaLabel;
+
+    protected final JPanel contentPanel = new JPanel();
+    protected final CardLayout cardLayout = new CardLayout();
+
+    private NavItem navHome;
+    private NavItem navUsers;
+    private NavItem navCourses;
+    private NavItem navMaintenance;
 
     protected AdminFrameBase(String adminId, String displayName, Page activePage) {
-        // Auth guard – only admins
-        Role actual = AuthContext.getRole();
-        if (actual != Role.ADMIN) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "You are not authorized to access the Admin area."
-            );
-            AuthContext.clear();
-            new LoginPage().setVisible(true);
+        this.adminId = adminId;
+        this.userDisplayName = (displayName == null || displayName.isBlank())
+                ? "Administrator"
+                : displayName;
+        this.activePage = (activePage == null) ? Page.HOME : activePage;
+
+        // --- auth guard ---
+        if (!AuthContext.isLoggedIn() || AuthContext.getRole() != Role.ADMIN) {
+            SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Your admin session has expired or is invalid. Please sign in again.",
+                        "Session expired",
+                        JOptionPane.WARNING_MESSAGE);
+                new LoginPage().setVisible(true);
+            });
             dispose();
-            throw new IllegalStateException("Unauthorized access to AdminFrameBase");
+            return;
         }
-
-        // Track current admin id
-        if (adminId != null && !adminId.isBlank()) {
-            currentAdminId = adminId;
-        }
-        this.adminId = currentAdminId;
-        this.userDisplayName = displayName;
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ignored) {}
-        FontKit.init();
-        DatabaseConnection.init();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle("IIITD ERP – Admin");
-        setSize(1200, 800);
-        setMinimumSize(new Dimension(1200, 800));
-        setLocationRelativeTo(null);
+        setMinimumSize(new Dimension(1100, 720));
         setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        setLocationRelativeTo(null);
 
+        buildFrameShell();
+    }
+
+    protected abstract JComponent buildMainContent();
+
+    private void buildFrameShell() {
+        JPanel root = new JPanel(new BorderLayout());
         root.setBackground(BG);
         setContentPane(root);
 
-        root.add(buildSidebar(activePage), BorderLayout.WEST);
-        root.add(buildBody(), BorderLayout.CENTER);
+        JPanel sidebar = buildSidebar();
+        root.add(sidebar, BorderLayout.WEST);
+
+        contentPanel.setLayout(cardLayout);
+        contentPanel.setOpaque(false);
+
+        // Wire subclass content to the right card
+        switch (activePage) {
+            case HOME -> {
+                contentPanel.add(buildMainContent(), "DASHBOARD");
+                contentPanel.add(buildPlaceholder("Manage Users will appear here."), "MANAGE_USERS");
+                contentPanel.add(buildPlaceholder("Manage Courses will appear here."), "MANAGE_COURSES");
+                contentPanel.add(buildPlaceholder("Maintenance will appear here."), "MAINTENANCE");
+            }
+            case USERS -> {
+                contentPanel.add(buildPlaceholder("Dashboard is not in this window."), "DASHBOARD");
+                contentPanel.add(buildMainContent(), "MANAGE_USERS");
+                contentPanel.add(buildPlaceholder("Manage Courses will appear here."), "MANAGE_COURSES");
+                contentPanel.add(buildPlaceholder("Maintenance will appear here."), "MAINTENANCE");
+            }
+            case COURSES -> {
+                contentPanel.add(buildPlaceholder("Dashboard is not in this window."), "DASHBOARD");
+                contentPanel.add(buildPlaceholder("Manage Users will appear here."), "MANAGE_USERS");
+                contentPanel.add(buildMainContent(), "MANAGE_COURSES");
+                contentPanel.add(buildPlaceholder("Maintenance will appear here."), "MAINTENANCE");
+            }
+            case ASSIGN -> {
+                contentPanel.add(buildPlaceholder("Dashboard is not in this window."), "DASHBOARD");
+                contentPanel.add(buildPlaceholder("Manage Users will appear here."), "MANAGE_USERS");
+                contentPanel.add(buildMainContent(), "MANAGE_COURSES"); // reuse courses card
+                contentPanel.add(buildPlaceholder("Maintenance will appear here."), "MAINTENANCE");
+            }
+            case MAINTENANCE -> {
+                contentPanel.add(buildPlaceholder("Dashboard is not in this window."), "DASHBOARD");
+                contentPanel.add(buildPlaceholder("Manage Users will appear here."), "MANAGE_USERS");
+                contentPanel.add(buildPlaceholder("Manage Courses will appear here."), "MANAGE_COURSES");
+                contentPanel.add(buildMainContent(), "MAINTENANCE");
+            }
+        }
+
+        root.add(contentPanel, BorderLayout.CENTER);
+        showPage(activePage);
     }
 
-    // Sidebar with nav + profile
-    private JComponent buildSidebar(Page active) {
-        JPanel sidebar = new JPanel(new BorderLayout());
-        sidebar.setBackground(TEAL_DARK);
-        sidebar.setPreferredSize(new Dimension(260, 0));
-        sidebar.setBorder(new EmptyBorder(24, 16, 24, 16));
+    private JComponent buildPlaceholder(String text) {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setOpaque(false);
+        JLabel label = new JLabel("<html><div style='text-align:center;'>" + text + "</div></html>",
+                SwingConstants.CENTER);
+        label.setFont(FontKit.regular(15f));
+        label.setForeground(new Color(148, 163, 184));
+        p.add(label, BorderLayout.CENTER);
+        return p;
+    }
 
-        // profile
+    private JPanel buildSidebar() {
+        JPanel side = new JPanel(new BorderLayout());
+        side.setBackground(SIDEBAR_BG);
+        side.setPreferredSize(new Dimension(260, 0));
+
+        // --- profile ---
         JPanel profile = new JPanel();
         profile.setOpaque(false);
         profile.setLayout(new BoxLayout(profile, BoxLayout.Y_AXIS));
-        profile.setBorder(new EmptyBorder(8, 8, 32, 8));
+        profile.setBorder(new EmptyBorder(24, 24, 16, 24));
 
-        JPanel avatarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel avatarPanel = new JPanel(new GridBagLayout());
         avatarPanel.setOpaque(false);
-        JLabel avatar = new JLabel() {
+        JComponent avatar = new JComponent() {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(230, 233, 236));
-                g2.fillOval(0, 0, getWidth(), getHeight());
+                int size = Math.min(getWidth(), getHeight());
+                Shape circle = new RoundRectangle2D.Double(0, 0, size, size, size, size);
+                g2.setClip(circle);
+                g2.setColor(new Color(15, 118, 110));
+                g2.fillRect(0, 0, size, size);
+                g2.setClip(null);
+                g2.setColor(new Color(208, 250, 242));
+                g2.setStroke(new BasicStroke(2f));
+                g2.draw(circle);
                 g2.dispose();
             }
 
             @Override
             public Dimension getPreferredSize() {
-                return new Dimension(96, 96);
+                return new Dimension(72, 72);
             }
         };
         avatarPanel.add(avatar);
         profile.add(avatarPanel);
-        profile.add(Box.createVerticalStrut(16));
+        profile.add(Box.createVerticalStrut(12));
 
         JLabel name = new JLabel(userDisplayName);
         name.setAlignmentX(Component.CENTER_ALIGNMENT);
+        name.setFont(FontKit.semibold(16f));
         name.setForeground(Color.WHITE);
-        name.setFont(FontKit.bold(18f));
-        profile.add(name);
 
-        metaLabel = new JLabel("System Administrator");
+        metaLabel = new JLabel("Administrator");
         metaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        metaLabel.setForeground(new Color(210, 225, 221));
-        metaLabel.setFont(FontKit.regular(14f));
-        profile.add(Box.createVerticalStrut(6));
+        metaLabel.setFont(FontKit.regular(13f));
+        metaLabel.setForeground(new Color(186, 230, 213));
+
+        profile.add(name);
+        profile.add(Box.createVerticalStrut(4));
         profile.add(metaLabel);
 
-        profile.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(TEAL_LIGHT, 1),
-                new EmptyBorder(12, 10, 28, 10)
-        ));
-        sidebar.add(profile, BorderLayout.NORTH);
+        side.add(profile, BorderLayout.NORTH);
 
-        // nav buttons with hover pill style (same as student / instructor)
+        // --- nav ---
         JPanel nav = new JPanel();
         nav.setOpaque(false);
         nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
-        nav.setBorder(new EmptyBorder(16, 0, 16, 0));
+        nav.setBorder(new EmptyBorder(12, 16, 12, 16));
 
-        // HOME
-        NavButton homeBtn = new NavButton("Dashboard", active == Page.HOME);
-        homeBtn.addActionListener(e -> {
-            if (active != Page.HOME) {
-                new AdminDashboard(adminId, userDisplayName).setVisible(true);
-                dispose();
-            }
-        });
-        nav.add(homeBtn);
-        nav.add(Box.createVerticalStrut(8));
+        navHome = new NavItem("Dashboard", Page.HOME);
+        navUsers = new NavItem("Manage Users", Page.USERS);
+        navCourses = new NavItem("Manage Courses", Page.COURSES);
+        navMaintenance = new NavItem("Maintenance & Backup", Page.MAINTENANCE);
 
-        // USERS
-        NavButton usersBtn = new NavButton("Manage Users", active == Page.USERS);
-        usersBtn.addActionListener(e -> {
-            if (active != Page.USERS) {
-                new AddUser(adminId, userDisplayName).setVisible(true);
-                dispose();
-            }
-        });
-        nav.add(usersBtn);
-        nav.add(Box.createVerticalStrut(8));
+        nav.add(navHome);
+        nav.add(Box.createVerticalStrut(4));
+        nav.add(navUsers);
+        nav.add(Box.createVerticalStrut(4));
+        nav.add(navCourses);
+        nav.add(Box.createVerticalStrut(4));
+        nav.add(navMaintenance);
+        nav.add(Box.createVerticalGlue());
 
-        // COURSES
-        NavButton coursesBtn = new NavButton("Manage Courses", active == Page.COURSES);
-        coursesBtn.addActionListener(e -> {
-            if (active != Page.COURSES) {
-                new ManageCourses(adminId, userDisplayName).setVisible(true);
-                dispose();
-            }
-        });
-        nav.add(coursesBtn);
-        nav.add(Box.createVerticalStrut(8));
+        side.add(nav, BorderLayout.CENTER);
 
-        // ASSIGN INSTRUCTOR
-        NavButton assignBtn = new NavButton("Assign Instructors", active == Page.ASSIGN);
-        assignBtn.addActionListener(e -> {
-            if (active != Page.ASSIGN) {
-                new AssignInstructor(adminId, userDisplayName).setVisible(true);
-                dispose();
-            }
-        });
-        nav.add(assignBtn);
-        nav.add(Box.createVerticalStrut(40));
+        // --- bottom: logout ---
+        JPanel bottom = new JPanel(new BorderLayout());
+        bottom.setOpaque(false);
+        bottom.setBorder(new EmptyBorder(12, 16, 20, 16));
 
-        JSeparator sep = new JSeparator();
-        sep.setForeground(new Color(60, 120, 116));
-        sep.setMaximumSize(new Dimension(240, 1));
-        nav.add(sep);
-        nav.add(Box.createVerticalStrut(40));
-
-        NavButton settingsBtn = new NavButton("Settings", active == Page.SETTINGS);
-        // settingsBtn.addActionListener(...) // later
-        nav.add(settingsBtn);
-        nav.add(Box.createVerticalStrut(8));
-
-        NavButton logout = new NavButton("Log Out", false);
+        JButton logout = new JButton("Sign out");
+        logout.setFocusPainted(false);
+        logout.setForeground(new Color(248, 250, 252));
+        logout.setBackground(new Color(15, 23, 42));
+        logout.setFont(FontKit.semibold(13f));
+        logout.setBorder(new EmptyBorder(8, 14, 8, 14));
+        logout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         logout.addActionListener(e -> {
             AuthContext.clear();
-            new LoginPage().setVisible(true);
+            SwingUtilities.invokeLater(() -> new LoginPage().setVisible(true));
             dispose();
         });
-        nav.add(logout);
 
-        sidebar.add(nav, BorderLayout.CENTER);
-        return sidebar;
+        bottom.add(logout, BorderLayout.CENTER);
+        side.add(bottom, BorderLayout.SOUTH);
+
+        setNavSelected(activePage);
+        return side;
     }
 
-    private JComponent buildBody() {
-        JPanel body = new JPanel(new BorderLayout());
-        body.setOpaque(false);
-        body.setBackground(BG);
-        body.setBorder(new EmptyBorder(24, 24, 24, 24));
-        body.add(buildMainContent(), BorderLayout.CENTER);
-        return body;
+    private String pageToCard(Page page) {
+        return switch (page) {
+            case HOME -> "DASHBOARD";
+            case USERS -> "MANAGE_USERS";
+            case COURSES,
+                    ASSIGN ->
+                "MANAGE_COURSES";
+            case MAINTENANCE -> "MAINTENANCE";
+        };
     }
 
-    protected abstract JComponent buildMainContent();
+    protected void showPage(Page page) {
+        cardLayout.show(contentPanel, pageToCard(page));
+        setNavSelected(page);
+    }
 
-    // --- Hover nav button (same behavior as StudentFrameBase.NavButton) ---
-    public static class NavButton extends JButton {
-        private final boolean selected;
-        private boolean hover;
+    private void setNavSelected(Page page) {
+        if (navHome != null)
+            navHome.setSelected(page == Page.HOME);
+        if (navUsers != null)
+            navUsers.setSelected(page == Page.USERS);
+        if (navCourses != null)
+            navCourses.setSelected(page == Page.COURSES || page == Page.ASSIGN);
+        if (navMaintenance != null)
+            navMaintenance.setSelected(page == Page.MAINTENANCE);
+    }
 
-        public NavButton(String text, boolean selected) {
-            super(text);
-            this.selected = selected;
-            setHorizontalAlignment(LEFT);
-            setFocusPainted(false);
-            setBorderPainted(false);
-            setContentAreaFilled(false);
+    // --- inner nav item class ---
+    private class NavItem extends JPanel {
+        private boolean selected = false;
+        private final Page page;
+
+        NavItem(String text, Page page) {
+            this.page = page;
             setOpaque(false);
-            setForeground(Color.WHITE);
-            setFont(FontKit.semibold(15f));
-            setBorder(new EmptyBorder(10, 14, 10, 14));
+            setLayout(new BorderLayout());
+            setBorder(new EmptyBorder(8, 10, 8, 10));
+
+            JLabel label = new JLabel(text);
+            label.setFont(FontKit.semibold(13f));
+            label.setForeground(SIDEBAR_TEXT);
+            add(label, BorderLayout.WEST);
+
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
 
             addMouseListener(new MouseAdapter() {
                 @Override
+                public void mouseClicked(MouseEvent e) {
+                    // Behave like StudentFrameBase: open the right frame,
+                    // so sidebar and dashboard tiles are consistent.
+
+                    switch (page) {
+                        case HOME -> {
+                            new AdminDashboard(adminId, userDisplayName).setVisible(true);
+                            AdminFrameBase.this.dispose();
+                        }
+                        case USERS -> {
+                            new AddUser(adminId, userDisplayName).setVisible(true);
+                            AdminFrameBase.this.dispose();
+                        }
+                        case COURSES, ASSIGN -> {
+                            new ManageCourses(adminId, userDisplayName).setVisible(true);
+                            AdminFrameBase.this.dispose();
+                        }
+                        case MAINTENANCE -> {
+                            JOptionPane.showMessageDialog(
+                                    AdminFrameBase.this,
+                                    "Maintenance & backup tools will be implemented in the next phase.",
+                                    "Maintenance",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    }
+                }
+
+                @Override
                 public void mouseEntered(MouseEvent e) {
-                    hover = true;
-                    repaint();
+                    if (!selected) {
+                        setBackground(new Color(15, 118, 110, 80));
+                        setOpaque(true);
+                        repaint();
+                    }
                 }
 
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    hover = false;
-                    repaint();
+                    if (!selected) {
+                        setOpaque(false);
+                        repaint();
+                    }
                 }
             });
         }
 
+        void setSelected(boolean selected) {
+            this.selected = selected;
+            if (selected) {
+                setOpaque(true);
+                setBackground(new Color(15, 118, 110, 150));
+            } else {
+                setOpaque(false);
+            }
+            repaint();
+        }
+
         @Override
         protected void paintComponent(Graphics g) {
+            if (!isOpaque()) {
+                super.paintComponent(g);
+                return;
+            }
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            if (hover || selected) {
-                // pill background on hover/selected
-                g2.setColor(new Color(255, 255, 255, selected ? 70 : 40));
-                g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 16, 16));
-
-                // subtle left accent bar
-                g2.setColor(new Color(204, 252, 246, 190));
-                g2.fillRoundRect(4, 6, 4, getHeight() - 12, 8, 8);
-            }
-
+            g2.setColor(getBackground());
+            g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 16, 16));
             g2.dispose();
             super.paintComponent(g);
         }

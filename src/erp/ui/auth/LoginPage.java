@@ -144,13 +144,13 @@ public class LoginPage extends JFrame {
 
                 try {
                     boolean locked = isLocked(user);
-                    if(locked){
+                    if (locked) {
                         SwingUtilities.invokeLater(() -> {
                             showError("Account is locked. Try again later.");
                         });
                         return;
                     }
-                
+
                     var session = new AuthService().login(user, pwStr);
                     resetWrongAttempts(user);
 
@@ -202,9 +202,12 @@ public class LoginPage extends JFrame {
                                 dispose();
                             }
                             case ADMIN -> {
-                                new AdminDashboard(display).setVisible(true);
+                                String adminId = String.valueOf(session.userId());
+                                String displayName = session.username();
+                                new AdminDashboard(adminId, displayName).setVisible(true);
                                 dispose();
                             }
+
                             default -> {
                                 // Unknown role — clear session and show error
                                 AuthContext.clear();
@@ -213,25 +216,22 @@ public class LoginPage extends JFrame {
                         }
                     });
 
-                } 
-                catch (AuthService.AuthException ex) {
+                } catch (AuthService.AuthException ex) {
                     SwingUtilities.invokeLater(() -> showError(ex.getMessage()));
                     updateWrongAttempts(user);
                     int wrong = getWrongAttempts(user);
-                    if(wrong>=5){
+                    if (wrong >= 5) {
                         lockAcc(user);
                     }
-                } 
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                     SwingUtilities.invokeLater(() -> showError("Incorrect username or password."));
                     updateWrongAttempts(user);
                     int wrong = getWrongAttempts(user);
-                    if(wrong>=5){
+                    if (wrong >= 5) {
                         lockAcc(user);
                     }
-                } 
-                finally {
+                } finally {
                     SwingUtilities.invokeLater(() -> {
                         signIn.setEnabled(true);
                         setCursor(Cursor.getDefaultCursor());
@@ -244,11 +244,10 @@ public class LoginPage extends JFrame {
     private void updateWrongAttempts(String usr) {
         String sql = "UPDATE users_auth SET failed_attempts = failed_attempts + 1 WHERE username = ?";
         try (Connection conn = DatabaseConnection.auth().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, usr);
             stmt.executeUpdate();
-        } 
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -256,14 +255,13 @@ public class LoginPage extends JFrame {
     private int getWrongAttempts(String usr) {
         String sql = "SELECT failed_attempts FROM users_auth WHERE username = ?";
         try (Connection conn = DatabaseConnection.auth().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, usr);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return rs.getInt("failed_attempts");
             }
-        } 
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
@@ -272,20 +270,19 @@ public class LoginPage extends JFrame {
     private void lockAcc(String usr) {
         String sql = "UPDATE users_auth SET locked_until = NOW() + INTERVAL 1 MINUTE WHERE username = ?";
         try (Connection conn = DatabaseConnection.auth().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, usr);
             stmt.executeUpdate();
             SwingUtilities.invokeLater(() -> showError("Account locked for 1 minute due to too many failed attempts."));
-        } 
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private boolean isLocked(String user){
+    private boolean isLocked(String user) {
         String checkLockSQL = "SELECT NOW(), locked_until FROM users_auth WHERE username = ?";
         try (Connection conn = DatabaseConnection.auth().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(checkLockSQL)) {
+                PreparedStatement stmt = conn.prepareStatement(checkLockSQL)) {
             stmt.setString(1, user);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -293,14 +290,12 @@ public class LoginPage extends JFrame {
                 Timestamp lockedUntil = rs.getTimestamp("locked_until");
                 if (lockedUntil != null && lockedUntil.after(now)) {
                     return true;
-                }
-                else{
+                } else {
                     return false;
                 }
             }
             return false;
-        } 
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
             return false;
         }
@@ -309,14 +304,13 @@ public class LoginPage extends JFrame {
     private void resetWrongAttempts(String usr) {
         String sql = "UPDATE users_auth SET failed_attempts = 0, locked_until = NULL WHERE username = ?";
         try (Connection conn = DatabaseConnection.auth().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, usr);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
 
     private void showError(String msg) {
         if (msg == null || msg.isBlank()) {
@@ -425,18 +419,17 @@ public class LoginPage extends JFrame {
         boolean first = false;
         String sql = "SELECT last_login FROM users_auth WHERE username = ?";
         try (Connection conn = DatabaseConnection.auth().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 String lastLogin = rs.getString("last_login");
                 // first login if value is null OR 0000-00-00
-                if(lastLogin == null || lastLogin.toString().startsWith("0000-00-00")){
+                if (lastLogin == null || lastLogin.toString().startsWith("0000-00-00")) {
                     first = true;
                 }
             }
-        } 
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return first;
