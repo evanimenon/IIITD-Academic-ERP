@@ -31,8 +31,12 @@ public class LoginPage extends JFrame {
     public LoginPage() {
         setTitle("IIITD ERP – Sign in");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // base/min size for smaller screens
         setMinimumSize(new Dimension(1100, 720));
-        setLocationRelativeTo(null);
+        setSize(1200, 800);
+
+        // start full screen (maximized), same as student frames
+        setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
         BackgroundPanel bg = new BackgroundPanel("/resources/bg_login.png");
         bg.setLayout(new GridBagLayout());
