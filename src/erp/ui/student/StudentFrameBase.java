@@ -8,6 +8,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public abstract class StudentFrameBase extends JFrame {
 
@@ -31,7 +33,7 @@ public abstract class StudentFrameBase extends JFrame {
 
     protected StudentFrameBase(String studentId, String userDisplayName, Page activePage) {
 
-        // Update global id if non-null provided
+        // Update global id if a non-null one is passed
         if (studentId != null && !studentId.isBlank()) {
             currentStudentId = studentId;
         }
@@ -40,19 +42,24 @@ public abstract class StudentFrameBase extends JFrame {
         this.studentId = currentStudentId;
         this.userDisplayName = userDisplayName;
 
-        System.out.println("[DEBUG] StudentFrameBase: using studentId = '" + this.studentId + "'");
+        System.out.println("[DEBUG] StudentFrameBase: using studentId = '" + this.studentId +
+                "', page = " + activePage);
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         FontKit.init();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("IIITD ERP");
+
+        // Base size (for smaller screens), but always start maximized
         setSize(1200, 800);
         setMinimumSize(new Dimension(1200, 800));
         setLocationRelativeTo(null);
+        setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
         root.setBackground(BG);
         setContentPane(root);
@@ -61,10 +68,11 @@ public abstract class StudentFrameBase extends JFrame {
         root.add(buildBody(), BorderLayout.CENTER);
     }
 
+    // Sidebar with nav + profile
     private JComponent buildSidebar(Page active) {
         JPanel sidebar = new JPanel(new BorderLayout());
         sidebar.setBackground(TEAL_DARK);
-        sidebar.setPreferredSize(new Dimension(280, 0));
+        sidebar.setPreferredSize(new Dimension(260, 0));
         sidebar.setBorder(new EmptyBorder(24, 16, 24, 16));
 
         // profile
@@ -76,14 +84,19 @@ public abstract class StudentFrameBase extends JFrame {
         JPanel avatarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         avatarPanel.setOpaque(false);
         JLabel avatar = new JLabel() {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(new Color(230, 233, 236));
                 g2.fillOval(0, 0, getWidth(), getHeight());
                 g2.dispose();
             }
-            @Override public Dimension getPreferredSize() { return new Dimension(100, 100); }
+
+            @Override
+            public Dimension getPreferredSize() {
+                return new Dimension(100, 100);
+            }
         };
         avatarPanel.add(avatar);
         profile.add(avatarPanel);
@@ -107,16 +120,17 @@ public abstract class StudentFrameBase extends JFrame {
 
         sidebar.add(profile, BorderLayout.NORTH);
 
-        // nav
+        // nav buttons
         JPanel nav = new JPanel();
         nav.setOpaque(false);
         nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
         nav.setBorder(new EmptyBorder(16, 0, 16, 0));
 
-        NavButton home = new NavButton("  🏠  Home", active == Page.HOME);
+        // HOME
+        NavButton home = new NavButton("Home", active == Page.HOME);
         home.addActionListener(e -> {
             if (active != Page.HOME) {
-                System.out.println("[DEBUG] NAV → Dashboard (studentId=" + studentId + ")");
+                System.out.println("[DEBUG] NAV → Home (studentId=" + studentId + ")");
                 new StudentDashboard(studentId, userDisplayName).setVisible(true);
                 dispose();
             }
@@ -124,29 +138,40 @@ public abstract class StudentFrameBase extends JFrame {
         nav.add(home);
         nav.add(Box.createVerticalStrut(8));
 
-        NavButton catalog = new NavButton("  📚  Course Catalogue", active == Page.CATALOG);
-        catalog.addActionListener(e -> {
+        /*
+         * -------------------------
+         * REGISTRATION → CourseCatalog
+         * -------------------------
+         */
+        NavButton registration = new NavButton("Registration", active == Page.CATALOG);
+        registration.addActionListener(e -> {
             if (active != Page.CATALOG) {
-                System.out.println("[DEBUG] NAV → Catalog (studentId=" + studentId + ")");
+                System.out.println("[DEBUG] NAV → Registration/CourseCatalog (studentId=" + studentId + ")");
                 new CourseCatalog(studentId, userDisplayName).setVisible(true);
                 dispose();
             }
         });
-        nav.add(catalog);
+        nav.add(registration);
         nav.add(Box.createVerticalStrut(8));
 
-        NavButton regs = new NavButton("  📜  My Registrations", active == Page.REGISTRATIONS);
-        regs.addActionListener(e -> {
+        /*
+         * -------------------------
+         * MY COURSES → MyRegistrationsFrame
+         * -------------------------
+         */
+        NavButton myCourses = new NavButton("My Courses", active == Page.REGISTRATIONS);
+        myCourses.addActionListener(e -> {
             if (active != Page.REGISTRATIONS) {
-                System.out.println("[DEBUG] NAV → Registrations (studentId=" + studentId + ")");
+                System.out.println("[DEBUG] NAV → My Courses (studentId=" + studentId + ")");
                 new MyRegistrationsFrame(studentId, userDisplayName).setVisible(true);
                 dispose();
             }
         });
-        nav.add(regs);
+        nav.add(myCourses);
         nav.add(Box.createVerticalStrut(8));
 
-        NavButton tt = new NavButton("  🗺️  Time Table", active == Page.TIMETABLE);
+        // TIME TABLE
+        NavButton tt = new NavButton("Time Table", active == Page.TIMETABLE);
         tt.addActionListener(e -> {
             if (active != Page.TIMETABLE) {
                 System.out.println("[DEBUG] NAV → Timetable (studentId=" + studentId + ")");
@@ -163,8 +188,9 @@ public abstract class StudentFrameBase extends JFrame {
         nav.add(sep);
         nav.add(Box.createVerticalStrut(40));
 
-        NavButton logout = new NavButton("  🚪  Log Out", false);
+        NavButton logout = new NavButton("Log Out", false);
         logout.addActionListener(e -> {
+            System.out.println("[DEBUG] NAV → Logout");
             currentStudentId = null;
             new LoginPage().setVisible(true);
             dispose();
@@ -172,6 +198,7 @@ public abstract class StudentFrameBase extends JFrame {
         nav.add(logout);
 
         sidebar.add(nav, BorderLayout.CENTER);
+
         return sidebar;
     }
 
@@ -186,8 +213,10 @@ public abstract class StudentFrameBase extends JFrame {
 
     protected abstract JComponent buildMainContent();
 
+    // Shared nav button style
     public static class NavButton extends JButton {
         private final boolean selected;
+        private boolean hover;
 
         public NavButton(String text, boolean selected) {
             super(text);
@@ -198,18 +227,41 @@ public abstract class StudentFrameBase extends JFrame {
             setContentAreaFilled(false);
             setOpaque(false);
             setForeground(Color.WHITE);
-            setFont(FontKit.semibold(16f));
+            setFont(FontKit.semibold(15f));
             setBorder(new EmptyBorder(10, 14, 10, 14));
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
+
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    hover = true;
+                    repaint();
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    hover = false;
+                    repaint();
+                }
+            });
         }
 
-        @Override protected void paintComponent(Graphics g) {
+        @Override
+        protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            if (getModel().isRollover() || selected) {
-                g2.setColor(new Color(255, 255, 255, selected ? 60 : 30));
-                g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 14, 14));
+
+            if (hover || selected) {
+                // pill background on hover/selected
+                g2.setColor(new Color(255, 255, 255, selected ? 70 : 40));
+                g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 16, 16));
+
+                // subtle left accent bar
+                g2.setColor(new Color(204, 252, 246, 190));
+                g2.fillRoundRect(4, 6, 4, getHeight() - 12, 8, 8);
             }
+
             g2.dispose();
             super.paintComponent(g);
         }
