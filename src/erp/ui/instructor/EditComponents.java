@@ -43,7 +43,6 @@ public class EditComponents extends InstructorFrameBase {
     public EditComponents(String instrID, int sectionID, String displayName) {
         super(instrID, displayName, Page.COMPONENTS);
         this.sectionID = sectionID;
-        System.out.println("[DEBUG] Stored sectionID = " + this.sectionID);
         JComponent mainContent = buildMainContent();
         setContentPane(mainContent);
         revalidate();

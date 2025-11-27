@@ -27,10 +27,11 @@ import com.lowagie.text.pdf.PdfWriter;
 
 public class MyRegistrationsFrame extends StudentFrameBase {
 
-    private JPanel listPanel; 
+    private JPanel listPanel;
+
     public MyRegistrationsFrame(String studentId, String userDisplayName) {
         super(studentId, userDisplayName, Page.REGISTRATIONS);
-        setTitle("IIITD ERP – My Registrations");
+        setTitle("IIITD ERP – My Courses");
     }
 
     @Override
@@ -40,7 +41,7 @@ public class MyRegistrationsFrame extends StudentFrameBase {
         main.setBorder(new EmptyBorder(8, 8, 8, 8));
 
         // ---- Top bar: Title + Transcript button ----
-        JLabel title = new JLabel("My Registrations");
+        JLabel title = new JLabel("My Courses");
         title.setFont(FontKit.bold(22f));
         title.setForeground(new Color(24, 30, 37));
 
@@ -75,7 +76,6 @@ public class MyRegistrationsFrame extends StudentFrameBase {
     }
 
     private void loadRegistrations() {
-        System.out.println("[DEBUG] Student ID in MyRegistrationsFrame = '" + this.studentId + "'");
 
         listPanel.removeAll();
 
@@ -105,7 +105,7 @@ public class MyRegistrationsFrame extends StudentFrameBase {
         int count = 0;
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, this.studentId);
 
@@ -174,13 +174,77 @@ public class MyRegistrationsFrame extends StudentFrameBase {
      */
     private static class ComponentRow {
         final String name;
-        final Double score; // may be null
+        final Double score;  // may be null
         final Double weight; // may be null
 
         ComponentRow(String name, Double score, Double weight) {
             this.name = name;
             this.score = score;
             this.weight = weight;
+        }
+    }
+
+    /**
+     * Small progress-bar cell for the component table.
+     * Uses score/weight to compute a percentage and color (red / yellow / green).
+     */
+    private static class ProgressBarCell extends JComponent {
+        private final Double score;
+        private final Double weight;
+
+        ProgressBarCell(Double score, Double weight) {
+            this.score = score;
+            this.weight = weight;
+            setPreferredSize(new Dimension(120, 14));
+            setMinimumSize(new Dimension(80, 14));
+            setOpaque(false);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int w = getWidth();
+            int h = getHeight();
+            int trackH = Math.max(6, h - 4);
+            int y = (h - trackH) / 2;
+            int arc = trackH;
+
+            // track
+            g2.setColor(new Color(229, 231, 235)); // light grey
+            g2.fillRoundRect(0, y, w, trackH, arc, arc);
+
+            double pct = 0.0;
+            if (score != null && weight != null && weight > 0) {
+                pct = Math.max(0.0, Math.min(1.0, score / weight));
+            } else {
+                // no data → leave empty
+                g2.dispose();
+                return;
+            }
+
+            int filled = (int) Math.round(w * pct);
+            if (filled <= 0) {
+                g2.dispose();
+                return;
+            }
+
+            // color: 0–40% red, 40–70% yellow, 70–100% green
+            Color fill;
+            if (pct < 0.4) {
+                fill = new Color(239, 68, 68);   // red
+            } else if (pct < 0.7) {
+                fill = new Color(234, 179, 8);  // yellow
+            } else {
+                fill = new Color(34, 197, 94);  // green
+            }
+
+            g2.setColor(fill);
+            g2.fillRoundRect(0, y, filled, trackH, arc, arc);
+
+            g2.dispose();
         }
     }
 
@@ -194,10 +258,10 @@ public class MyRegistrationsFrame extends StudentFrameBase {
         final String sql = "SELECT sc.component_name, sc.weight, g.score " +
                 "FROM   erp_db.section_components sc " +
                 "LEFT JOIN erp_db.grades g " +
-                "       ON g.component_id = sc.id " + // << key fix
+                "       ON g.component_id = sc.id " +
                 "      AND g.enrollment_id = ? " +
                 "WHERE  sc.section_id = ? " +
-                "ORDER BY sc.id"; // << use id, not component_id
+                "ORDER BY sc.id";
 
         List<ComponentRow> rows = new ArrayList<>();
 
@@ -205,8 +269,6 @@ public class MyRegistrationsFrame extends StudentFrameBase {
             ps.setInt(1, enrollmentId);
             ps.setInt(2, sectionId);
 
-            System.out.println("[DEBUG] fetchComponentRows enrollment=" +
-                    enrollmentId + " section=" + sectionId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -233,6 +295,7 @@ public class MyRegistrationsFrame extends StudentFrameBase {
 
     /**
      * Builds a single “card” for a registered course, with inline component table.
+     * Functionality is unchanged; only layout/styling is updated.
      */
     private JPanel createCourseCard(
             int enrollmentId,
@@ -248,15 +311,20 @@ public class MyRegistrationsFrame extends StudentFrameBase {
             String finalGrade,
             String status,
             List<ComponentRow> components) {
-        RoundedPanel card = new RoundedPanel(18);
-        card.setLayout(new BorderLayout(12, 8));
-        card.setBackground(Color.WHITE);
-        card.setBorder(new EmptyBorder(16, 18, 16, 18));
 
-        // ==== LEFT: course info (unchanged) ====
-        JPanel left = new JPanel();
-        left.setOpaque(false);
-        left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
+        RoundedPanel card = new RoundedPanel(18);
+        card.setLayout(new BorderLayout(12, 10));
+        card.setBackground(Color.WHITE);
+        card.setBorder(new EmptyBorder(14, 18, 14, 18));
+
+        // ==== TOP AREA: course + section info + grade badge ====
+        JPanel top = new JPanel(new BorderLayout());
+        top.setOpaque(false);
+
+        // Left block: course, section, term
+        JPanel infoLeft = new JPanel();
+        infoLeft.setOpaque(false);
+        infoLeft.setLayout(new BoxLayout(infoLeft, BoxLayout.Y_AXIS));
 
         JLabel titleLbl = new JLabel(code + " – " + title);
         titleLbl.setFont(FontKit.semibold(16f));
@@ -264,40 +332,40 @@ public class MyRegistrationsFrame extends StudentFrameBase {
 
         String metaLine = "Course ID " + courseId + " • " + credits + " credits";
         JLabel meta = new JLabel(metaLine);
-        meta.setFont(FontKit.regular(13f));
+        meta.setFont(FontKit.regular(12f));
         meta.setForeground(new Color(100, 116, 139));
 
         String instructorLine = (instructor == null || instructor.isBlank())
                 ? "Instructor: TBA"
                 : "Instructor: " + instructor;
         JLabel instr = new JLabel(instructorLine);
-        instr.setFont(FontKit.regular(13f));
+        instr.setFont(FontKit.regular(12f));
         instr.setForeground(new Color(100, 116, 139));
 
         String scheduleLine = (dayTime == null || dayTime.isBlank() ? "Time TBA" : dayTime)
                 + (room == null || room.isBlank() ? "" : " • Room " + room);
         JLabel schedule = new JLabel(scheduleLine);
-        schedule.setFont(FontKit.regular(13f));
+        schedule.setFont(FontKit.regular(12f));
         schedule.setForeground(new Color(100, 116, 139));
 
         String termLine = semester + " " + year;
         JLabel term = new JLabel(termLine);
-        term.setFont(FontKit.regular(13f));
+        term.setFont(FontKit.regular(12f));
         term.setForeground(new Color(148, 163, 184));
 
-        left.add(titleLbl);
-        left.add(Box.createVerticalStrut(4));
-        left.add(meta);
-        left.add(Box.createVerticalStrut(2));
-        left.add(instr);
-        left.add(Box.createVerticalStrut(2));
-        left.add(schedule);
-        left.add(Box.createVerticalStrut(2));
-        left.add(term);
+        infoLeft.add(titleLbl);
+        infoLeft.add(Box.createVerticalStrut(2));
+        infoLeft.add(meta);
+        infoLeft.add(Box.createVerticalStrut(2));
+        infoLeft.add(instr);
+        infoLeft.add(Box.createVerticalStrut(2));
+        infoLeft.add(schedule);
+        infoLeft.add(Box.createVerticalStrut(2));
+        infoLeft.add(term);
 
-        card.add(left, BorderLayout.CENTER);
+        top.add(infoLeft, BorderLayout.CENTER);
 
-        // ==== RIGHT: final grade badge (unchanged) ====
+        // Right: final grade badge
         JPanel right = new JPanel();
         right.setOpaque(false);
         right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
@@ -313,76 +381,102 @@ public class MyRegistrationsFrame extends StudentFrameBase {
             gradeBadge.setFont(FontKit.regular(13f));
             gradeBadge.setForeground(new Color(148, 163, 184));
         }
-        gradeBadge.setBorder(new EmptyBorder(4, 8, 4, 8));
+        gradeBadge.setBorder(new EmptyBorder(4, 10, 4, 10));
 
         right.add(Box.createVerticalStrut(4));
         right.add(gradeBadge);
         right.add(Box.createVerticalGlue());
 
-        card.add(right, BorderLayout.EAST);
+        top.add(right, BorderLayout.EAST);
 
-        // ==== BOTTOM: component breakdown (new styling) ====
+        card.add(top, BorderLayout.NORTH);
+
+        // ==== BOTTOM: component breakdown styled like a compact table ====
         if (components != null && !components.isEmpty()) {
 
-            // Wrapper so the table sits more towards the middle
             JPanel compWrapper = new JPanel(new BorderLayout());
             compWrapper.setOpaque(false);
-            compWrapper.setBorder(new EmptyBorder(16, 80, 4, 80)); // left/right padding pushes it inward
+            compWrapper.setBorder(new EmptyBorder(10, 4, 4, 4));
 
-            // Light rounded panel to frame the mini table
             RoundedPanel tablePanel = new RoundedPanel(12);
             tablePanel.setOpaque(true);
             tablePanel.setBackground(new Color(248, 250, 252)); // light grey
             tablePanel.setLayout(new GridBagLayout());
-            tablePanel.setBorder(new EmptyBorder(10, 16, 10, 16));
+            tablePanel.setBorder(new EmptyBorder(8, 12, 8, 12));
 
             GridBagConstraints gc = new GridBagConstraints();
             gc.insets = new Insets(4, 8, 4, 8);
-            gc.anchor = GridBagConstraints.CENTER;
             gc.fill = GridBagConstraints.HORIZONTAL;
-            gc.weightx = 1.0;
+            gc.anchor = GridBagConstraints.CENTER;
 
-            // Header row
-            gc.gridy = 0;
+            int row = 0;
+
+            // Header row: Component | Score / Weight | Progress
+            gc.gridy = row;
+
             gc.gridx = 0;
+            gc.weightx = 0.4;
             JLabel h1 = new JLabel("Component");
-            h1.setFont(FontKit.semibold(13f));
+            h1.setFont(FontKit.semibold(12f));
             h1.setForeground(new Color(55, 65, 81));
             tablePanel.add(h1, gc);
 
             gc.gridx = 1;
+            gc.weightx = 0.25;
             JLabel h2 = new JLabel("Score / Weight");
-            h2.setFont(FontKit.semibold(13f));
+            h2.setFont(FontKit.semibold(12f));
             h2.setForeground(new Color(55, 65, 81));
             tablePanel.add(h2, gc);
 
+            gc.gridx = 2;
+            gc.weightx = 0.35;
+            JLabel h3 = new JLabel("Progress");
+            h3.setFont(FontKit.semibold(12f));
+            h3.setForeground(new Color(55, 65, 81));
+            h3.setHorizontalAlignment(SwingConstants.RIGHT);
+            tablePanel.add(h3, gc);
+
+            row++;
+
             // Data rows
-            int row = 1;
             for (ComponentRow cr : components) {
                 gc.gridy = row;
 
+                // Column 0: component name
                 gc.gridx = 0;
+                gc.weightx = 0.4;
                 JLabel nameLbl = new JLabel(cr.name);
-                nameLbl.setFont(FontKit.regular(13f));
+                nameLbl.setFont(FontKit.regular(12f));
                 nameLbl.setForeground(new Color(75, 85, 99));
                 tablePanel.add(nameLbl, gc);
 
+                // Column 1: score / weight text
                 gc.gridx = 1;
+                gc.weightx = 0.25;
                 String scorePart = (cr.score == null) ? "–" : String.valueOf(cr.score);
                 String weightPart = (cr.weight == null) ? "?" : String.valueOf(cr.weight);
                 JLabel scoreLbl = new JLabel(scorePart + " / " + weightPart);
-                scoreLbl.setFont(FontKit.regular(13f));
+                scoreLbl.setFont(FontKit.regular(12f));
                 scoreLbl.setForeground(new Color(75, 85, 99));
                 tablePanel.add(scoreLbl, gc);
+
+                // Column 2: progress bar (visual)
+                gc.gridx = 2;
+                gc.weightx = 0.35;
+                ProgressBarCell bar = new ProgressBarCell(cr.score, cr.weight);
+                JPanel barHolder = new JPanel(new BorderLayout());
+                barHolder.setOpaque(false);
+                barHolder.add(bar, BorderLayout.CENTER);
+                tablePanel.add(barHolder, gc);
 
                 row++;
             }
 
             compWrapper.add(tablePanel, BorderLayout.CENTER);
-            card.add(compWrapper, BorderLayout.SOUTH);
+            card.add(compWrapper, BorderLayout.CENTER);
         }
 
-        // Hover effect (unchanged)
+        // Hover effect (subtle, same behaviour)
         card.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
@@ -399,7 +493,7 @@ public class MyRegistrationsFrame extends StudentFrameBase {
     }
 
     // --------------------------------------------------------------------
-    // Transcript download
+    // Transcript download – unchanged functionality
     // --------------------------------------------------------------------
 
     private void handleDownloadTranscript(ActionEvent evt) {
@@ -509,11 +603,9 @@ public class MyRegistrationsFrame extends StudentFrameBase {
             }
 
         } finally {
-            // Close document first (so it can write trailer to the stream)
             if (doc.isOpen()) {
                 doc.close();
             }
-            // Then close the underlying stream
             if (fos != null) {
                 fos.close();
             }

@@ -45,8 +45,6 @@ public abstract class StudentFrameBase extends JFrame {
         this.studentId = currentStudentId;
         this.userDisplayName = userDisplayName;
 
-        System.out.println("[DEBUG] StudentFrameBase: using studentId = '" + this.studentId +
-                "', page = " + activePage);
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -135,7 +133,6 @@ public abstract class StudentFrameBase extends JFrame {
         NavButton home = new NavButton("Home", active == Page.HOME);
         home.addActionListener(e -> {
             if (active != Page.HOME) {
-                System.out.println("[DEBUG] NAV → Home (studentId=" + studentId + ")");
                 new StudentDashboard(studentId, userDisplayName).setVisible(true);
                 dispose();
             }
@@ -147,7 +144,6 @@ public abstract class StudentFrameBase extends JFrame {
         NavButton registration = new NavButton("Registration", active == Page.CATALOG);
         registration.addActionListener(e -> {
             if (active != Page.CATALOG) {
-                System.out.println("[DEBUG] NAV → Registration/CourseCatalog (studentId=" + studentId + ")");
                 new CourseCatalog(studentId, userDisplayName).setVisible(true);
                 dispose();
             }
@@ -159,7 +155,6 @@ public abstract class StudentFrameBase extends JFrame {
         NavButton myCourses = new NavButton("My Courses", active == Page.REGISTRATIONS);
         myCourses.addActionListener(e -> {
             if (active != Page.REGISTRATIONS) {
-                System.out.println("[DEBUG] NAV → My Courses (studentId=" + studentId + ")");
                 new MyRegistrationsFrame(studentId, userDisplayName).setVisible(true);
                 dispose();
             }
@@ -171,7 +166,6 @@ public abstract class StudentFrameBase extends JFrame {
         NavButton tt = new NavButton("Time Table", active == Page.TIMETABLE);
         tt.addActionListener(e -> {
             if (active != Page.TIMETABLE) {
-                System.out.println("[DEBUG] NAV → Timetable (studentId=" + studentId + ")");
                 new StudentTimetableFrame(studentId, userDisplayName).setVisible(true);
                 dispose();
             }
@@ -187,7 +181,6 @@ public abstract class StudentFrameBase extends JFrame {
 
         NavButton logout = new NavButton("Log Out", false);
         logout.addActionListener(e -> {
-            System.out.println("[DEBUG] NAV → Logout");
             currentStudentId = null;
             new LoginPage().setVisible(true);
             dispose();
@@ -196,7 +189,6 @@ public abstract class StudentFrameBase extends JFrame {
 
         NavButton settings = new NavButton("Settings", false);
         settings.addActionListener(e -> {
-            System.out.println("[DEBUG] NAV → settings");
             currentStudentId = null;
             new StudentSettingsPage(studentId, userDisplayName).setVisible(true);
             dispose();
