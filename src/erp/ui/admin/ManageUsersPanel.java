@@ -21,6 +21,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Locale;
+
+
 import erp.auth.hash.PasswordHasher;
 
 public class ManageUsersPanel extends JPanel {
@@ -126,16 +135,9 @@ public class ManageUsersPanel extends JPanel {
         addStudentBtn.addActionListener(this::onAddStudent);
         addInstructorBtn.addActionListener(this::onAddInstructor);
         saveBtn.addActionListener(e -> onSaveChanges());
-        exportBtn.addActionListener(e -> JOptionPane.showMessageDialog(
-                this,
-                "Export will be implemented in Phase 4 (Backup).",
-                "Export",
-                JOptionPane.INFORMATION_MESSAGE));
-        importBtn.addActionListener(e -> JOptionPane.showMessageDialog(
-                this,
-                "Import will be implemented in Phase 4 (Backup).",
-                "Import",
-                JOptionPane.INFORMATION_MESSAGE));
+        exportBtn.addActionListener(e -> onExportCsv());
+        importBtn.addActionListener(e -> onImportCsv());
+
         backBtn.addActionListener(e -> {
             new AdminDashboard(adminId, adminDisplayName).setVisible(true);
             SwingUtilities.getWindowAncestor(this).dispose();
@@ -190,57 +192,56 @@ public class ManageUsersPanel extends JPanel {
     }
 
     private JComponent buildSearchRow() {
-    JPanel row = new JPanel(new BorderLayout());
-    row.setOpaque(false);
-    row.setBorder(new EmptyBorder(0, 0, 12, 0));
+        JPanel row = new JPanel(new BorderLayout());
+        row.setOpaque(false);
+        row.setBorder(new EmptyBorder(0, 0, 12, 0));
 
-    // Wrapper that looks like a normal text field
-    RoundedPanel inputWrapper = new RoundedPanel(12);  // small radius, not a circle
-    inputWrapper.setBackground(Color.WHITE);
-    inputWrapper.setLayout(new BorderLayout());
-    inputWrapper.setBorder(new EmptyBorder(4, 10, 4, 10));
-    inputWrapper.setPreferredSize(new Dimension(320, 32)); // normal search box size
+        // Wrapper that looks like a normal text field
+        RoundedPanel inputWrapper = new RoundedPanel(12); // small radius, not a circle
+        inputWrapper.setBackground(Color.WHITE);
+        inputWrapper.setLayout(new BorderLayout());
+        inputWrapper.setBorder(new EmptyBorder(4, 10, 4, 10));
+        inputWrapper.setPreferredSize(new Dimension(320, 32)); // normal search box size
 
-    JLabel searchIcon = new JLabel("\uD83D\uDD0D");
-    searchIcon.setForeground(TEXT_600);
-    searchIcon.setBorder(new EmptyBorder(0, 0, 0, 6));
+        JLabel searchIcon = new JLabel("\uD83D\uDD0D");
+        searchIcon.setForeground(TEXT_600);
+        searchIcon.setBorder(new EmptyBorder(0, 0, 0, 6));
 
-    searchField = new JTextField();
-    searchField.setBorder(null);
-    searchField.setOpaque(false);
-    searchField.setFont(FontKit.regular(14f));
-    searchField.setForeground(TEXT_900);
-    searchField.setCaretColor(TEXT_900);
-    searchField.putClientProperty("JTextField.placeholderText",
-            "Search by name, username, roll no, program…");
+        searchField = new JTextField();
+        searchField.setBorder(null);
+        searchField.setOpaque(false);
+        searchField.setFont(FontKit.regular(14f));
+        searchField.setForeground(TEXT_900);
+        searchField.setCaretColor(TEXT_900);
+        searchField.putClientProperty("JTextField.placeholderText",
+                "Search by name, username, roll no, program…");
 
-    inputWrapper.add(searchIcon, BorderLayout.WEST);
-    inputWrapper.add(searchField, BorderLayout.CENTER);
+        inputWrapper.add(searchIcon, BorderLayout.WEST);
+        inputWrapper.add(searchField, BorderLayout.CENTER);
 
-    // Put it on the left; it will look like a normal text box
-    row.add(inputWrapper, BorderLayout.WEST);
+        // Put it on the left; it will look like a normal text box
+        row.add(inputWrapper, BorderLayout.WEST);
 
-    // Wire up filter logic
-    searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-        @Override
-        public void insertUpdate(javax.swing.event.DocumentEvent e) {
-            updateFilters();
-        }
+        // Wire up filter logic
+        searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                updateFilters();
+            }
 
-        @Override
-        public void removeUpdate(javax.swing.event.DocumentEvent e) {
-            updateFilters();
-        }
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                updateFilters();
+            }
 
-        @Override
-        public void changedUpdate(javax.swing.event.DocumentEvent e) {
-            updateFilters();
-        }
-    });
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                updateFilters();
+            }
+        });
 
-    return row;
-}
-
+        return row;
+    }
 
     private void updateFilters() {
         String text = searchField != null ? searchField.getText().trim() : "";
@@ -446,7 +447,9 @@ public class ManageUsersPanel extends JPanel {
         try (Connection erpConn = DatabaseConnection.erp().getConnection();
                 PreparedStatement ps = erpConn.prepareStatement(sql)) {
 
-            ps.setString(1, row.username); // username is the student_id
+            // student_id = username
+            ps.setString(1, row.username);
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     row.fullName = rs.getString("full_name");
@@ -620,21 +623,349 @@ public class ManageUsersPanel extends JPanel {
         }
     }
 
+        // ---------------------------------------------------------------------
+    // CSV Export / Import
+    // ---------------------------------------------------------------------
+
+    private void onExportCsv() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Export users to CSV");
+        chooser.setSelectedFile(new File("users_export.csv"));
+
+        int result = chooser.showSaveDialog(this);
+        if (result != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File file = chooser.getSelectedFile();
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+            // Header
+            bw.write("type,username,full_name,roll_no,program,year,department,status,password");
+            bw.newLine();
+
+            // Students
+            for (StudentsTableModel.Row r : studentsModel.getRows()) {
+                bw.write(String.join(",",
+                        "student",
+                        escapeCsv(r.username),
+                        escapeCsv(r.fullName),
+                        escapeCsv(r.rollNo),
+                        escapeCsv(r.program),
+                        escapeCsv(r.year),
+                        "", // department (not used)
+                        escapeCsv(r.status),
+                        ""  // password left empty; fill if you want on re-import
+                ));
+                bw.newLine();
+            }
+
+            // Instructors
+            for (InstructorsTableModel.Row r : instructorsModel.getRows()) {
+                bw.write(String.join(",",
+                        "instructor",
+                        escapeCsv(r.username),
+                        escapeCsv(r.fullName),
+                        "", "", "",                     // roll_no, program, year not used
+                        escapeCsv(r.department),
+                        escapeCsv(r.status),
+                        ""  // password
+                ));
+                bw.newLine();
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    "Exported users to:\n" + file.getAbsolutePath(),
+                    "Export CSV",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Failed to export CSV:\n" + ex.getMessage(),
+                    "Export Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void onImportCsv() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Import users from CSV");
+
+        int result = chooser.showOpenDialog(this);
+        if (result != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File file = chooser.getSelectedFile();
+
+        int addedStudents = 0;
+        int addedInstructors = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            boolean first = true;
+            while ((line = br.readLine()) != null) {
+                if (first) { // skip header
+                    first = false;
+                    continue;
+                }
+                if (line.trim().isEmpty()) continue;
+
+                String[] parts = parseCsvLine(line);
+                if (parts.length < 3) continue;
+
+                String type = parts[0].trim().toLowerCase(Locale.ROOT);
+
+                if ("student".equals(type)) {
+                    StudentsTableModel.Row r = new StudentsTableModel.Row();
+                    r.state = RowState.NEW;
+                    r.userId = "";
+                    r.username   = safeGet(parts, 1);
+                    r.fullName   = safeGet(parts, 2);
+                    r.rollNo     = safeGet(parts, 3);
+                    r.program    = safeGet(parts, 4);
+                    r.year       = safeGet(parts, 5);
+                    r.status     = safeGet(parts, 7).isBlank() ? "active" : safeGet(parts, 7);
+                    r.password   = safeGet(parts, 8); // plain password; will be hashed on save
+                    r.role       = "STUDENT";
+                    r.lastLogin  = "-";
+                    r.delete     = false;
+
+                    studentsModel.addNewRow(r);
+                    addedStudents++;
+
+                } else if ("instructor".equals(type)) {
+                    InstructorsTableModel.Row r = new InstructorsTableModel.Row();
+                    r.state = RowState.NEW;
+                    r.userId = "";
+                    r.username   = safeGet(parts, 1);
+                    r.fullName   = safeGet(parts, 2);
+                    r.department = safeGet(parts, 6);
+                    r.status     = safeGet(parts, 7).isBlank() ? "active" : safeGet(parts, 7);
+                    r.password   = safeGet(parts, 8); // plain password
+                    r.role       = "INSTRUCTOR";
+                    r.lastLogin  = "-";
+                    r.delete     = false;
+
+                    instructorsModel.addNewRow(r);
+                    addedInstructors++;
+                }
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    "Imported " + addedStudents + " students and "
+                            + addedInstructors + " instructors.\n"
+                            + "Click \"Save Changes\" to write them to the database.",
+                    "Import CSV",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Failed to import CSV:\n" + ex.getMessage(),
+                    "Import Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // small helpers ------------------------------------------------------
+
+    private String escapeCsv(String s) {
+        if (s == null) return "";
+        boolean needQuotes = s.contains(",") || s.contains("\"") || s.contains("\n");
+        String escaped = s.replace("\"", "\"\"");
+        return needQuotes ? "\"" + escaped + "\"" : escaped;
+    }
+
+    private String[] parseCsvLine(String line) {
+        // very small CSV parser handling quotes
+        List<String> cols = new ArrayList<>();
+        StringBuilder cur = new StringBuilder();
+        boolean inQuotes = false;
+
+        for (int i = 0; i < line.length(); i++) {
+            char ch = line.charAt(i);
+            if (inQuotes) {
+                if (ch == '"') {
+                    if (i + 1 < line.length() && line.charAt(i + 1) == '"') {
+                        cur.append('"');
+                        i++;
+                    } else {
+                        inQuotes = false;
+                    }
+                } else {
+                    cur.append(ch);
+                }
+            } else {
+                if (ch == '"') {
+                    inQuotes = true;
+                } else if (ch == ',') {
+                    cols.add(cur.toString());
+                    cur.setLength(0);
+                } else {
+                    cur.append(ch);
+                }
+            }
+        }
+        cols.add(cur.toString());
+        return cols.toArray(new String[0]);
+    }
+
+    private String safeGet(String[] arr, int idx) {
+        return (idx >= 0 && idx < arr.length) ? arr[idx] : "";
+    }
+
+
     private void applyChangesToDatabase() throws SQLException {
+
+        // --- Students ---
         for (StudentsTableModel.Row r : studentsModel.getRows()) {
-            if (r.state == RowState.NEW) {
+            if (r.delete && r.userId != null && !r.userId.isBlank()) {
+                deleteStudentUser(r);
+            } else if (r.state == RowState.NEW && !r.delete) {
                 insertNewStudentUser(r);
+            } else if (r.state == RowState.MODIFIED && !r.delete) {
+                updateStudentUser(r);
             }
         }
+
+        // --- Instructors ---
         for (InstructorsTableModel.Row r : instructorsModel.getRows()) {
-            if (r.state == RowState.NEW) {
+            if (r.delete && r.userId != null && !r.userId.isBlank()) {
+                deleteInstructorUser(r);
+            } else if (r.state == RowState.NEW && !r.delete) {
                 insertNewInstructorUser(r);
+            } else if (r.state == RowState.MODIFIED && !r.delete) {
+                updateInstructorUser(r);
             }
         }
-        // TODO: handle deletions / modifications
+    }
+
+    private void deleteStudentUser(StudentsTableModel.Row r) throws SQLException {
+        // 1) Delete from students by student_id = username
+        String erpSql = "DELETE FROM students WHERE student_id = ?";
+
+        try (Connection erpConn = DatabaseConnection.erp().getConnection();
+                PreparedStatement ps = erpConn.prepareStatement(erpSql)) {
+            ps.setString(1, r.username);
+            ps.executeUpdate();
+        }
+
+        // 2) Delete from users_auth by user_id
+        String authSql = "DELETE FROM users_auth WHERE user_id = ?";
+
+        try (Connection authConn = DatabaseConnection.auth().getConnection();
+                PreparedStatement ps = authConn.prepareStatement(authSql)) {
+            ps.setString(1, r.userId);
+            ps.executeUpdate();
+        }
+    }
+
+    private void updateStudentUser(StudentsTableModel.Row r) throws SQLException {
+        // Update users_auth (username + status)
+        String authSql = """
+                UPDATE users_auth
+                SET username = ?, status = ?
+                WHERE user_id = ?
+                """;
+
+        try (Connection authConn = DatabaseConnection.auth().getConnection();
+                PreparedStatement ps = authConn.prepareStatement(authSql)) {
+
+            ps.setString(1, r.username);
+            ps.setString(2, (r.status == null || r.status.isBlank()) ? "active" : r.status);
+            ps.setString(3, r.userId);
+            ps.executeUpdate();
+        }
+
+        // Update students row
+        String erpSql = """
+                UPDATE students
+                SET student_id = ?, roll_no = ?, full_name = ?, program = ?, year = ?
+                WHERE student_id = ?
+                """;
+
+        try (Connection erpConn = DatabaseConnection.erp().getConnection();
+                PreparedStatement ps = erpConn.prepareStatement(erpSql)) {
+
+            // if username changed, we move the key too
+            ps.setString(1, r.username); // new student_id
+            ps.setString(2, r.rollNo);
+            ps.setString(3, r.fullName);
+            ps.setString(4, r.program);
+            ps.setString(5, r.year);
+            ps.setString(6, r.username); // old student_id — if you want to support renames,
+                                         // store old value separately; else keep as-is.
+            ps.executeUpdate();
+        }
+
+        r.state = RowState.CLEAN;
+    }
+
+    private void deleteInstructorUser(InstructorsTableModel.Row r) throws SQLException {
+        String erpSql = "DELETE FROM instructors WHERE instructor_id = ?";
+
+        try (Connection erpConn = DatabaseConnection.erp().getConnection();
+                PreparedStatement ps = erpConn.prepareStatement(erpSql)) {
+            ps.setString(1, r.userId);
+            ps.executeUpdate();
+        }
+
+        String authSql = "DELETE FROM users_auth WHERE user_id = ?";
+
+        try (Connection authConn = DatabaseConnection.auth().getConnection();
+                PreparedStatement ps = authConn.prepareStatement(authSql)) {
+            ps.setString(1, r.userId);
+            ps.executeUpdate();
+        }
+    }
+
+    private void updateInstructorUser(InstructorsTableModel.Row r) throws SQLException {
+        // 1) Update users_auth (login side)
+        long newId = generateNewUserId();
+
+        String authSql = """
+                UPDATE users_auth
+                SET username = ?, status = ?
+                WHERE user_id = ?
+                """;
+
+        try (Connection authConn = DatabaseConnection.auth().getConnection();
+                PreparedStatement ps = authConn.prepareStatement(authSql)) {
+
+            ps.setString(1, r.username); // e.g. "inst1"
+            ps.setString(2, (r.status == null || r.status.isBlank())
+                    ? "active" // matches your dump
+                    : r.status);
+            ps.setString(3, r.userId); // e.g. "1000001"
+            ps.executeUpdate();
+        }
+
+        r.userId = String.valueOf(newId);
+
+        // 2) Update instructors (ERP side)
+        String erpSql = """
+                UPDATE instructors
+                SET username = ?, full_name = ?, department = ?
+                WHERE instructor_id = ?
+                """;
+
+        try (Connection erpConn = DatabaseConnection.erp().getConnection();
+                PreparedStatement ps = erpConn.prepareStatement(erpSql)) {
+
+            ps.setString(1, r.username); // same username as in auth
+            ps.setString(2, r.fullName); // display name
+            ps.setString(3, r.department); // dept from table
+            ps.setString(4, r.userId); // instructor_id = user_id (1000001, etc.)
+            ps.executeUpdate();
+        }
+
+        r.state = RowState.CLEAN;
     }
 
     private void insertNewStudentUser(StudentsTableModel.Row r) throws SQLException {
+
         if (r.username == null || r.username.isBlank()) {
             throw new SQLException("Student username is required.");
         }
@@ -644,50 +975,48 @@ public class ManageUsersPanel extends JPanel {
 
         String hashed = PasswordHasher.hash(r.password);
 
+        // ---------------------------------------------------------
+        // STEP 1: INSERT INTO users_auth (manual user_id)
+        // ---------------------------------------------------------
+        long newId = generateNewUserId();
+
         String authSql = """
                 INSERT INTO users_auth
-                    (username, role, password_hash, status, last_login, failed_attempts, locked_until)
+                    (user_id, username, role, password_hash, status, last_login, failed_attempts, locked_until)
                 VALUES
-                    (?, 'STUDENT', ?, ?, NULL, 0, NULL)
+                    (?, ?, 'student', ?, 'active', NULL, 0, NULL)
                 """;
 
         try (Connection conn = DatabaseConnection.auth().getConnection();
-                PreparedStatement ps = conn.prepareStatement(authSql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conn.prepareStatement(authSql)) {
 
-            ps.setString(1, r.username);
-            ps.setString(2, hashed);
-            ps.setString(3, (r.status == null || r.status.isBlank()) ? "ACTIVE" : r.status);
-
+            ps.setLong(1, newId);
+            ps.setString(2, r.username);
+            ps.setString(3, hashed);
             ps.executeUpdate();
-
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) {
-                    r.userId = String.valueOf(keys.getLong(1));
-                }
-            }
         }
 
+        // Make sure the model row knows the new user_id
+        r.userId = String.valueOf(newId);
+
+        // ---------------------------------------------------------
+        // STEP 2: INSERT INTO students
+        // ---------------------------------------------------------
         String erpSql = """
                 INSERT INTO students
-                    (student_id, username, full_name, roll_no, program, year)
+                    (student_id, roll_no, full_name, program, year)
                 VALUES
-                    (?, ?, ?, ?, ?, ?)
+                    (?, ?, ?, ?, ?)
                 """;
 
         try (Connection erpConn = DatabaseConnection.erp().getConnection();
                 PreparedStatement ps = erpConn.prepareStatement(erpSql)) {
 
-            String studentId = (r.rollNo != null && !r.rollNo.isBlank())
-                    ? r.rollNo
-                    : r.username;
-
-            ps.setString(1, studentId);
-            ps.setString(2, r.username);
+            ps.setString(1, r.username); // students.student_id = username
+            ps.setString(2, r.rollNo);
             ps.setString(3, r.fullName);
-            ps.setString(4, r.rollNo);
-            ps.setString(5, r.program);
-            ps.setString(6, r.year);
-
+            ps.setString(4, r.program);
+            ps.setString(5, r.year);
             ps.executeUpdate();
         }
 
@@ -696,6 +1025,7 @@ public class ManageUsersPanel extends JPanel {
     }
 
     private void insertNewInstructorUser(InstructorsTableModel.Row r) throws SQLException {
+
         if (r.username == null || r.username.isBlank()) {
             throw new SQLException("Instructor username is required.");
         }
@@ -705,29 +1035,35 @@ public class ManageUsersPanel extends JPanel {
 
         String hashed = PasswordHasher.hash(r.password);
 
+        // ---------------------------------------------------------
+        // STEP 1: GENERATE NEW user_id
+        // ---------------------------------------------------------
+        long newId = generateNewUserId(); // <-- SAME AS STUDENT
+
+        // ---------------------------------------------------------
+        // STEP 2: INSERT INTO users_auth WITH user_id
+        // ---------------------------------------------------------
         String authSql = """
                 INSERT INTO users_auth
-                    (username, role, password_hash, status, last_login, failed_attempts, locked_until)
+                    (user_id, username, role, password_hash, status, last_login, failed_attempts, locked_until)
                 VALUES
-                    (?, 'INSTRUCTOR', ?, ?, NULL, 0, NULL)
+                    (?, ?, 'instructor', ?, 'active', NULL, 0, NULL)
                 """;
 
         try (Connection conn = DatabaseConnection.auth().getConnection();
-                PreparedStatement ps = conn.prepareStatement(authSql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conn.prepareStatement(authSql)) {
 
-            ps.setString(1, r.username);
-            ps.setString(2, hashed);
-            ps.setString(3, (r.status == null || r.status.isBlank()) ? "ACTIVE" : r.status);
-
+            ps.setLong(1, newId); // user_id
+            ps.setString(2, r.username); // username
+            ps.setString(3, hashed); // password hash
             ps.executeUpdate();
-
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) {
-                    r.userId = String.valueOf(keys.getLong(1));
-                }
-            }
         }
 
+        r.userId = String.valueOf(newId); // REQUIRED for later updates/deletes
+
+        // ---------------------------------------------------------
+        // STEP 3: INSERT INTO instructors TABLE
+        // ---------------------------------------------------------
         String erpSql = """
                 INSERT INTO instructors
                     (instructor_id, username, full_name, department)
@@ -738,20 +1074,30 @@ public class ManageUsersPanel extends JPanel {
         try (Connection erpConn = DatabaseConnection.erp().getConnection();
                 PreparedStatement ps = erpConn.prepareStatement(erpSql)) {
 
-            String instructorId = (r.userId != null && !r.userId.isBlank())
-                    ? r.userId
-                    : r.username;
-
-            ps.setString(1, instructorId);
+            ps.setLong(1, newId); // instructor_id = user_id
             ps.setString(2, r.username);
             ps.setString(3, r.fullName);
             ps.setString(4, r.department);
-
             ps.executeUpdate();
         }
 
         r.state = RowState.CLEAN;
         r.password = null;
+    }
+
+    private long generateNewUserId() throws SQLException {
+        String sql = "SELECT MAX(user_id) AS max_id FROM users_auth";
+        try (Connection conn = DatabaseConnection.auth().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                long max = rs.getLong("max_id");
+                return max + 1;
+            } else {
+                return 1;
+            }
+        }
     }
 
     // ---------------------------------------------------------------------
