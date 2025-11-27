@@ -305,9 +305,20 @@ public abstract class AdminFrameBase extends JFrame {
                             AdminFrameBase.this.dispose();
                         }
                         case COURSES, ASSIGN -> {
-                            new ManageCourses(adminId, userDisplayName).setVisible(true);
-                            AdminFrameBase.this.dispose();
+                            try {
+                                new ManageCourses(adminId, userDisplayName).setVisible(true);
+                                AdminFrameBase.this.dispose();
+                            } catch (Throwable t) {
+                                t.printStackTrace();
+                                JOptionPane.showMessageDialog(
+                                        AdminFrameBase.this,
+                                        "Failed to open Manage Courses:\n" + t.getClass().getSimpleName() + ": "
+                                                + t.getMessage(),
+                                        "Error",
+                                        JOptionPane.ERROR_MESSAGE);
+                            }
                         }
+
                         case MAINTENANCE -> {
                             new AdminMaintenanceFrame(adminId, userDisplayName).setVisible(true);
                             AdminFrameBase.this.dispose();

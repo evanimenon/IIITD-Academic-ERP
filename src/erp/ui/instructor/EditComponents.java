@@ -14,6 +14,8 @@ import java.util.List;
 import erp.db.DatabaseConnection;
 import erp.db.Maintenance;
 import erp.ui.common.*;
+import erp.ui.auth.LoginPage;
+import erp.ui.common.FontKit;
 
 public class EditComponents extends InstructorFrameBase {
 

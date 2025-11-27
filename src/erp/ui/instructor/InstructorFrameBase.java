@@ -28,7 +28,6 @@ public abstract class InstructorFrameBase extends JFrame {
         HOME, SECTIONS, COMPONENTS
     }
 
-    // Keep for compatibility, but we now *resolve* from AuthContext
     protected static String currentInstructorId;
 
     protected final String instructorId;
@@ -53,7 +52,7 @@ public abstract class InstructorFrameBase extends JFrame {
         // --- Resolve instructor id from args OR session ---
         String resolvedId = instrID;
         if (resolvedId == null || resolvedId.isBlank()) {
-            Integer uid = AuthContext.getUserId();  // helper you added in AuthContext
+            Integer uid = AuthContext.getUserId(); 
             if (uid != null) {
                 resolvedId = String.valueOf(uid);
             }
@@ -61,7 +60,6 @@ public abstract class InstructorFrameBase extends JFrame {
         currentInstructorId = resolvedId;   // keep static in sync
         this.instructorId = resolvedId;
 
-        // --- Resolve display name from args OR session ---
         String resolvedName = displayName;
         if (resolvedName == null || resolvedName.isBlank()) {
             String fromSession = AuthContext.getUsername(); // another helper in AuthContext

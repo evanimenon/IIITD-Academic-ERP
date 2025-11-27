@@ -269,8 +269,6 @@ public class InstructorDashboard extends InstructorFrameBase {
             SwingUtilities.getWindowAncestor(card).dispose();
         }));
 
-        // Class Stats is now accessed per-section from the gradebook, not as a global quick action.
-
         card.add(btnRow, BorderLayout.CENTER);
         return card;
     }

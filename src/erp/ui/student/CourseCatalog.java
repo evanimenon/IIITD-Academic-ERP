@@ -26,9 +26,6 @@ public class CourseCatalog extends StudentFrameBase {
     private static final Color CARD_SELECTED  = new Color(220, 241, 239);
     private static final String SEARCH_PLACEHOLDER = "Search courses...";
 
-    /**
-     * Single course row, plus whether THIS student is registered in it.
-     */
     static class CourseRecord {
         final String courseId;
         final String code;
@@ -66,7 +63,6 @@ public class CourseCatalog extends StudentFrameBase {
         // IMPORTANT: we don't keep our own studentId; we let StudentFrameBase own it.
         super(studentId, userDisplayName, Page.CATALOG);
         setTitle("IIITD ERP – Course Catalog");
-        // Maintenance banner is now handled by StudentFrameBase.buildBody()
     }
 
     @Override
@@ -350,9 +346,7 @@ public class CourseCatalog extends StudentFrameBase {
         loadCourses();
     }
 
-    /**
-     * Decide how to color the result dialog based on the backend message.
-     */
+
     private ModernResultDialog.Type classifyResult(String msg, boolean wasDrop) {
         if (msg == null)
             return ModernResultDialog.Type.ERROR;
@@ -428,7 +422,6 @@ public class CourseCatalog extends StudentFrameBase {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
-                // If this fails, we just treat everything as unregistered.
             }
         }
 
@@ -551,12 +544,6 @@ public class CourseCatalog extends StudentFrameBase {
         return haystack.contains(filter);
     }
 
-    // ── Modern confirm + result dialogs (unchanged) ─────────────────────────
-    // ... keep ModernConfirmDialog & ModernResultDialog exactly as in your version ...
-
-    /**
-     * Modern "Are you sure?" dialog for Add / Drop.
-     */
     private static class ModernConfirmDialog extends JDialog {
 
         private boolean accepted = false;
