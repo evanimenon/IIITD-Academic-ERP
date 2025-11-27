@@ -275,20 +275,20 @@ public class MySections extends InstructorFrameBase {
                 "ORDER BY course_id, section_id";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, Long.parseLong(instrId));
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     SectionInfo s = new SectionInfo();
-                    s.sectionID   = rs.getInt("section_id");
-                    s.courseID    = rs.getString("course_id");
-                    s.dayTime     = rs.getString("day_time");
-                    s.room        = rs.getString("room");
-                    s.capacity    = rs.getInt("capacity");
-                    s.semester    = rs.getString("semester");
-                    s.year        = rs.getInt("year");
+                    s.sectionID = rs.getInt("section_id");
+                    s.courseID = rs.getString("course_id");
+                    s.dayTime = rs.getString("day_time");
+                    s.room = rs.getString("room");
+                    s.capacity = rs.getInt("capacity");
+                    s.semester = rs.getString("semester");
+                    s.year = rs.getInt("year");
                     list.add(s);
                 }
             }
@@ -538,15 +538,15 @@ public class MySections extends InstructorFrameBase {
                 "ORDER BY id";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(cmpSql)) {
+                PreparedStatement stmt = conn.prepareStatement(cmpSql)) {
 
             stmt.setInt(1, sectionId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     ComponentInfo c = new ComponentInfo();
                     c.componentId = rs.getInt("id");
-                    c.name        = rs.getString("component_name");
-                    c.weight      = rs.getInt("weight");
+                    c.name = rs.getString("component_name");
+                    c.weight = rs.getInt("weight");
                     gradebookComponents.add(c);
                 }
             }
@@ -563,16 +563,16 @@ public class MySections extends InstructorFrameBase {
                 "ORDER BY s.roll_no";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(stuSql)) {
+                PreparedStatement stmt = conn.prepareStatement(stuSql)) {
 
             stmt.setInt(1, sectionId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     StudentRow row = new StudentRow();
-                    row.enrollId  = rs.getString("enrollment_id");
+                    row.enrollId = rs.getString("enrollment_id");
                     row.studentId = rs.getString("student_id");
-                    row.rollNo    = String.valueOf(rs.getInt("roll_no"));
-                    row.name      = rs.getString("full_name");
+                    row.rollNo = String.valueOf(rs.getInt("roll_no"));
+                    row.name = rs.getString("full_name");
                     gradebookStudents.add(row);
                 }
             }
@@ -587,15 +587,15 @@ public class MySections extends InstructorFrameBase {
                 "WHERE e.section_id = ?";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(grdSql)) {
+                PreparedStatement stmt = conn.prepareStatement(grdSql)) {
 
             stmt.setInt(1, sectionId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     String enrollId = rs.getString("enrollment_id");
-                    int compId      = rs.getInt("component_id");
-                    String score    = rs.getString("score");
-                    String key      = enrollId + ":" + compId;
+                    int compId = rs.getInt("component_id");
+                    String score = rs.getString("score");
+                    String key = enrollId + ":" + compId;
                     gradesByKey.put(key, score == null ? "" : score);
                 }
             }
@@ -628,7 +628,13 @@ public class MySections extends InstructorFrameBase {
                 return "Full Name";
             if (column == 2 + gradebookComponents.size())
                 return "Final Grade";
-            return gradebookComponents.get(column - 2).name;
+
+            ComponentInfo c = gradebookComponents.get(column - 2);
+            if (c.weight > 0) {
+                return c.name + " (" + c.weight + ")";
+            } else {
+                return c.name;
+            }
         }
 
         @Override
@@ -675,12 +681,28 @@ public class MySections extends InstructorFrameBase {
             String value = (aValue == null) ? "" : aValue.toString().trim();
             String key = s.enrollId + ":" + c.componentId;
 
-            // Basic numeric validation (optional: allow blank to clear)
             if (!value.isBlank()) {
+                double numeric;
                 try {
-                    Double.parseDouble(value);
+                    numeric = Double.parseDouble(value);
                 } catch (NumberFormatException ex) {
-                    // Reject invalid input; keep old value
+                    return; // reject invalid input
+                }
+
+                if (numeric < 0) {
+                    JOptionPane.showMessageDialog(MySections.this,
+                            "Score cannot be negative.",
+                            "Invalid score",
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                if (numeric > c.weight) {
+                    JOptionPane.showMessageDialog(MySections.this,
+                            "Score for \"" + c.name + "\" cannot exceed its weight ("
+                                    + c.weight + ").",
+                            "Invalid score",
+                            JOptionPane.WARNING_MESSAGE);
                     return;
                 }
             }
@@ -688,10 +710,10 @@ public class MySections extends InstructorFrameBase {
             gradesByKey.put(key, value);
             dirtyKeys.add(key);
 
-            // Refresh this cell + final grade column
             fireTableCellUpdated(rowIndex, columnIndex);
             fireTableCellUpdated(rowIndex, 2 + gradebookComponents.size());
         }
+
     }
 
     private void upsertGrade(String enrollId, int componentId, String value) {
@@ -702,7 +724,7 @@ public class MySections extends InstructorFrameBase {
             // Delete grade if user cleared the cell
             String delSql = "DELETE FROM grades WHERE enrollment_id = ? AND component_id = ?";
             try (Connection conn = DatabaseConnection.erp().getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(delSql)) {
+                    PreparedStatement stmt = conn.prepareStatement(delSql)) {
                 stmt.setString(1, enrollId);
                 stmt.setInt(2, componentId);
                 stmt.executeUpdate();
@@ -716,8 +738,16 @@ public class MySections extends InstructorFrameBase {
         try {
             numeric = Double.parseDouble(value);
         } catch (NumberFormatException ex) {
-            // Ignore invalid non-numeric values
             return;
+        }
+
+        if (numeric < 0)
+            numeric = 0.0;
+
+        ComponentInfo comp = findComponentById(componentId);
+        if (comp != null && numeric > comp.weight) {
+            // clamp to weight for CSV/import path
+            numeric = (double) comp.weight;
         }
 
         String updateSql = "UPDATE grades SET score = ? WHERE enrollment_id = ? AND component_id = ?";
@@ -1049,9 +1079,9 @@ public class MySections extends InstructorFrameBase {
     }
 
     private JComponent buildChartCard(String title,
-                                      List<String> labels,
-                                      List<Double> values,
-                                      String yCaption) {
+            List<String> labels,
+            List<Double> values,
+            String yCaption) {
         RoundedPanel card = new RoundedPanel(20);
         card.setBackground(Color.WHITE);
         card.setBorder(new EmptyBorder(18, 18, 18, 18));
@@ -1178,7 +1208,7 @@ public class MySections extends InstructorFrameBase {
         String sql = "SELECT department FROM instructors WHERE instructor_id = ?";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, Long.parseLong(instrId));
             try (ResultSet rs = stmt.executeQuery()) {
@@ -1196,24 +1226,32 @@ public class MySections extends InstructorFrameBase {
     private double computeFinalPercentage(StudentRow s) {
         double sumScores = 0.0;
         double sumWeights = 0.0;
+        boolean missingAny = false;
 
         for (ComponentInfo c : gradebookComponents) {
             String key = s.enrollId + ":" + c.componentId;
             String val = gradesByKey.get(key);
-            if (val == null || val.isBlank())
+
+            // always count the weight
+            sumWeights += (c.weight > 0 ? c.weight : 0);
+
+            if (val == null || val.isBlank()) {
+                missingAny = true;
                 continue;
+            }
 
             try {
                 double score = Double.parseDouble(val);
                 sumScores += score;
-                sumWeights += (c.weight > 0 ? c.weight : 0);
             } catch (NumberFormatException ignored) {
             }
         }
 
-        if (sumWeights <= 0)
-            return Double.NaN;
-        return (sumScores / sumWeights) * 100.0; // Final percent
+        if (sumWeights <= 0 || missingAny) {
+            return Double.NaN; // shown as "-" in table / CSV
+        }
+
+        return (sumScores / sumWeights) * 100.0;
     }
 
     private void saveGrades() {
@@ -1261,11 +1299,133 @@ public class MySections extends InstructorFrameBase {
             upsertGrade(enrollId, compId, value);
         }
 
+        updateFinalGradesForCurrentSection();
+        if (gradebookModel != null) {
+            gradebookModel.fireTableDataChanged();
+        }
+
+        try (Connection conn = DatabaseConnection.erp().getConnection()) {
+            for (StudentRow s : gradebookStudents) {
+
+                // Skip if not fully graded
+                if (!hasAllComponents(s)) {
+                    // Clear final grade if incomplete
+                    try (PreparedStatement clear = conn.prepareStatement(
+                            "UPDATE enrollments SET final_grade = NULL WHERE enrollment_id = ?")) {
+                        clear.setString(1, s.enrollId);
+                        clear.executeUpdate();
+                    }
+                    continue;
+                }
+
+                // Compute final percentage
+                double pct = computeFinalPercentage(s);
+                String letter = toLetterGrade(pct);
+
+                try (PreparedStatement update = conn.prepareStatement(
+                        "UPDATE enrollments SET final_grade = ? WHERE enrollment_id = ?")) {
+                    update.setString(1, letter);
+                    update.setString(2, s.enrollId);
+                    update.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
         dirtyKeys.clear();
         JOptionPane.showMessageDialog(this,
                 "Grades saved successfully.",
                 "Save Grades",
                 JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /** Map numeric percentage to letter grade. Adjust thresholds as needed. */
+    private String mapPercentageToLetter(double pct) {
+        if (pct >= 85.0)
+            return "A";
+        if (pct >= 75.0)
+            return "B";
+        if (pct >= 65.0)
+            return "C";
+        if (pct >= 55.0)
+            return "D";
+        if (pct >= 45.0)
+            return "E";
+        return "F";
+    }
+
+    /** Compute letter grade for one student, or null if incomplete. */
+    private String computeFinalLetter(StudentRow s) {
+        double pct = computeFinalPercentage(s);
+        if (Double.isNaN(pct)) {
+            return null; // some component missing → no final grade
+        }
+        return mapPercentageToLetter(pct);
+    }
+
+    /** Update enrollments.final_grade for all students in the current section. */
+    private void updateFinalGradesForCurrentSection() {
+        if (currentSection == null)
+            return;
+
+        try (Connection conn = DatabaseConnection.erp().getConnection();
+                PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE enrollments SET final_grade = ? WHERE enrollment_id = ?")) {
+
+            for (StudentRow s : gradebookStudents) {
+                String letter = computeFinalLetter(s);
+
+                if (letter == null) {
+                    ps.setNull(1, java.sql.Types.VARCHAR); // clear final_grade if incomplete
+                } else {
+                    ps.setString(1, letter);
+                }
+
+                ps.setInt(2, Integer.parseInt(s.enrollId));
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private ComponentInfo findComponentById(int componentId) {
+        for (ComponentInfo c : gradebookComponents) {
+            if (c.componentId == componentId)
+                return c;
+        }
+        return null;
+    }
+
+    private String toLetterGrade(double pct) {
+        if (Double.isNaN(pct))
+            return null;
+
+        if (pct >= 85)
+            return "A";
+        if (pct >= 75)
+            return "B";
+        if (pct >= 65)
+            return "C";
+        if (pct >= 55)
+            return "D";
+        return "F";
+    }
+
+    private boolean hasAllComponents(StudentRow s) {
+        for (ComponentInfo c : gradebookComponents) {
+            String key = s.enrollId + ":" + c.componentId;
+            String val = gradesByKey.get(key);
+
+            if (val == null || val.isBlank()) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
