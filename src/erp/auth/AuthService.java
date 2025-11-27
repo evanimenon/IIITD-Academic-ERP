@@ -1,7 +1,11 @@
 package erp.auth;
 
 import erp.auth.store.AuthDAO;
+import erp.db.DatabaseConnection;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,13 +28,15 @@ public class AuthService {
     public Session login(String username, String password) throws AuthException {
         if (username == null || username.isBlank()) throw new AuthException("Incorrect username or password.");
         if (password == null) throw new AuthException("Incorrect username or password.");
-
+        int wa = getWrongAttempts(username);
+        int attempts_left = 5-wa;
         try {
             // Authenticate first (returns boolean). This avoids exposing hash handling.
             boolean ok = AuthDAO.authenticate(username.trim(), password);
+
             if (!ok) {
                 // generic error for wrong creds
-                throw new AuthException("Incorrect username or password.");
+                throw new AuthException("Incorrect username or password. " + attempts_left + " attempts left.");
             }
 
             // Fetch the row to get userId and role for session (row must exist because authenticate succeeded)
@@ -38,7 +44,7 @@ public class AuthService {
             if (row == null) {
                 // Extremely unlikely (race), but treat as auth failure
                 LOGGER.log(Level.WARNING, "Authenticated user not found afterwards: {0}", username);
-                throw new AuthException("Incorrect username or password.");
+                throw new AuthException("Incorrect username or password. " + attempts_left + " attempts left.");
             }
 
             // Best-effort: update last_login; log failures but do not block login
@@ -53,10 +59,11 @@ public class AuthService {
 
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "Database error during login for user=" + username, ex);
-            throw new AuthException("Login error. Please try again later.");
-        } catch (Exception ex) {
+            throw new AuthException("Incorrect username or password. " + attempts_left + " attempts left.");
+        } 
+        catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Unexpected error during login for user=" + username, ex);
-            throw new AuthException("Login error. Please try again later.");
+            throw new AuthException("Incorrect username or password. " + attempts_left + " attempts left.");
         }
     }
 
@@ -64,5 +71,20 @@ public class AuthService {
 
     public static class AuthException extends Exception {
         public AuthException(String m) { super(m); }
+    }
+
+    private int getWrongAttempts(String usr) {
+        String sql = "SELECT failed_attempts FROM users_auth WHERE username = ?";
+        try (Connection conn = DatabaseConnection.auth().getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, usr);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("failed_attempts");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

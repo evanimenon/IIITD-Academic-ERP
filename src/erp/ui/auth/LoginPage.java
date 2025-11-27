@@ -125,7 +125,7 @@ public class LoginPage extends JFrame {
         signIn.addActionListener(e -> {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             signIn.setEnabled(false);
-            showError(null); // clear any old message
+            showError(null);
 
             new Thread(() -> {
                 String user = username.getText().trim();
@@ -220,12 +220,14 @@ public class LoginPage extends JFrame {
                     SwingUtilities.invokeLater(() -> showError(ex.getMessage()));
                     updateWrongAttempts(user);
                     int wrong = getWrongAttempts(user);
-                    if (wrong >= 5) {
+                    if (wrong > 5) {
                         lockAcc(user);
                     }
-                } catch (Exception ex) {
+                } 
+                catch (Exception ex) {
                     ex.printStackTrace();
-                    SwingUtilities.invokeLater(() -> showError("Incorrect username or password."));
+                    int wa = 5 - getWrongAttempts(user);
+                    SwingUtilities.invokeLater(() -> showError("Incorrect username or password. " + wa + " attempts remaining."));
                     updateWrongAttempts(user);
                     int wrong = getWrongAttempts(user);
                     if (wrong >= 5) {
