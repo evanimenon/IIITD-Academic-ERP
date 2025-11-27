@@ -6,25 +6,24 @@ A desktop Academic ERP system for IIIT-Delhi that supports students, instructors
 * Evani Menon – 2024210
 * Nandika Routray – 2024371
 
-**Course:** CSE201 – Advanced Programming Project
+**Course:** CSE201 – Advanced Programming Final Course Project
 
 ---
 
 ## How to Compile & Run
 
-### macOS / Linux
-
 ```bash
+### macOS / Linux
 javac -cp "lib/*" -d out $(find src -name "*.java")
 cp -R src/resources/* out/
-java -cp "out:lib/*:src:src/resources" erp.Main```
+java -cp "out:lib/*:src:src/resources" erp.Main
 
 
 ### Windows (cmd.exe alternative)
 
-```bat
-javac -d out -cp "lib/*" (Get-ChildItem -Recurse src\*.java | ForEach-Object {$_.FullName}) 
-java -cp "out;lib/*;src" erp.Main
+for /R src %f in (*.java) do @echo %f >> files.txt
+javac -cp ".;lib/*" -d bin @files.txt   
+java -cp "bin;lib/*" erp.ui.auth.LoginPage
 ```
 
 ---
@@ -116,6 +115,8 @@ java -cp "out;lib/*;src" erp.Main
 
 ### 1. Authentication & Roles
 
+<img width="1496" height="934" alt="Screenshot 2025-11-27 at 17 21 41" src="https://github.com/user-attachments/assets/4b25d8a7-defb-4618-a064-eb416cd33ec6" />
+
 * Central **login screen** for all users.
 * Role-based redirection to **Admin**, **Instructor**, or **Student** dashboards.
 * Auth data stored in `auth_db.users_auth` with secure password handling.
@@ -123,6 +124,7 @@ java -cp "out;lib/*;src" erp.Main
 ### 2. Student Portal
 
 * **Dashboard overview** with welcome meta, current semester and maintenance banner.
+  
 * **Course Catalog & Registration**
 
   * Browse all offered courses with code, acronym, title, and credits.
@@ -131,10 +133,16 @@ java -cp "out;lib/*;src" erp.Main
     * global **course drop deadline** from `settings.COURSE_DROP_DEADLINE`
     * **maintenance mode** – registration is read-only when enabled).
   * Registered courses visually pinned to the top and marked with a badge.
+  
+  <img width="1496" height="903" alt="Screenshot 2025-11-27 at 17 22 19" src="https://github.com/user-attachments/assets/cb28f3a9-4377-46e5-939c-647d9281cd5a" />
+
 * **My Timetable**
 
   * Weekly timetable grid by day/time.
   * Cells show **course acronym** + section.
+<img width="1496" height="934" alt="Screenshot 2025-11-27 at 17 23 49" src="https://github.com/user-attachments/assets/049963d9-8f52-4fdb-ade7-597f46f40d40" />
+
+   
 * **My Grades**
 
   * Per-course grade view using the `grades` table.
