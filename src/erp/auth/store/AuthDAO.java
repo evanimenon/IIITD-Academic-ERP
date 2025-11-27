@@ -57,7 +57,8 @@ public final class AuthDAO {
                         rs.getString("role"),
                         rs.getString("password_hash"));
             }
-        } catch (SQLException ex) {
+        } 
+        catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "DB error while finding user by username", ex);
             throw ex;
         }

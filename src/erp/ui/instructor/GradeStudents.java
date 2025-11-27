@@ -29,8 +29,8 @@ public class GradeStudents extends InstructorFrameBase {
     private static final Color CARD     = Color.WHITE;
 
     public GradeStudents(String instrID, String displayName) {
-        super(instrID, displayName, Page.GRADES);
-        setTitle("IIITD ERP – Grade Students");
+        super(instrID, displayName, Page.COMPONENTS);
+        setTitle("IIITD ERP - Grade Students");
 
         String dept = getDepartment(instrID);
         if (metaLabel != null) {

@@ -25,7 +25,7 @@ public abstract class InstructorFrameBase extends JFrame {
     protected final boolean maintenanceMode;
 
     public enum Page {
-        HOME, SECTIONS, GRADES
+        HOME, SECTIONS, COMPONENTS
     }
 
     // Keep for compatibility, but we now *resolve* from AuthContext
@@ -178,16 +178,15 @@ public abstract class InstructorFrameBase extends JFrame {
         nav.add(sectionsBtn);
         nav.add(Box.createVerticalStrut(8));
 
-        // If you re-enable GradeStudents later, it’ll still work:
-        // NavButton gradeBtn = new NavButton("Grade Students", active == Page.GRADES);
-        // gradeBtn.addActionListener(e -> {
-        //     if (active != Page.GRADES) {
-        //         new GradeStudents(instructorId, userDisplayName).setVisible(true);
-        //         dispose();
-        //     }
-        // });
-        // nav.add(gradeBtn);
-        // nav.add(Box.createVerticalStrut(40));
+        NavButton gradeBtn = new NavButton("Manage Components", active == Page.COMPONENTS);
+        gradeBtn.addActionListener(e -> {
+            if (active != Page.COMPONENTS) {
+                new ManageComponents(instructorId, userDisplayName).setVisible(true);
+                dispose();
+            }
+        });
+        nav.add(gradeBtn);
+        nav.add(Box.createVerticalStrut(40));
 
         JSeparator sep = new JSeparator();
         sep.setForeground(new Color(60, 120, 116));
