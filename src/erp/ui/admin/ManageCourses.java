@@ -53,22 +53,22 @@ public class ManageCourses extends AdminFrameBase {
 
     private static class CourseRecord {
         String originalCourseId; // current DB key
-        String courseId;         // editable
-        String code;             // courses.code (acronym)
+        String courseId; // editable
+        String code; // courses.code (acronym)
         String title;
-        int    credits;
+        int credits;
     }
 
     private static class SectionRecord {
-        int    sectionId;
+        int sectionId;
         String courseId;
         String instructorId;
         String instructorName;
         String dayTime;
         String room;
-        int    capacity;
+        int capacity;
         String semester;
-        int    year;
+        int year;
     }
 
     private static class StudentRow {
@@ -78,7 +78,7 @@ public class ManageCourses extends AdminFrameBase {
         String name;
         String program;
         String year;
-        String finalGrade;   // from enrollments.final_grade
+        String finalGrade; // from enrollments.final_grade
 
         boolean pendingNew = false; // true if not in DB yet (staged)
     }
@@ -87,25 +87,25 @@ public class ManageCourses extends AdminFrameBase {
 
     // Courses
     private List<CourseRecord> courses = new ArrayList<>();
-    private JPanel             courseCardsContainer;
-    private CourseCard         selectedCourseCard;
-    private CourseRecord       selectedCourse;
+    private JPanel courseCardsContainer;
+    private CourseCard selectedCourseCard;
+    private CourseRecord selectedCourse;
 
     // Course search
     private JTextField courseSearchField;
-    private String     courseSearchQuery = "";
+    private String courseSearchQuery = "";
 
     // Course detail editor
     private JTextField courseIdField;
     private JTextField acronymField;
     private JTextField titleField;
     private JTextField creditsField;
-    private boolean    courseDirty = false;
+    private boolean courseDirty = false;
 
     // Sections
     private List<SectionRecord> sections = new ArrayList<>();
-    private JPanel              sectionsContainer;
-    private SectionCard         selectedSectionCard;
+    private JPanel sectionsContainer;
+    private SectionCard selectedSectionCard;
     private SectionRecord selectedSection;
     private Set<Integer> dirtySectionIds = new HashSet<>();
 
@@ -178,7 +178,7 @@ public class ManageCourses extends AdminFrameBase {
         split.setBorder(BorderFactory.createEmptyBorder());
         split.setContinuousLayout(true);
 
-        JPanel left  = buildCoursesPanel();
+        JPanel left = buildCoursesPanel();
         JPanel right = buildDetailsPanel();
 
         split.setLeftComponent(left);
@@ -217,15 +217,13 @@ public class ManageCourses extends AdminFrameBase {
                 new EmptyBorder(4, 8, 4, 8)));
         courseSearchField.putClientProperty(
                 "JTextField.placeholderText",
-                "Search by ID, code, or title"
-        );
+                "Search by ID, code, or title");
 
         courseSearchField.getDocument().addDocumentListener(
                 new SimpleDocumentListener(() -> {
                     courseSearchQuery = courseSearchField.getText();
                     refreshCourseCards();
-                })
-        );
+                }));
 
         header.add(courseSearchField, BorderLayout.SOUTH);
         root.add(header, BorderLayout.NORTH);
@@ -274,15 +272,17 @@ public class ManageCourses extends AdminFrameBase {
     // ------------------------------------------------------------------------
 
     private JPanel buildDetailsPanel() {
-        JPanel root = new JPanel(new BorderLayout(0, 12));
+        JPanel root = new JPanel();
         root.setOpaque(false);
+        root.setLayout(new BorderLayout(0, 12));
         root.setBorder(new EmptyBorder(16, 8, 16, 16));
 
         JPanel courseEditor = buildCourseEditorPanel();
         root.add(courseEditor, BorderLayout.NORTH);
 
         JSplitPane verticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        verticalSplit.setResizeWeight(0.55); // bias slightly to sections
+        verticalSplit.setResizeWeight(0.55);
+        verticalSplit.setDividerLocation(0.5);
         verticalSplit.setBorder(BorderFactory.createEmptyBorder());
         verticalSplit.setContinuousLayout(true);
 
@@ -293,6 +293,25 @@ public class ManageCourses extends AdminFrameBase {
         verticalSplit.setBottomComponent(studentsPanel);
 
         root.add(verticalSplit, BorderLayout.CENTER);
+
+        // ---- Bottom-right Save button (always visible) ----
+        JPanel bottomBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 8));
+        bottomBar.setOpaque(false);
+
+        saveChangesBtn = new JButton("Save Changes");
+        saveChangesBtn.setFont(FontKit.semibold(12f));
+        saveChangesBtn.setFocusPainted(false);
+        saveChangesBtn.setBackground(new Color(22, 163, 74));
+        saveChangesBtn.setForeground(Color.WHITE);
+        saveChangesBtn.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
+        saveChangesBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        saveChangesBtn.addActionListener(e -> handleSaveChanges());
+
+        bottomBar.add(saveChangesBtn);
+        root.add(bottomBar, BorderLayout.SOUTH);
+
+        // Make sure initial enabled/disabled state is correct
+        updateButtonsEnabled();
 
         return root;
     }
@@ -317,9 +336,9 @@ public class ManageCourses extends AdminFrameBase {
         gc.anchor = GridBagConstraints.WEST;
 
         courseIdField = new JTextField(14);
-        acronymField  = new JTextField(10);
-        titleField    = new JTextField(22);
-        creditsField  = new JTextField(4);
+        acronymField = new JTextField(10);
+        titleField = new JTextField(22);
+        creditsField = new JTextField(4);
 
         JLabel cidLbl = new JLabel("Course ID");
         cidLbl.setFont(FontKit.regular(12f));
@@ -365,21 +384,6 @@ public class ManageCourses extends AdminFrameBase {
         form.add(creditsField, gc);
 
         card.add(form, BorderLayout.CENTER);
-
-        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
-        right.setOpaque(false);
-
-        saveChangesBtn = new JButton("Save Changes");
-        saveChangesBtn.setFont(FontKit.semibold(12f));
-        saveChangesBtn.setFocusPainted(false);
-        saveChangesBtn.setBackground(new Color(22, 163, 74));
-        saveChangesBtn.setForeground(Color.WHITE);
-        saveChangesBtn.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
-        saveChangesBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        saveChangesBtn.addActionListener(e -> handleSaveChanges());
-
-        right.add(saveChangesBtn);
-        card.add(right, BorderLayout.SOUTH);
 
         DocumentListener dirtyListener = new SimpleDocumentListener(() -> {
             if (selectedCourse != null) {
@@ -457,9 +461,20 @@ public class ManageCourses extends AdminFrameBase {
         studentsTable = new JTable(studentsModel);
         styleTable(studentsTable);
 
+        // Single-row selection
+        studentsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
         // Enable sorting
         studentsTable.setAutoCreateRowSorter(true);
         studentsSorter = (TableRowSorter<StudentsTableModel>) studentsTable.getRowSorter();
+
+        // When the user selects / deselects a row, update the "Remove Student" button
+        studentsTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                updateButtonsEnabled();
+        }
+    });
+
 
         JScrollPane sc = new JScrollPane(studentsTable);
         sc.setBorder(BorderFactory.createLineBorder(BORDER));
@@ -492,8 +507,7 @@ public class ManageCourses extends AdminFrameBase {
                 new EmptyBorder(4, 8, 4, 8)));
         studentSearchField.putClientProperty(
                 "JTextField.placeholderText",
-                "Filter by ID, roll, or name"
-        );
+                "Filter by ID, roll, or name");
 
         studentSearchField.getDocument().addDocumentListener(
                 new SimpleDocumentListener(() -> {
@@ -516,8 +530,7 @@ public class ManageCourses extends AdminFrameBase {
                             }
                         });
                     }
-                })
-        );
+                }));
 
         toolbar.add(addStudentBtn);
         toolbar.add(removeStudentBtn);
@@ -557,16 +570,16 @@ public class ManageCourses extends AdminFrameBase {
         String sql = "SELECT course_id, code, title, credits FROM courses ORDER BY course_id";
 
         try (Connection conn = getConn();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 CourseRecord cr = new CourseRecord();
                 cr.originalCourseId = rs.getString("course_id");
-                cr.courseId         = cr.originalCourseId;
-                cr.code             = rs.getString("code");
-                cr.title            = rs.getString("title");
-                cr.credits          = rs.getInt("credits");
+                cr.courseId = cr.originalCourseId;
+                cr.code = rs.getString("code");
+                cr.title = rs.getString("title");
+                cr.credits = rs.getInt("credits");
                 courses.add(cr);
             }
 
@@ -587,14 +600,25 @@ public class ManageCourses extends AdminFrameBase {
             sectionsContainer.repaint();
         }
 
-        students.clear();
+                students.clear();
         if (studentsModel != null) {
             studentsModel.fireTableDataChanged();
         }
-        pendingNewStudents.clear();
-        pendingRemovedEnrollmentIds.clear();
+
+        if (pendingNewStudents == null) {
+            pendingNewStudents = new ArrayList<>();
+        } else {
+            pendingNewStudents.clear();
+        }
+
+        if (pendingRemovedEnrollmentIds == null) {
+            pendingRemovedEnrollmentIds = new ArrayList<>();
+        } else {
+            pendingRemovedEnrollmentIds.clear();
+        }
 
         updateButtonsEnabled();
+
     }
 
     private void refreshCourseCards() {
@@ -674,21 +698,21 @@ public class ManageCourses extends AdminFrameBase {
                 """;
 
         try (Connection conn = getConn();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, course.originalCourseId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     SectionRecord sr = new SectionRecord();
-                    sr.sectionId     = rs.getInt("section_id");
-                    sr.courseId      = rs.getString("course_id");
-                    sr.instructorId  = rs.getString("instructor_id");
-                    sr.instructorName= rs.getString("instructor_name");
-                    sr.dayTime       = rs.getString("day_time");
-                    sr.room          = rs.getString("room");
-                    sr.capacity      = rs.getInt("capacity");
-                    sr.semester      = rs.getString("semester");
-                    sr.year          = rs.getInt("year");
+                    sr.sectionId = rs.getInt("section_id");
+                    sr.courseId = rs.getString("course_id");
+                    sr.instructorId = rs.getString("instructor_id");
+                    sr.instructorName = rs.getString("instructor_name");
+                    sr.dayTime = rs.getString("day_time");
+                    sr.room = rs.getString("room");
+                    sr.capacity = rs.getInt("capacity");
+                    sr.semester = rs.getString("semester");
+                    sr.year = rs.getInt("year");
                     sections.add(sr);
                 }
             }
@@ -720,12 +744,23 @@ public class ManageCourses extends AdminFrameBase {
 
     private void loadStudentsForSection(SectionRecord section) {
         ensureCollections();
-        if (students == null) {
+                if (students == null) {
             students = new ArrayList<>();
         }
         students.clear();
-        pendingNewStudents.clear();
-        pendingRemovedEnrollmentIds.clear();
+
+        if (pendingNewStudents == null) {
+            pendingNewStudents = new ArrayList<>();
+        } else {
+            pendingNewStudents.clear();
+        }
+
+        if (pendingRemovedEnrollmentIds == null) {
+            pendingRemovedEnrollmentIds = new ArrayList<>();
+        } else {
+            pendingRemovedEnrollmentIds.clear();
+        }
+
 
         if (section == null) {
             if (studentsModel != null) {
@@ -752,29 +787,34 @@ public class ManageCourses extends AdminFrameBase {
                 """;
 
         try (Connection conn = getConn();
-             PreparedStatement ps = conn.prepareStatement(stuSql)) {
+                PreparedStatement ps = conn.prepareStatement(stuSql)) {
 
             ps.setInt(1, section.sectionId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     StudentRow row = new StudentRow();
                     row.enrollmentId = rs.getString("enrollment_id");
-                    row.studentId    = rs.getString("student_id");
+                    row.studentId = rs.getString("student_id");
 
                     row.rollNo = rs.getString("roll_no");
-                    if (row.rollNo == null) row.rollNo = "";
+                    if (row.rollNo == null)
+                        row.rollNo = "";
 
                     row.name = rs.getString("full_name");
-                    if (row.name == null) row.name = "";
+                    if (row.name == null)
+                        row.name = "";
 
                     row.program = rs.getString("program");
-                    if (row.program == null) row.program = "";
+                    if (row.program == null)
+                        row.program = "";
 
                     row.year = rs.getString("year");
-                    if (row.year == null) row.year = "";
+                    if (row.year == null)
+                        row.year = "";
 
                     row.finalGrade = rs.getString("final_grade");
-                    if (row.finalGrade == null) row.finalGrade = "";
+                    if (row.finalGrade == null)
+                        row.finalGrade = "";
 
                     students.add(row);
                 }
@@ -795,10 +835,10 @@ public class ManageCourses extends AdminFrameBase {
     // ------------------------------------------------------------------------
 
     private void handleAddCourse() {
-        JTextField idField     = new JTextField(10);
-        JTextField acrField    = new JTextField(8);
-        JTextField titleField  = new JTextField(20);
-        JTextField creditsField= new JTextField("4");
+        JTextField idField = new JTextField(10);
+        JTextField acrField = new JTextField(8);
+        JTextField titleField = new JTextField(20);
+        JTextField creditsField = new JTextField("4");
 
         JPanel form = new JPanel(new GridLayout(0, 2, 6, 6));
         form.add(new JLabel("Course ID:"));
@@ -820,10 +860,10 @@ public class ManageCourses extends AdminFrameBase {
             return;
         }
 
-        String cid   = idField.getText().trim();
-        String acr   = acrField.getText().trim();
-        String ttl   = titleField.getText().trim();
-        String crdStr= creditsField.getText().trim();
+        String cid = idField.getText().trim();
+        String acr = acrField.getText().trim();
+        String ttl = titleField.getText().trim();
+        String crdStr = creditsField.getText().trim();
 
         if (cid.isEmpty() || acr.isEmpty() || ttl.isEmpty() || crdStr.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -847,7 +887,7 @@ public class ManageCourses extends AdminFrameBase {
         String sql = "INSERT INTO courses (course_id, code, title, credits) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = getConn();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cid);
             ps.setString(2, acr);
@@ -873,7 +913,7 @@ public class ManageCourses extends AdminFrameBase {
 
         CourseRecord cr = selectedCourse;
 
-        int sectionCount    = 0;
+        int sectionCount = 0;
         int enrollmentCount = 0;
 
         String countSections = "SELECT COUNT(*) FROM sections WHERE course_id = ?";
@@ -928,7 +968,7 @@ public class ManageCourses extends AdminFrameBase {
         String deleteEnrollments = "DELETE FROM enrollments WHERE section_id IN " +
                 "(SELECT section_id FROM sections WHERE course_id = ?)";
         String deleteSections = "DELETE FROM sections WHERE course_id = ?";
-        String deleteCourse  = "DELETE FROM courses WHERE course_id = ?";
+        String deleteCourse = "DELETE FROM courses WHERE course_id = ?";
 
         try (Connection conn = getConn()) {
             conn.setAutoCommit(false);
@@ -972,12 +1012,12 @@ public class ManageCourses extends AdminFrameBase {
             return;
         }
 
-        JTextField instrField    = new JTextField();
-        JTextField dayTimeField  = new JTextField("Mon 09:00-10:30");
-        JTextField roomField     = new JTextField("TBA");
+        JTextField instrField = new JTextField();
+        JTextField dayTimeField = new JTextField("Mon 09:00-10:30");
+        JTextField roomField = new JTextField("TBA");
         JTextField capacityField = new JTextField("60");
         JTextField semesterField = new JTextField("Monsoon");
-        JTextField yearField     = new JTextField("2025");
+        JTextField yearField = new JTextField("2025");
 
         JPanel form = new JPanel(new GridLayout(0, 2, 6, 6));
         form.add(new JLabel("Instructor ID:"));
@@ -1003,12 +1043,12 @@ public class ManageCourses extends AdminFrameBase {
             return;
         }
 
-        String instr  = instrField.getText().trim();
-        String dayTime= dayTimeField.getText().trim();
-        String room   = roomField.getText().trim();
+        String instr = instrField.getText().trim();
+        String dayTime = dayTimeField.getText().trim();
+        String room = roomField.getText().trim();
         String capStr = capacityField.getText().trim();
-        String sem    = semesterField.getText().trim();
-        String yearStr= yearField.getText().trim();
+        String sem = semesterField.getText().trim();
+        String yearStr = yearField.getText().trim();
 
         if (dayTime.isEmpty() || room.isEmpty() || capStr.isEmpty() ||
                 sem.isEmpty() || yearStr.isEmpty()) {
@@ -1023,7 +1063,7 @@ public class ManageCourses extends AdminFrameBase {
         int yr;
         try {
             cap = Integer.parseInt(capStr);
-            yr  = Integer.parseInt(yearStr);
+            yr = Integer.parseInt(yearStr);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this,
                     "Capacity and Year must be integers.",
@@ -1040,7 +1080,7 @@ public class ManageCourses extends AdminFrameBase {
                 """;
 
         try (Connection conn = getConn();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, selectedCourse.originalCourseId);
             ps.setString(2, instr.isEmpty() ? null : instr);
@@ -1082,7 +1122,7 @@ public class ManageCourses extends AdminFrameBase {
         String countSql = "SELECT COUNT(*) FROM enrollments WHERE section_id = ?";
 
         try (Connection conn = getConn();
-             PreparedStatement ps = conn.prepareStatement(countSql)) {
+                PreparedStatement ps = conn.prepareStatement(countSql)) {
 
             ps.setInt(1, sr.sectionId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -1114,7 +1154,7 @@ public class ManageCourses extends AdminFrameBase {
         }
 
         String deleteEnrollments = "DELETE FROM enrollments WHERE section_id = ?";
-        String deleteSection     = "DELETE FROM sections WHERE section_id = ?";
+        String deleteSection = "DELETE FROM sections WHERE section_id = ?";
 
         try (Connection conn = getConn()) {
             conn.setAutoCommit(false);
@@ -1175,7 +1215,7 @@ public class ManageCourses extends AdminFrameBase {
         StudentRow row = null;
 
         try (Connection conn = getConn();
-             PreparedStatement ps = conn.prepareStatement(lookupSql)) {
+                PreparedStatement ps = conn.prepareStatement(lookupSql)) {
 
             ps.setString(1, val);
             ps.setString(2, val);
@@ -1184,17 +1224,21 @@ public class ManageCourses extends AdminFrameBase {
                 if (rs.next()) {
                     row = new StudentRow();
                     row.studentId = rs.getString("student_id");
-                    row.rollNo    = rs.getString("roll_no");
-                    if (row.rollNo == null) row.rollNo = "";
-                    row.name      = rs.getString("full_name");
-                    if (row.name == null) row.name = "";
-                    row.program   = rs.getString("program");
-                    if (row.program == null) row.program = "";
-                    row.year      = rs.getString("year");
-                    if (row.year == null) row.year = "";
-                    row.finalGrade   = "";
+                    row.rollNo = rs.getString("roll_no");
+                    if (row.rollNo == null)
+                        row.rollNo = "";
+                    row.name = rs.getString("full_name");
+                    if (row.name == null)
+                        row.name = "";
+                    row.program = rs.getString("program");
+                    if (row.program == null)
+                        row.program = "";
+                    row.year = rs.getString("year");
+                    if (row.year == null)
+                        row.year = "";
+                    row.finalGrade = "";
                     row.enrollmentId = null; // not in DB yet
-                    row.pendingNew   = true;
+                    row.pendingNew = true;
                 }
             }
 
@@ -1221,22 +1265,21 @@ public class ManageCourses extends AdminFrameBase {
     }
 
     private void handleRemoveStudent() {
-        if (studentsTable == null) {
+        // No table or no section selected → nothing to do
+        if (studentsTable == null || selectedSection == null) {
             return;
         }
-        int rowIndex = studentsTable.getSelectedRow();
-        if (rowIndex < 0) {
+
+        int viewRow = studentsTable.getSelectedRow();
+        if (viewRow < 0) {
             JOptionPane.showMessageDialog(this,
                     "Select a student row to remove.",
                     "No Student Selected",
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if (selectedSection == null) {
-            return;
-        }
 
-        int modelRow = studentsTable.convertRowIndexToModel(rowIndex);
+        int modelRow = studentsTable.convertRowIndexToModel(viewRow);
         StudentRow sr = students.get(modelRow);
 
         int res = JOptionPane.showConfirmDialog(
@@ -1249,24 +1292,36 @@ public class ManageCourses extends AdminFrameBase {
             return;
         }
 
-        // If it already exists in DB, mark for deletion.
+        // If it already exists in DB → delete immediately
         if (sr.enrollmentId != null && !sr.enrollmentId.isEmpty()) {
-            pendingRemovedEnrollmentIds.add(sr.enrollmentId);
+            String sql = "DELETE FROM enrollments WHERE enrollment_id = ?";
+            try (Connection conn = getConn();
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, sr.enrollmentId);
+                ps.executeUpdate();
+
+            } catch (SQLException ex) {
+                showError("Failed to remove student from section", ex);
+                return;
+            }
         } else if (sr.pendingNew) {
-            // It was only staged locally; remove from the "new" list too
+            // It was only staged locally → drop from "new" list as well
             pendingNewStudents.remove(sr);
         }
 
+        // Remove from in-memory list and refresh table
         students.remove(modelRow);
         if (studentsModel != null) {
             studentsModel.fireTableDataChanged();
         }
+
         updateButtonsEnabled();
     }
 
     private void handleSaveChanges() {
         ensureCollections();
-        boolean anyDirtySections     = (dirtySectionIds != null && !dirtySectionIds.isEmpty());
+        boolean anyDirtySections = (dirtySectionIds != null && !dirtySectionIds.isEmpty());
         boolean hasEnrollmentChanges = hasEnrollmentChanges();
 
         if (!courseDirty && !anyDirtySections && !hasEnrollmentChanges) {
@@ -1287,9 +1342,9 @@ public class ManageCourses extends AdminFrameBase {
 
         // Pull current values from fields
         selectedCourse.courseId = courseIdField.getText().trim();
-        selectedCourse.code     = acronymField.getText().trim();
-        selectedCourse.title    = titleField.getText().trim();
-        String crdStr           = creditsField.getText().trim();
+        selectedCourse.code = acronymField.getText().trim();
+        selectedCourse.title = titleField.getText().trim();
+        String crdStr = creditsField.getText().trim();
         int newCredits;
         try {
             newCredits = Integer.parseInt(crdStr);
@@ -1352,7 +1407,7 @@ public class ManageCourses extends AdminFrameBase {
                                 continue;
                             }
 
-                            int cap  = Math.max(sr.capacity, 0);
+                            int cap = Math.max(sr.capacity, 0);
                             int year = sr.year;
 
                             ps.setString(1, (sr.instructorId == null || sr.instructorId.isBlank())
@@ -1407,8 +1462,18 @@ public class ManageCourses extends AdminFrameBase {
 
                 conn.commit();
 
-                pendingNewStudents.clear();
-                pendingRemovedEnrollmentIds.clear();
+                if (pendingNewStudents == null) {
+                    pendingNewStudents = new ArrayList<>();
+                } else {
+                    pendingNewStudents.clear();
+                }
+
+                if (pendingRemovedEnrollmentIds == null) {
+                    pendingRemovedEnrollmentIds = new ArrayList<>();
+                } else {
+                    pendingRemovedEnrollmentIds.clear();
+                }
+
 
                 JOptionPane.showMessageDialog(this,
                         "Changes saved successfully.",
@@ -1434,10 +1499,14 @@ public class ManageCourses extends AdminFrameBase {
     // ------------------------------------------------------------------------
 
     private void clearCourseEditor() {
-        if (courseIdField != null) courseIdField.setText("");
-        if (acronymField  != null) acronymField.setText("");
-        if (titleField    != null) titleField.setText("");
-        if (creditsField  != null) creditsField.setText("");
+        if (courseIdField != null)
+            courseIdField.setText("");
+        if (acronymField != null)
+            acronymField.setText("");
+        if (titleField != null)
+            titleField.setText("");
+        if (creditsField != null)
+            creditsField.setText("");
         courseDirty = false;
     }
 
@@ -1467,23 +1536,19 @@ public class ManageCourses extends AdminFrameBase {
         if (students == null) {
             students = new ArrayList<>();
         }
-        if (pendingNewStudents == null) {
-            pendingNewStudents = new ArrayList<>();
-        }
-        if (pendingRemovedEnrollmentIds == null) {
-            pendingRemovedEnrollmentIds = new ArrayList<>();
-        }
     }
 
-    private boolean hasEnrollmentChanges() {
-        return !pendingNewStudents.isEmpty() || !pendingRemovedEnrollmentIds.isEmpty();
+        private boolean hasEnrollmentChanges() {
+        return (pendingNewStudents != null && !pendingNewStudents.isEmpty())
+            || (pendingRemovedEnrollmentIds != null && !pendingRemovedEnrollmentIds.isEmpty());
     }
+
 
     private void updateButtonsEnabled() {
-        boolean hasCourse         = selectedCourse != null;
-        boolean hasSection        = selectedSection != null;
-        boolean anyDirtySections  = dirtySectionIds != null && !dirtySectionIds.isEmpty();
-        boolean hasEnrollChanges  = hasEnrollmentChanges();
+        boolean hasCourse = selectedCourse != null;
+        boolean hasSection = selectedSection != null;
+        boolean anyDirtySections = dirtySectionIds != null && !dirtySectionIds.isEmpty();
+        boolean hasEnrollChanges = hasEnrollmentChanges();
 
         if (deleteCourseBtn != null)
             deleteCourseBtn.setEnabled(hasCourse);
@@ -1621,7 +1686,8 @@ public class ManageCourses extends AdminFrameBase {
     }
 
     private void onCourseCardClicked(CourseCard card) {
-        if (card == null) return;
+        if (card == null)
+            return;
         setSelectedCard(card);
         onCourseSelected(card.record);
     }
@@ -1634,14 +1700,22 @@ public class ManageCourses extends AdminFrameBase {
         String prefix = rec.courseId.substring(0, 3).toUpperCase();
 
         switch (prefix) {
-            case "BIO": return new Color(16, 185, 129);  // green
-            case "CSE": return new Color(59, 130, 246);  // blue
-            case "DES": return new Color(139, 92, 246);  // purple
-            case "ECE": return new Color(234, 179, 8);   // yellow
-            case "ECO": return new Color(22, 163, 74);   // light green
-            case "MTH": return new Color(248, 113, 113); // red
-            case "ABC": return Color.BLACK;
-            default:    return new Color(148, 163, 184); // neutral grey
+            case "BIO":
+                return new Color(16, 185, 129); // green
+            case "CSE":
+                return new Color(59, 130, 246); // blue
+            case "DES":
+                return new Color(139, 92, 246); // purple
+            case "ECE":
+                return new Color(234, 179, 8); // yellow
+            case "ECO":
+                return new Color(22, 163, 74); // light green
+            case "MTH":
+                return new Color(248, 113, 113); // red
+            case "ABC":
+                return Color.BLACK;
+            default:
+                return new Color(148, 163, 184); // neutral grey
         }
     }
 
@@ -1818,8 +1892,8 @@ public class ManageCourses extends AdminFrameBase {
 
             SimpleDocumentListener dl = new SimpleDocumentListener(() -> {
                 record.instructorId = instructorField.getText().trim();
-                record.dayTime      = dayTimeField.getText().trim();
-                record.room         = roomField.getText().trim();
+                record.dayTime = dayTimeField.getText().trim();
+                record.room = roomField.getText().trim();
                 try {
                     record.capacity = Integer.parseInt(capacityField.getText().trim());
                 } catch (NumberFormatException ex) {
@@ -1960,7 +2034,7 @@ public class ManageCourses extends AdminFrameBase {
 
             String sql = "UPDATE enrollments SET final_grade = ? WHERE enrollment_id = ?";
             try (Connection conn = getConn();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
 
                 ps.setString(1, newGrade.isEmpty() ? null : newGrade);
                 ps.setString(2, r.enrollmentId);
@@ -1996,12 +2070,18 @@ public class ManageCourses extends AdminFrameBase {
         }
 
         @Override
-        public void insertUpdate(DocumentEvent e) { onChange.run(); }
+        public void insertUpdate(DocumentEvent e) {
+            onChange.run();
+        }
 
         @Override
-        public void removeUpdate(DocumentEvent e) { onChange.run(); }
+        public void removeUpdate(DocumentEvent e) {
+            onChange.run();
+        }
 
         @Override
-        public void changedUpdate(DocumentEvent e) { onChange.run(); }
+        public void changedUpdate(DocumentEvent e) {
+            onChange.run();
+        }
     }
 }
