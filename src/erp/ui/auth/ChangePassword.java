@@ -7,32 +7,16 @@ import javax.swing.border.EmptyBorder;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import erp.auth.AuthService;
 import erp.ui.common.FontKit;
-import erp.ui.student.StudentDashboard;
-import erp.ui.instructor.InstructorDashboard;
-import erp.ui.admin.AdminDashboard;
-import java.util.Locale;
-import erp.auth.AuthContext;
-import erp.auth.Role;
 import erp.db.DatabaseConnection;
-import erp.ui.student.StudentDashboard;
-import erp.ui.student.StudentLookupService;
 
 import erp.ui.common.RoundedButton;
-import erp.ui.common.RoundedTextField;
 import erp.ui.common.RoundedPasswordField;
-
-import java.sql.Timestamp;
 
 public class ChangePassword extends JFrame {
 
@@ -138,22 +122,25 @@ public class ChangePassword extends JFrame {
                 signIn.setEnabled(true);
                 return;
             }
+            if (pass.length() < 8) {
+                JOptionPane.showMessageDialog(this,"Password should be at least 8 characters.","Weak Password",JOptionPane.ERROR_MESSAGE);
+                setCursor(Cursor.getDefaultCursor());
+                signIn.setEnabled(true);
+                return;
+            }
             boolean set = setNewPassword(pass, username);
             if(set){
                 JOptionPane.showMessageDialog(this,"Password updated successfully. Please log in with your new password.");
                 new LoginPage().setVisible(true);
                 dispose();
             }
+            else{
+                new ChangePassword(username);
+            }
         });
     }
 
     private boolean setNewPassword(String pwd, String usr){
-        
-        // checking for weak password
-        if (pwd.length() < 8) {
-            JOptionPane.showMessageDialog(this,"Password should be at least 8 characters.","Weak Password",JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
 
         // Hash password
         String hash = BCrypt.hashpw(pwd, BCrypt.gensalt(12));

@@ -25,7 +25,7 @@ public abstract class InstructorFrameBase extends JFrame {
     protected final boolean maintenanceMode;
 
     public enum Page {
-        HOME, SECTIONS, COMPONENTS
+        HOME, SECTIONS, COMPONENTS, SETTINGS
     }
 
     protected static String currentInstructorId;
@@ -193,6 +193,10 @@ public abstract class InstructorFrameBase extends JFrame {
         nav.add(Box.createVerticalStrut(40));
 
         NavButton settingsBtn = new NavButton("Settings", false);
+        settingsBtn.addActionListener(e -> {
+            new InstructorSettingsPage(instructorId, userDisplayName).setVisible(true);
+            dispose();
+        });
         nav.add(settingsBtn);
         nav.add(Box.createVerticalStrut(8));
 

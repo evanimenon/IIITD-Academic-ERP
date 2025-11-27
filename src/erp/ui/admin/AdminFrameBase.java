@@ -34,7 +34,8 @@ public abstract class AdminFrameBase extends JFrame {
         USERS,
         COURSES,
         ASSIGN,
-        MAINTENANCE
+        MAINTENANCE,
+        SETTINGS
     }
 
     protected final String adminId;
@@ -50,6 +51,7 @@ public abstract class AdminFrameBase extends JFrame {
     private NavItem navUsers;
     private NavItem navCourses;
     private NavItem navMaintenance;
+    private NavItem navSettings;
 
     protected AdminFrameBase(String adminId, String displayName, Page activePage) {
         this.adminId = adminId;
@@ -124,6 +126,13 @@ public abstract class AdminFrameBase extends JFrame {
                 contentPanel.add(buildPlaceholder("Manage Users will appear here."), "MANAGE_USERS");
                 contentPanel.add(buildPlaceholder("Manage Courses will appear here."), "MANAGE_COURSES");
                 contentPanel.add(buildMainContent(), "MAINTENANCE");
+            }
+            case SETTINGS -> {
+                contentPanel.add(buildPlaceholder("Dashboard is not in this window."), "DASHBOARD");
+                contentPanel.add(buildPlaceholder("Manage Users will appear here."), "MANAGE_USERS");
+                contentPanel.add(buildPlaceholder("Manage Courses will appear here."), "MANAGE_COURSES");
+                contentPanel.add(buildPlaceholder("Maintenance will appear here."), "MAINTENANCE");
+                contentPanel.add(buildMainContent(), "SETTINGS");
             }
         }
 
@@ -207,6 +216,7 @@ public abstract class AdminFrameBase extends JFrame {
         navUsers = new NavItem("Manage Users", Page.USERS);
         navCourses = new NavItem("Manage Courses", Page.COURSES);
         navMaintenance = new NavItem("Maintenance & Backup", Page.MAINTENANCE);
+        navSettings = new NavItem("Settings", Page.SETTINGS);
 
         nav.add(navHome);
         nav.add(Box.createVerticalStrut(4));
@@ -215,7 +225,10 @@ public abstract class AdminFrameBase extends JFrame {
         nav.add(navCourses);
         nav.add(Box.createVerticalStrut(4));
         nav.add(navMaintenance);
+        nav.add(Box.createVerticalStrut(4));
+        nav.add(navSettings);
         nav.add(Box.createVerticalGlue());
+
 
         side.add(nav, BorderLayout.CENTER);
 
@@ -252,6 +265,7 @@ public abstract class AdminFrameBase extends JFrame {
                     ASSIGN ->
                 "MANAGE_COURSES";
             case MAINTENANCE -> "MAINTENANCE";
+            case SETTINGS -> "SETTINGS";
         };
     }
 
@@ -269,6 +283,8 @@ public abstract class AdminFrameBase extends JFrame {
             navCourses.setSelected(page == Page.COURSES || page == Page.ASSIGN);
         if (navMaintenance != null)
             navMaintenance.setSelected(page == Page.MAINTENANCE);
+        if (navSettings != null)
+            navSettings.setSelected(page == Page.SETTINGS);
     }
 
     // --- inner nav item class ---
@@ -321,6 +337,11 @@ public abstract class AdminFrameBase extends JFrame {
 
                         case MAINTENANCE -> {
                             new AdminMaintenanceFrame(adminId, userDisplayName).setVisible(true);
+                            AdminFrameBase.this.dispose();
+                        }
+
+                        case SETTINGS ->{
+                            new AdminSettingsPage(adminId, userDisplayName).setVisible(true);
                             AdminFrameBase.this.dispose();
                         }
 

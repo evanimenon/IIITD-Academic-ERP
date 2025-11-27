@@ -23,7 +23,7 @@ public abstract class StudentFrameBase extends JFrame {
     protected final boolean maintenanceMode;
 
     public enum Page {
-        HOME, CATALOG, REGISTRATIONS, TIMETABLE
+        HOME, CATALOG, REGISTRATIONS, TIMETABLE, SETTINGS
     }
 
     // Persistent student id across all student frames
@@ -193,6 +193,15 @@ public abstract class StudentFrameBase extends JFrame {
             dispose();
         });
         nav.add(logout);
+
+        NavButton settings = new NavButton("Settings", false);
+        settings.addActionListener(e -> {
+            System.out.println("[DEBUG] NAV → settings");
+            currentStudentId = null;
+            new StudentSettingsPage(studentId, userDisplayName).setVisible(true);
+            dispose();
+        });
+        nav.add(settings);
 
         sidebar.add(nav, BorderLayout.CENTER);
 
