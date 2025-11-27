@@ -11,17 +11,6 @@ import java.sql.SQLException;
 import erp.ui.common.FontKit;
 import erp.ui.common.RoundedPanel;
 
-/**
- * GradeStudents (Updated)
- *
- * This page used to contain CSV uploading and manual grading logic.
- * Now grading is handled entirely inside:
- *
- *      → MySections → Section → Gradebook Page
- *
- * So this screen has been redesigned into a simple, clean redirect panel
- * that guides the instructor to “My Sections” where all grading now lives.
- */
 public class GradeStudents extends InstructorFrameBase {
 
     private static final Color TEXT_900 = new Color(24, 30, 37);

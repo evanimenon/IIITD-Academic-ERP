@@ -34,21 +34,6 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Set;
 
-/**
- * MySections
- *
- * - Shows only sections taught by the current instructor.
- * - Compact card layout.
- * - Clicking a card navigates (in-place) to a "Section Gradebook" view within
- *   the same frame using CardLayout.
- * - Gradebook view shows:
- *   • Summary stats + charts
- *   • Students (rows) x section components (cols) with editable scores,
- *     search bar, and CSV import/export.
- *
- * When maintenance mode is ON (from InstructorFrameBase.isReadOnly()),
- * all editing actions (Save, Import, table editing) are disabled.
- */
 public class MySections extends InstructorFrameBase {
 
     // --- Simple local models -------------------------------------------------

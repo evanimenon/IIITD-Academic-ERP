@@ -13,7 +13,6 @@ import java.time.format.DateTimeFormatter;
 
 public class ImportUsersHashedCsv {
 
-    // change this if your last_login format is different
     private static final DateTimeFormatter TS_FMT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -31,7 +30,6 @@ public class ImportUsersHashedCsv {
 
         System.out.println("Connecting to auth DB and importing from: " + csvPath);
 
-        // ⬇⬇ KEY CHANGE: use DatabaseConnection.auth().getConnection()
         try (Connection conn = DatabaseConnection.auth().getConnection()) {
             conn.setAutoCommit(false);
 
@@ -64,7 +62,7 @@ public class ImportUsersHashedCsv {
                     }
                     first = false;
 
-                    String[] parts = line.split(",", -1); // keep empty fields
+                    String[] parts = line.split(",", -1);
                     if (parts.length < 6) {
                         System.err.println("Skipping malformed line: " + line);
                         continue;
@@ -73,13 +71,11 @@ public class ImportUsersHashedCsv {
                     long userId       = Long.parseLong(parts[0].trim());
                     String username   = parts[1].trim();
                     String role       = parts[2].trim();
-                    String plainPass  = parts[3].trim();  // currently plain text in CSV
+                    String plainPass  = parts[3].trim(); 
                     String status     = parts[4].trim();
                     String lastLoginS = parts[5].trim();
 
-                    // hash the plain-text password
                     String hashed = PasswordUtil.hashPassword(plainPass);
-                    // (if you already use some other hasher, call that here instead)
 
                     ps.setLong(1, userId);
                     ps.setString(2, username);

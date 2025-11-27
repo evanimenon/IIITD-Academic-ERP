@@ -6,12 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-/**
- * Helper to map authenticated username to student row in erp_db.students.
- *
- * Assumes auth_db.users_auth.username corresponds to students.student_id
- * or students.roll_no (demo: stu1, stu2).
- */
+
 public class StudentLookupService {
 
     public static class StudentInfo {

@@ -10,15 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.Arrays;
 
-/**
- * Generic CSV → erp_db.<table> importer.
- * Usage:
- *   java ... erp.tools.ImportTableCsv <table_name> <path/to/file.csv>
- *
- * Expects:
- *   - First row = comma-separated column names matching the table columns.
- *   - No embedded commas in fields (simple CSV).
- */
 public class ImportTableCsv {
 
     public static void main(String[] args) throws Exception {
@@ -51,7 +42,6 @@ public class ImportTableCsv {
                         .map(String::trim)
                         .toArray(String[]::new);
 
-                // Build INSERT statement: INSERT INTO table (col1,col2,...) VALUES (?,?,...)
                 StringBuilder sb = new StringBuilder();
                 sb.append("INSERT INTO ").append(table).append(" (");
                 for (int i = 0; i < cols.length; i++) {
@@ -78,13 +68,11 @@ public class ImportTableCsv {
                                 .map(String::trim)
                                 .toArray(String[]::new);
 
-                        // pad or truncate to columns length
                         if (f.length != cols.length) {
                             f = Arrays.copyOf(f, cols.length);
                         }
 
                         for (int i = 0; i < cols.length; i++) {
-                            // let MySQL cast as needed; everything comes in as String
                             ps.setString(i + 1, f[i]);
                         }
 
@@ -95,7 +83,7 @@ public class ImportTableCsv {
                 }
 
                 c.commit();
-                System.out.println("✅ Imported " + ok + " rows into " + table + " from " + csv.getFileName());
+                System.out.println("Imported " + ok + " rows into " + table + " from " + csv.getFileName());
             } catch (Exception e) {
                 c.rollback();
                 throw e;

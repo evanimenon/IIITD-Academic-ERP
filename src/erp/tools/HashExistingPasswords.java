@@ -10,12 +10,10 @@ public class HashExistingPasswords {
     public static void main(String[] args) {
         System.out.println("Connecting to auth DB and hashing existing passwords...");
 
-        // Force init (not strictly needed, but explicit)
         DatabaseConnection.init();
 
         try (Connection conn = DatabaseConnection.auth().getConnection()) {
 
-            // --- Debug: which DB are we actually connected to? ---
             try (Statement s = conn.createStatement();
                  ResultSet rs = s.executeQuery("SELECT DATABASE()")) {
                 if (rs.next()) {
@@ -23,7 +21,6 @@ public class HashExistingPasswords {
                 }
             }
 
-            // --- Debug: how many rows are in users_auth? ---
             int totalRows;
             try (Statement s = conn.createStatement();
                  ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM users_auth")) {

@@ -27,3 +27,4 @@ src/resources/db.properties
 # Temporary files
 *.tmp
 *.swp
+src/resources/db.example.properties

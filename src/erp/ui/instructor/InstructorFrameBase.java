@@ -28,7 +28,6 @@ public abstract class InstructorFrameBase extends JFrame {
         HOME, SECTIONS, GRADES
     }
 
-    // Keep for compatibility, but we now *resolve* from AuthContext
     protected static String currentInstructorId;
 
     protected final String instructorId;
@@ -53,7 +52,7 @@ public abstract class InstructorFrameBase extends JFrame {
         // --- Resolve instructor id from args OR session ---
         String resolvedId = instrID;
         if (resolvedId == null || resolvedId.isBlank()) {
-            Integer uid = AuthContext.getUserId();  // helper you added in AuthContext
+            Integer uid = AuthContext.getUserId(); 
             if (uid != null) {
                 resolvedId = String.valueOf(uid);
             }
@@ -61,7 +60,6 @@ public abstract class InstructorFrameBase extends JFrame {
         currentInstructorId = resolvedId;   // keep static in sync
         this.instructorId = resolvedId;
 
-        // --- Resolve display name from args OR session ---
         String resolvedName = displayName;
         if (resolvedName == null || resolvedName.isBlank()) {
             String fromSession = AuthContext.getUsername(); // another helper in AuthContext
@@ -177,17 +175,6 @@ public abstract class InstructorFrameBase extends JFrame {
         });
         nav.add(sectionsBtn);
         nav.add(Box.createVerticalStrut(8));
-
-        // If you re-enable GradeStudents later, it’ll still work:
-        // NavButton gradeBtn = new NavButton("Grade Students", active == Page.GRADES);
-        // gradeBtn.addActionListener(e -> {
-        //     if (active != Page.GRADES) {
-        //         new GradeStudents(instructorId, userDisplayName).setVisible(true);
-        //         dispose();
-        //     }
-        // });
-        // nav.add(gradeBtn);
-        // nav.add(Box.createVerticalStrut(40));
 
         JSeparator sep = new JSeparator();
         sep.setForeground(new Color(60, 120, 116));

@@ -13,15 +13,8 @@ import java.time.format.DateTimeParseException;
 
 public class EnrollmentService {
 
-    // Universal deadline for DROPS (and optionally for registration testing)
     public static final LocalDate DROP_DEADLINE = LocalDate.of(2025, 11, 30);
 
-    /**
-     * Register a student for a course at course level.
-     * - Checks duplicate registration (any section of this course).
-     * - Checks total course capacity (sum of section capacities).
-     * - Picks the section with least load that still has free seats.
-     */
     public static String registerForCourse(String studentId, String courseId) {
         if (studentId == null || studentId.isBlank()) {
             return "Student ID not available.";
@@ -164,11 +157,6 @@ public class EnrollmentService {
         }
     }
 
-    /**
-     * A course is "registered" for a student if there exists a row in
-     * erp_db.enrollments with this student, some section for this course,
-     * AND status = 'REGISTERED'.
-     */
     public static boolean isRegisteredForCourse(String studentId, String courseId) {
         final String sql = "SELECT COUNT(*) " +
                 "FROM erp_db.enrollments e " +
@@ -194,12 +182,7 @@ public class EnrollmentService {
         return false;
     }
 
-    /**
-     * ✅ NEW:
-     * A course can be dropped iff:
-     *  - The global/settings drop deadline has NOT passed, and
-     *  - There is at least one REGISTERED enrollment for this student+course.
-     */
+
     public static boolean canDropCourse(String studentId, String courseId) {
         try (Connection conn = DatabaseConnection.erp().getConnection()) {
 
@@ -233,10 +216,6 @@ public class EnrollmentService {
         return false;
     }
 
-    /**
-     * Drops a course for a student if we are before the configured drop deadline.
-     * Returns a human-readable message for the UI.
-     */
     public static String dropCourse(String studentId, String courseId) {
         try (Connection conn = DatabaseConnection.erp().getConnection()) {
 
@@ -274,10 +253,6 @@ public class EnrollmentService {
         }
     }
 
-    /**
-     * Reads COURSE_DROP_DEADLINE from erp_db.settings as YYYY-MM-DD.
-     * Returns null if not set or invalid – in that case we allow dropping anytime.
-     */
     private static LocalDate fetchDropDeadline(Connection conn) throws SQLException {
         final String sql = "SELECT setting_value " +
                 "FROM erp_db.settings " +
@@ -292,7 +267,6 @@ public class EnrollmentService {
                     try {
                         return LocalDate.parse(value.trim(), DateTimeFormatter.ISO_LOCAL_DATE);
                     } catch (DateTimeParseException ex) {
-                        // bad date in DB – treat as no deadline
                         ex.printStackTrace();
                     }
                 }
