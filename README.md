@@ -89,11 +89,10 @@ If using a non-standard MySQL port, update the URLs accordingly.
 
 ---
 
-### 4. Ensure MySQL is running before launching the app.
+### 3. Ensure MySQL is running before launching the app.
 
 ---
 
----
 
 ## Project Structure
 
