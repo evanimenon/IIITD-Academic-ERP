@@ -1,63 +1,52 @@
 -- =========================================
--- IIITD Academic ERP - Demo Auth Database
--- Creates schema + users_auth table + demo rows (with BCRYPT hashes)
--- Demo credentials (case sensitive):
---   Admins:      admin1           / admin@123
---   Instructors: inst1, sambuddho / inst@123
---                 inst3, payel, shad, ravi
---   Students:    stu1, stu2       / stud@123
+-- IIITD Academic ERP - Auth DB (CSV seed)
+-- Uses data/users_auth.csv
 -- =========================================
 
--- (Optional) Create MySQL app user expected by the app:
--- Uncomment and run with a privileged MySQL account if needed.
--- CREATE USER IF NOT EXISTS 'auth_user'@'localhost' IDENTIFIED BY 'secret';
--- GRANT ALL PRIVILEGES ON auth_db.* TO 'auth_user'@'localhost';
--- FLUSH PRIVILEGES;
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
 
--- Create database
-CREATE DATABASE IF NOT EXISTS auth_db;
+DROP DATABASE IF EXISTS auth_db;
+CREATE DATABASE auth_db
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_0900_ai_ci;
 USE auth_db;
 
--- Recreate table for a clean demo (safe for demo environments)
 DROP TABLE IF EXISTS users_auth;
 
+-- Matches your current schema (see screenshot)
 CREATE TABLE users_auth (
-  user_id       BIGINT PRIMARY KEY AUTO_INCREMENT,
-  username      VARCHAR(64)  NOT NULL UNIQUE,
-  role          ENUM('admin','instructor','student') NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  status        ENUM('active','inactive') DEFAULT 'active',
-  last_login    DATETIME NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  user_id         INT        NOT NULL,
+  username        TEXT       NOT NULL,
+  role            TEXT       NOT NULL,
+  password_hash   TEXT       NOT NULL,
+  status          TEXT       NOT NULL,
+  last_login      TEXT       NULL,
+  failed_attempts INT        NOT NULL DEFAULT 0,
+  locked_until    DATETIME   NULL,
+  PRIMARY KEY (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- -----------------------------------------
--- Demo users (bcrypt-hashed passwords)
--- Hashes generated via BCrypt (work factor 12)
--- admin@123 → $2a$12$QWyylCqkkii8JOqGl14G8eVKXe8LDBuqgcEblQ1wc8hPJN029Js.K
--- inst@123  → $2a$12$GMXaY1JgfkJ6OOGqDxDdVOIFzWARr2kBiSLD7ltqxTk8qlyBhFax.
--- stud@123  → $2a$12$XAoENJtYORZ/FfXiXJoan.IjqLX9MWncTJ69obWn/VOFDuUkJUY5e
--- -----------------------------------------
+-- Helpful indexes (optional, but good to have)
+CREATE INDEX idx_users_auth_username ON users_auth (username(100));
+CREATE INDEX idx_users_auth_role     ON users_auth (role(50));
+CREATE INDEX idx_users_auth_status   ON users_auth (status(50));
 
-INSERT INTO users_auth (username, role, password_hash, status) VALUES
--- Admins
-('admin1','admin','$2a$12$QWyylCqkkii8JOqGl14G8eVKXe8LDBuqgcEblQ1wc8hPJN029Js.K','active'),
+SET SESSION sql_log_bin = 0;
+-- If LOAD DATA LOCAL fails, run once as root:
+--   SET GLOBAL local_infile = 1;
 
--- Instructors
-('inst1','instructor',     '$2a$12$GMXaY1JgfkJ6OOGqDxDdVOIFzWARr2kBiSLD7ltqxTk8qlyBhFax.','active'),
-('sambuddho','instructor', '$2a$12$GMXaY1JgfkJ6OOGqDxDdVOIFzWARr2kBiSLD7ltqxTk8qlyBhFax.','active'),
-('inst3','instructor',     '$2a$12$GMXaY1JgfkJ6OOGqDxDdVOIFzWARr2kBiSLD7ltqxTk8qlyBhFax.','active'),
-('payel','instructor',     '$2a$12$GMXaY1JgfkJ6OOGqDxDdVOIFzWARr2kBiSLD7ltqxTk8qlyBhFax.','active'),
-('shad','instructor',      '$2a$12$GMXaY1JgfkJ6OOGqDxDdVOIFzWARr2kBiSLD7ltqxTk8qlyBhFax.','active'),
-('ravi','instructor',      '$2a$12$GMXaY1JgfkJ6OOGqDxDdVOIFzWARr2kBiSLD7ltqxTk8qlyBhFax.','active'),
+-- Expected CSV header:
+-- user_id,username,role,password_hash,status,last_login,failed_attempts,locked_until
+LOAD DATA LOCAL INFILE 'users_auth.csv'
+INTO TABLE users_auth
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(user_id, username, role, password_hash, status,
+ @last_login, failed_attempts, @locked_until)
+SET last_login   = NULLIF(@last_login,''),
+    locked_until = NULLIF(@locked_until,'');
 
--- Students
-('stu1','student','$2a$12$XAoENJtYORZ/FfXiXJoan.IjqLX9MWncTJ69obWn/VOFDuUkJUY5e','active'),
-('stu2','student','$2a$12$XAoENJtYORZ/FfXiXJoan.IjqLX9MWncTJ69obWn/VOFDuUkJUY5e','active');
-
--- Helpful indexes
-CREATE INDEX idx_users_auth_role ON users_auth(role);
-CREATE INDEX idx_users_auth_status ON users_auth(status);
-
--- Quick verification queries (optional)
--- SELECT username, role, status, LEFT(password_hash,4) AS pfx, LENGTH(password_hash) AS len FROM users_auth;
--- Expected: pfx = '$2a' (or '$2b') and len ≈ 60
+SET FOREIGN_KEY_CHECKS = 1;

@@ -1,21 +1,23 @@
--- bootstrap.sql — ERP DB (portable, CSV-driven)
--- MySQL 8.x recommended
+-- =========================================
+-- IIITD Academic ERP - Main ERP DB (CSV seed)
+-- Uses CSVs in ./data:
+--   students.csv, instructors.csv, courses.csv,
+--   sections.csv, section_components.csv,
+--   enrollments.csv, grades.csv, settings.csv
+-- =========================================
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP DATABASE IF EXISTS erp_db;
-CREATE DATABASE erp_db CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE erp_db
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_0900_ai_ci;
 USE erp_db;
 
--- ────────────────────────────────────────────────────────────────────────────
--- USERS (external) NOTE:
--- Your auth DB exists separately. We keep a FK only for INSTRUCTORS since
--- those IDs are BIGINTs matching auth_db.users_auth.user_id.
--- Students use alphanumeric IDs → do NOT FK them to auth_db.
--- ────────────────────────────────────────────────────────────────────────────
-
--- STUDENTS  (IDs like 'aadi24001', etc.)
+-- ─────────────────────────────────────────
+-- STUDENTS
+-- ─────────────────────────────────────────
 CREATE TABLE students (
   student_id VARCHAR(64)  NOT NULL,
   roll_no    VARCHAR(32)  NOT NULL,
@@ -26,7 +28,9 @@ CREATE TABLE students (
   UNIQUE KEY uq_students_roll (roll_no)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- INSTRUCTORS (FK to auth_db.users_auth.user_id)
+-- ─────────────────────────────────────────
+-- INSTRUCTORS  (FK to auth_db.users_auth.user_id)
+-- ─────────────────────────────────────────
 CREATE TABLE instructors (
   instructor_id   BIGINT       NOT NULL,
   department      VARCHAR(32)  NOT NULL,
@@ -38,7 +42,9 @@ CREATE TABLE instructors (
     ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- COURSES (course_id like 'BIO101'; code = acronym like 'FOB')
+-- ─────────────────────────────────────────
+-- COURSES
+-- ─────────────────────────────────────────
 CREATE TABLE courses (
   course_id VARCHAR(32)  NOT NULL,
   code      VARCHAR(16)  NOT NULL,
@@ -48,7 +54,9 @@ CREATE TABLE courses (
   KEY idx_courses_code (code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- ─────────────────────────────────────────
 -- SECTIONS
+-- ─────────────────────────────────────────
 CREATE TABLE sections (
   section_id    INT NOT NULL AUTO_INCREMENT,
   course_id     VARCHAR(32) NOT NULL,
@@ -69,13 +77,31 @@ CREATE TABLE sections (
     ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- ─────────────────────────────────────────
+-- SECTION_COMPONENTS  (***id*** is the PK)
+-- CSV: id,section_id,component_name,weight
+-- ─────────────────────────────────────────
+CREATE TABLE section_components (
+  id             INT NOT NULL AUTO_INCREMENT,
+  section_id     INT NOT NULL,
+  component_name TEXT NOT NULL,
+  weight         INT NOT NULL,
+  PRIMARY KEY (id),
+  KEY idx_seccomp_section (section_id),
+  CONSTRAINT fk_seccomp_section
+    FOREIGN KEY (section_id) REFERENCES sections(section_id)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ─────────────────────────────────────────
 -- ENROLLMENTS
+-- ─────────────────────────────────────────
 CREATE TABLE enrollments (
   enrollment_id INT NOT NULL AUTO_INCREMENT,
   student_id    VARCHAR(64) NOT NULL,
   section_id    INT         NOT NULL,
   status        ENUM('REGISTERED','DROPPED') NOT NULL DEFAULT 'REGISTERED',
-  final_grade   VARCHAR(8)  NULL,  -- e.g., A, A-, B+, default NULL
+  final_grade   VARCHAR(8)  NULL,
   PRIMARY KEY (enrollment_id),
   UNIQUE KEY uq_student_section (student_id, section_id),
   KEY idx_enr_student (student_id),
@@ -88,36 +114,41 @@ CREATE TABLE enrollments (
     ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-
--- GRADES (one row per component; composite PK)
+-- ─────────────────────────────────────────
+-- GRADES
+-- CSV: grade_id,enrollment_id,component_id,score
+-- component_id here refers to section_components.id
+-- ─────────────────────────────────────────
 CREATE TABLE grades (
+  grade_id      INT NOT NULL AUTO_INCREMENT,
   enrollment_id INT NOT NULL,
-  component     VARCHAR(64) NOT NULL, -- Quiz1, Midterm, EndSem, etc.
-  score         DECIMAL(5,2) NULL,
-  final_grade   VARCHAR(8)  NULL,     -- e.g., A, A-, B+
-  PRIMARY KEY (enrollment_id, component),
-  CONSTRAINT fk_grades_enr
+  component_id  INT NOT NULL,
+  score         DOUBLE NULL,
+  PRIMARY KEY (grade_id),
+  KEY idx_grades_enrollment (enrollment_id),
+  KEY idx_grades_component  (component_id),
+  CONSTRAINT fk_grades_enrollment
     FOREIGN KEY (enrollment_id) REFERENCES enrollments(enrollment_id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_grades_component
+    FOREIGN KEY (component_id)  REFERENCES section_components(id)
     ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- SETTINGS
+-- ─────────────────────────────────────────
+-- SETTINGS  (CSV: setting_key,setting_value)
+-- ─────────────────────────────────────────
 CREATE TABLE settings (
-  `key`   VARCHAR(64)  NOT NULL,
-  `value` VARCHAR(256) NULL,
-  PRIMARY KEY (`key`)
+  setting_key   VARCHAR(64)  NOT NULL,
+  setting_value VARCHAR(256) NULL,
+  PRIMARY KEY (setting_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- ────────────────────────────────────────────────────────────────────────────
--- CSV IMPORTS  (expects CSVs in same directory; first row = headers)
--- If secure_file_priv blocks loads, run the mysql client with --local-infile=1
--- Example:
---   mysql --local-infile=1 -u root -p erp_db < erp_db.sql
--- ────────────────────────────────────────────────────────────────────────────
+-- ─────────────────────────────────────────
+-- CSV IMPORTS
+-- ─────────────────────────────────────────
 SET SESSION sql_log_bin = 0;
-
--- You may need:
--- SET GLOBAL local_infile = 1;
+-- If needed once as root:  SET GLOBAL local_infile = 1;
 
 LOAD DATA LOCAL INFILE 'students.csv'
 INTO TABLE students
@@ -143,7 +174,6 @@ LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (course_id, code, title, credits);
 
--- sections.csv may or may not include section_id; we handle blank → AUTO_INCREMENT
 LOAD DATA LOCAL INFILE 'sections.csv'
 INTO TABLE sections
 CHARACTER SET utf8mb4
@@ -153,8 +183,14 @@ IGNORE 1 LINES
 (@sid, course_id, instructor_id, day_time, room, capacity, semester, year)
 SET section_id = NULLIF(@sid,'');
 
--- enrollments.csv: enrollment_id (optional), student_id, section_id, status
--- enrollments.csv: enrollment_id (optional), student_id, section_id, status, final_grade
+LOAD DATA LOCAL INFILE 'section_components.csv'
+INTO TABLE section_components
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(id, section_id, component_name, weight);
+
 LOAD DATA LOCAL INFILE 'enrollments.csv'
 INTO TABLE enrollments
 CHARACTER SET utf8mb4
@@ -166,24 +202,20 @@ SET enrollment_id = NULLIF(@eid,''),
     status        = IFNULL(NULLIF(@st,''),'REGISTERED'),
     final_grade   = NULLIF(@fg,'');
 
-
--- grades.csv: enrollment_id, component, score, final_grade
 LOAD DATA LOCAL INFILE 'grades.csv'
 INTO TABLE grades
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
-(enrollment_id, component, @sc, @fg)
-SET score = NULLIF(@sc,''), final_grade = NULLIF(@fg,'');
+(grade_id, enrollment_id, component_id, score);
 
--- settings.csv: key,value
 LOAD DATA LOCAL INFILE 'settings.csv'
 INTO TABLE settings
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
-(`key`,`value`);
+(setting_key, setting_value);
 
 SET FOREIGN_KEY_CHECKS = 1;
