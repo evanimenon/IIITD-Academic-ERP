@@ -1,12 +1,13 @@
 # IIITD Academic ERP – CSE201 Advanced Programming Project
 
-A desktop Academic ERP system for IIIT-Delhi that supports students, instructors, and administrators: course registration, grading, and basic maintenance tooling – implemented as a Java Swing application backed by MySQL and JDBC connection pooling. 
+A desktop Academic ERP system for IIIT-Delhi supporting students, instructors, and administrators: course registration, grading, timetable generation, and maintenance tooling — implemented as a **Java Swing** application backed by **MySQL** with **JDBC + HikariCP** connection pooling.
 
 **Made by**
-* Evani Menon – 2024210
-* Nandika Routray – 2024371
 
-**Course:** CSE201 – Advanced Programming Final Course Project
+* **Evani Menon – 2024210**
+* **Nandika Routray – 2024371**
+
+**Course:** CSE201 – Advanced Programming (Final Course Project)
 
 ---
 
@@ -20,50 +21,85 @@ java -cp "out:lib/*:src:src/resources" erp.Main
 
 
 ### Windows (cmd.exe alternative)
-
 for /R src %f in (*.java) do @echo %f >> files.txt
-javac -cp ".;lib/*" -d bin @files.txt   
-java -cp "bin;lib/*" erp.ui.auth.LoginPage
+javac -cp ".;lib/*" -d bin @files.txt
+java -cp "bin;lib/*" erp.Main
 ```
 
 ---
 
 ## Database Setup (MySQL 8)
 
-1. **Create databases** (names can be adjusted in `resources/db.properties`):
-   ```sql
-   CREATE DATABASE auth_db;
-   CREATE DATABASE erp_db;
-   ```
+The project uses **two databases**:
 
-2. **Import schema + seed data** using the SQL files in the `data/` folder (exact filenames may differ slightly):
-   * Into `auth_db`: tables and seed data for `users_auth` (login accounts).
-   * Into `erp_db`: tables and seed data for
-     `students, instructors, courses, sections, enrollments, grades, settings`.
+* `auth_db` — login accounts
+* `erp_db` — students, instructors, courses, sections, components, enrollments, grades, settings
 
-   Example from MySQL CLI:
+Seed scripts + CSV data are located in the **`data/`** folder.
 
-   ```bash
-   mysql -u root -p auth_db < data/auth_db.sql
-   mysql -u root -p erp_db  < data/erp_db.sql
-   ```
+---
 
-3. **Configure DB credentials** in:
+### 1. Enable CSV imports
 
-   * `src/resources/db.properties` (copied into `out/` at runtime).
+Run inside MySQL:
 
-   Typical keys:
-   ```properties
-   auth.url=jdbc:mysql://localhost:3306/auth_db
-   auth.user=root
-   auth.password=your_password
+```sql
+SET GLOBAL local_infile = 1;
+```
 
-   erp.url=jdbc:mysql://localhost:3306/erp_db
-   erp.user=root
-   erp.password=your_password
-   ```
+---
 
-4. Ensure MySQL is running before starting the app.
+### 2. Run seed scripts
+
+From project root:
+
+```bash
+cd data
+
+# Seed authentication DB
+mysql --local-infile=1 -u root -p < auth_db.sql
+
+# Seed main ERP DB
+mysql --locallocal-infile=1 -u root -p < erp_db.sql
+```
+
+Each script will:
+
+* Drop the database if it exists
+* Recreate tables
+* Load data from the CSV files in `/data`
+* Set up foreign keys & indexes
+
+---
+
+### 3. Configure database credentials
+
+Edit:
+
+```
+src/resources/db.properties
+```
+
+(This file is copied into `out/` automatically during compile.)
+
+Typical configuration:
+
+```properties
+auth.url=jdbc:mysql://localhost:3306/auth_db
+auth.user=root
+auth.password=your_password
+
+erp.url=jdbc:mysql://localhost:3306/erp_db
+erp.user=root
+erp.password=your_password
+```
+
+Replace `your_password` with your MySQL password.
+If using a non-standard MySQL port, update the URLs accordingly.
+
+---
+
+### 4. Ensure MySQL is running before launching the app.
 
 ---
 
@@ -75,23 +111,23 @@ java -cp "bin;lib/*" erp.ui.auth.LoginPage
 │   └── erp
 │       ├── Main.java
 │       ├── auth/              # Login, roles, AuthContext
-│       ├── db/                # DatabaseConnection, HikariCP pool, DAOs, MaintenanceService
+│       ├── db/                # Hikari pools, DatabaseConnection, DAOs, MaintenanceService
 │       ├── models/            # POJOs for users, courses, sections, enrollments, grades
-│       ├── tools/             # Utilities (e.g., CSV importers)
+│       ├── tools/             # CSV import/export utilities
 │       └── ui/
-│           ├── common/        # Shared UI components (RoundedPanel, FontKit, NavButton…)
-│           ├── auth/          # LoginPage and auth frame
-│           ├── student/       # Student dashboards, course catalog, timetable, grades
-│           ├── instructor/    # Instructor dashboards, grading, class stats
-│           └── admin/         # Admin dashboards, manage users/courses/sections, maintenance
+│           ├── common/        # Shared UI widgets (RoundedPanel, FontKit, NavButton…)
+│           ├── auth/          # Login UI
+│           ├── student/       # Student dashboard, catalog, timetable, grades
+│           ├── instructor/    # Instructor dashboard, grading, class stats
+│           └── admin/         # Admin dashboard: users/courses/sections, enrollment, maintenance
 ├── resources
-│   ├── fonts/                 # Inter and other fonts
-│   ├── images/                # Logos, icons, UI artwork
+│   ├── fonts/                 # Inter font family
+│   ├── images/                # Icons and UI assets
 │   └── db.properties          # DB configuration (copied into out/)
 ├── data
-│   ├── *.csv                  # Seed CSVs for users / demo data
-│   └── *.sql                  # Schema + seed SQL for auth_db and erp_db
-├── lib                        # External JARs (JDBC driver, HikariCP, etc.)
+│   ├── *.csv                  # Seed CSVs for all tables
+│   └── *.sql                  # SQL seeds for auth_db & erp_db
+├── lib                        # External JARs (MySQL Connector/J, HikariCP)
 ├── out/                       # Compiled classes + copied resources (generated)
 └── README.md
 ```
@@ -100,7 +136,6 @@ java -cp "bin;lib/*" erp.ui.auth.LoginPage
 
 ## Demo Accounts
 
-
 | Role       | Username | Password  |
 | ---------- | -------- | --------- |
 | Admin      | `admin1` | `temp123` |
@@ -108,137 +143,144 @@ java -cp "bin;lib/*" erp.ui.auth.LoginPage
 | Student    | `stu1`   | `temp123` |
 | Student    | `stu2`   | `temp123` |
 
-
 ---
 
 ## Features
 
 ### 1. Authentication & Roles
 
-* Central **login screen** for all users.
-* Role-based redirection to **Admin**, **Instructor**, or **Student** dashboards.
-* Auth data stored in `auth_db.users_auth` with secure password handling.
+* Central login screen
+* Role-based dashboards
+* Secure credential storage
+* Values loaded from `auth_db.users_auth`
+
+---
 
 ### 2. Student Portal
 
-* **Dashboard overview** with welcome meta, current semester and maintenance banner.
-  
-* **Course Catalog & Registration**
+#### Dashboard
 
-  * Browse all offered courses with code, acronym, title, and credits.
-  * Register / drop sections (subject to:
+* Welcome banner, student info, semester
+* Maintenance mode banner when system is locked
 
-    * global **course drop deadline** from `settings.COURSE_DROP_DEADLINE`
-    * **maintenance mode** – registration is read-only when enabled).
-  * Registered courses visually pinned to the top and marked with a badge.
-  
-* **My Timetable**
+#### Course Catalog & Registration
 
-  * Weekly timetable grid by day/time.
-  * Cells show **course acronym** + section.
+* Browse available courses
 
-   
-* **My Grades**
+* Register/drop sections
 
-  * Per-course grade view using the `grades` table.
-  * Read-only; driven directly from instructor entries.
+* Global controls (via `settings` table):
+
+  * course drop deadline
+  * maintenance mode
+
+* Registered courses:
+
+  * Displayed **first**
+  * Highlighted with a **green badge**
+
+#### My Timetable
+
+* Weekly timetable grid
+* Cells display: **Course acronym + Section**
+
+#### My Grades
+
+* Component-level grade breakdown
+* Final grade computed from instructor-entered components
+
+---
 
 ### 3. Instructor Portal
 
-* **My Sections**
+#### My Sections
 
-  * Cards for each section taught (course, semester, room, capacity, time).
-* **Grade Students**
+* Cards for each section taught
+* Course, semester, timings, room, capacity
 
-  * View enrolled students per section.
-  * Enter / update grades, with inline validation.
-  * Saves to `grades` table; uses transactions to keep data consistent.
-* **Class Stats (optional panel)**
+#### Grade Students
 
-  * Simple aggregate statistics per section (e.g., counts / distribution).
-* **Maintenance awareness**
+* Per-section student list
 
-  * Shared banner: when maintenance mode is ON, all write actions (grading etc.)
-    are disabled, but instructors can still view data.
+* Grade entry
+
+* Uses:
+
+  * `grades` table
+  * `section_components` for weightage
+
+* Auto-updates final grade
+
+#### Class Stats
+
+* Basic statistics for grade distribution
+
+---
 
 ### 4. Admin Portal
 
-* **User Management**
+#### User Management
 
-  * CRUD for **students**, **instructors**, and login accounts in `users_auth`.
-  * Import helpers via CSV (e.g., `erp.tools.ImportUsersCsv`).
-* **Manage Courses & Sections**
+* Manage students & instructors
+* Create login accounts in `users_auth`
+* CSV-based import
 
-  * Grid of all courses (ID, acronym, title, credits).
-  * For a selected course:
+#### Manage Courses & Sections
 
-    * List of **sections** with instructor, room, capacity, semester, year, time.
-    * Editable fields for section metadata (room, capacity, time, instructor).
-  * **Enrollment management**
+* Full course list
+* For a selected course:
 
-    * Table of enrolled students for the selected section.
-    * Add student to section, remove student from section.
-    * Changes staged in memory and committed via a prominent **“Save Changes”**
-      button anchored at the bottom-right of the panel.
-* **Global Settings**
+  * All sections shown
+  * Editable metadata:
 
-  * Maintenance mode (see below).
-  * Course drop deadline and other global flags stored in the `settings` table.
-* **Maintenance & Backup**
+    * Room
+    * Capacity
+    * Instructor
+    * Day/Time
 
-  * Dedicated **Maintenance & Backup** page:
+#### Enrollment Management
 
-    * Toggle **maintenance mode** (ON/OFF) – persisted as
-      `settings.maintenance_mode = 'ON'/'OFF'`.
-    * When ON, all student/instructor UIs show a banner and become read-only.
-    * Export CSV snapshots of core tables:
-      `users_auth, students, instructors, courses, sections, enrollments, grades`.
-    * Optional “export selected tables” dialog with multi-select.
+* View enrolled students for a section
+* Add/remove enrollments
+* Changes saved via a “Save Changes” action
 
-### 5. Maintenance Mode (System-wide)
+#### Global Settings
 
-* Centralized service `MaintenanceService`:
+* Course drop deadline
+* Maintenance mode toggle
 
-  * `isMaintenanceOn()` reads from `erp_db.settings`.
-  * `setMaintenance(boolean)` writes/updates the setting with
-    `maintenance_mode = 'ON'/'OFF'`.
-* Every main frame (Admin, Student, Instructor) checks this flag on load and when
-  switching pages:
+#### Maintenance & Backup
 
-  * Shows a **colored banner** when maintenance is ON.
-  * Disables all actions that mutate data (registration, grading, edits).
-* The admin toggle provides confirmation dialogs and user feedback
-  (“Maintenance mode is now ON/OFF”).
+* Toggle maintenance mode (ON/OFF)
+* Export CSV snapshots for all major tables
+
+---
+
+### 5. System-wide Maintenance Mode
+
+* Controlled via `erp_db.settings`
+* When ON:
+
+  * All write actions (registration, grading, editing) are disabled
+  * Visible banner across all dashboards
+* Admin can toggle it from Maintenance Panel
+
+---
 
 ### 6. Tools & Utilities
 
-* **CSV importers** (in `erp.tools.*`) to bulk-load initial data.
-* Shared UI components:
-
-  * **Rounded panels/buttons**, consistent **Inter** typography,
-  * Reusable nav bar with hover effects,
-  * Small helper dialogs for errors, confirmations, and info messages.
+* CSV importers (`erp.tools.*`)
+* Custom Swing components (RoundedPanel, RoundedButton, FontKit)
+* Export utilities via `FileWriter`
+* Helper dialogs for confirmation/error/info
 
 ---
 
 ## Tech Stack
 
-* **Language:** Java (JDK compatible with the course setup, e.g. Java 17).
-* **Desktop UI:** Java Swing + custom components (RoundedPanel, RoundedButton, etc.).
-* **Database:** MySQL 8 (`auth_db`, `erp_db`).
-* **Persistence & Connectivity:**
-
-  * JDBC (MySQL Connector/J driver in `lib/`).
-  * HikariCP connection pooling via `DatabaseConnection` helper.
-* **Data Layer:**
-
-  * Normalized relational schema with foreign keys and cascading behavior for:
-    `courses`, `sections`, `students`, `instructors`,
-    `enrollments`, `grades`, `settings`.
-* **Build / Run:**
-
-  * Plain `javac` + `java` commands, wired via simple shell / PowerShell scripts.
-* **Misc:**
-
-  * CSV exports via plain Java IO (`FileWriter`, `ResultSetMetaData`) from
-    the **Maintenance** panel.
+* **Java (JDK 17)**
+* **Swing UI**
+* **MySQL 8**
+* **JDBC + HikariCP connection pooling**
+* **CSV-based seeding (LOAD DATA LOCAL INFILE)**
+* **Plain javac/java build pipeline**
