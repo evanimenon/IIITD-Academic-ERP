@@ -134,7 +134,7 @@ java -cp "bin;lib/*" erp.ui.auth.LoginPage
     * **maintenance mode** – registration is read-only when enabled).
   * Registered courses visually pinned to the top and marked with a badge.
   
-  <img width="1496" height="903" alt="Screenshot 2025-11-27 at 17 22 19" src="https://github.com/user-attachments/assets/cb28f3a9-4377-46e5-939c-647d9281cd5a" />
+<img width="1496" height="903" alt="Screenshot 2025-11-27 at 17 22 19" src="https://github.com/user-attachments/assets/cb28f3a9-4377-46e5-939c-647d9281cd5a" />
 
 * **My Timetable**
 
@@ -147,6 +147,8 @@ java -cp "bin;lib/*" erp.ui.auth.LoginPage
 
   * Per-course grade view using the `grades` table.
   * Read-only; driven directly from instructor entries.
+  
+<img width="1280" height="827" alt="image" src="https://github.com/user-attachments/assets/d8b22724-838f-47fb-8315-93b8b15c8a7f" />
 
 ### 3. Instructor Portal
 
@@ -165,6 +167,8 @@ java -cp "bin;lib/*" erp.ui.auth.LoginPage
 
   * Shared banner: when maintenance mode is ON, all write actions (grading etc.)
     are disabled, but instructors can still view data.
+<img width="1280" height="827" alt="image" src="https://github.com/user-attachments/assets/e7a341d9-206e-4c7d-a728-3841c285dd03" />
+
 
 ### 4. Admin Portal
 
@@ -172,6 +176,8 @@ java -cp "bin;lib/*" erp.ui.auth.LoginPage
 
   * CRUD for **students**, **instructors**, and login accounts in `users_auth`.
   * Import helpers via CSV (e.g., `erp.tools.ImportUsersCsv`).
+<img width="1600" height="1034" alt="image" src="https://github.com/user-attachments/assets/50f21495-f503-43df-8094-28d512573d1e" />
+
 * **Manage Courses & Sections**
 
   * Grid of all courses (ID, acronym, title, credits).
@@ -185,6 +191,8 @@ java -cp "bin;lib/*" erp.ui.auth.LoginPage
     * Add student to section, remove student from section.
     * Changes staged in memory and committed via a prominent **“Save Changes”**
       button anchored at the bottom-right of the panel.
+<img width="1600" height="1034" alt="image" src="https://github.com/user-attachments/assets/7054bad6-dcb6-46be-b615-47be414ba474" />
+
 * **Global Settings**
 
   * Maintenance mode (see below).
@@ -214,6 +222,7 @@ java -cp "bin;lib/*" erp.ui.auth.LoginPage
   * Disables all actions that mutate data (registration, grading, edits).
 * The admin toggle provides confirmation dialogs and user feedback
   (“Maintenance mode is now ON/OFF”).
+<img width="1600" height="1034" alt="image" src="https://github.com/user-attachments/assets/02952de1-a060-4a00-bf86-07b42e335273" />
 
 ### 6. Tools & Utilities
 
