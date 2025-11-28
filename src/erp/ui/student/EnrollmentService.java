@@ -13,8 +13,6 @@ import java.time.format.DateTimeParseException;
 
 public class EnrollmentService {
 
-    public static final LocalDate DROP_DEADLINE = LocalDate.of(2025, 11, 30);
-
     public static String registerForCourse(String studentId, String courseId) {
         if (studentId == null || studentId.isBlank()) {
             return "Student ID not available.";
@@ -22,6 +20,15 @@ public class EnrollmentService {
 
         try (Connection c = DatabaseConnection.erp().getConnection()) {
             c.setAutoCommit(false);
+
+            // 🔹 NEW: prevent adding courses after COURSE_DROP_DEADLINE
+            LocalDate deadline = fetchDropDeadline(c);
+            LocalDate today = LocalDate.now();
+            if (deadline != null && today.isAfter(deadline)) {
+                c.rollback();
+                return "The add/drop deadline (" + deadline + ") has passed. "
+                        + "You cannot register for new courses.";
+            }
 
             // 1) Check duplicate registration in this course
             final String dupSql = "SELECT COUNT(*) " +
@@ -124,10 +131,24 @@ public class EnrollmentService {
         }
     }
 
-    /** Can we drop today? (before universal deadline). */
+    /** Can we drop today? Uses COURSE_DROP_DEADLINE from erp_db.settings. */
     public static boolean canDrop() {
-        // strictly before; change to !isAfter if you want inclusive deadline
-        return LocalDate.now().isBefore(DROP_DEADLINE);
+        try (Connection conn = DatabaseConnection.erp().getConnection()) {
+            LocalDate deadline = fetchDropDeadline(conn);
+            LocalDate today = LocalDate.now();
+
+            // If no deadline configured, allow operations
+            if (deadline == null) {
+                return true;
+            }
+
+            // Allow on or before deadline; block strictly after
+            return !today.isAfter(deadline);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            // On DB error, be lenient (or change to `false` if you prefer blocking)
+            return true;
+        }
     }
 
     /** Drop a specific enrollment for this student, if before deadline. */
@@ -143,7 +164,7 @@ public class EnrollmentService {
                 "  AND status = 'REGISTERED'";
 
         try (Connection c = DatabaseConnection.erp().getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+                PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setLong(1, enrollmentId);
             ps.setString(2, studentId);
             int updated = ps.executeUpdate();
@@ -166,7 +187,7 @@ public class EnrollmentService {
                 "  AND e.status = 'REGISTERED'";
 
         try (Connection conn = DatabaseConnection.erp().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, studentId);
             ps.setString(2, courseId);
@@ -181,7 +202,6 @@ public class EnrollmentService {
         }
         return false;
     }
-
 
     public static boolean canDropCourse(String studentId, String courseId) {
         try (Connection conn = DatabaseConnection.erp().getConnection()) {
@@ -259,7 +279,7 @@ public class EnrollmentService {
                 "WHERE setting_key = 'COURSE_DROP_DEADLINE'";
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                ResultSet rs = ps.executeQuery()) {
 
             if (rs.next()) {
                 String value = rs.getString("setting_value");
