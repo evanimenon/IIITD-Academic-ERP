@@ -318,23 +318,23 @@ private void onToggleMaintenance() {
         rows.add(Box.createVerticalStrut(10));
 
         // 3) Import (future)
-        RoundedButton importBtn = new RoundedButton("Import from CSV (coming soon)");
-        importBtn.setFont(FontKit.semibold(13f));
-        importBtn.setBackground(new Color(148, 163, 184));
-        importBtn.setForeground(Color.WHITE);
-        importBtn.setBorder(new EmptyBorder(8, 14, 8, 14));
-        importBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        importBtn.addActionListener(e -> JOptionPane.showMessageDialog(
-                this,
-                "Safe CSV import can be added later.\nRight now only export is implemented.",
-                "Import",
-                JOptionPane.INFORMATION_MESSAGE));
+        // RoundedButton importBtn = new RoundedButton("Import from CSV (coming soon)");
+        // importBtn.setFont(FontKit.semibold(13f));
+        // importBtn.setBackground(new Color(148, 163, 184));
+        // importBtn.setForeground(Color.WHITE);
+        // importBtn.setBorder(new EmptyBorder(8, 14, 8, 14));
+        // importBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        // importBtn.addActionListener(e -> JOptionPane.showMessageDialog(
+        //         this,
+        //         "Safe CSV import can be added later.\nRight now only export is implemented.",
+        //         "Import",
+        //         JOptionPane.INFORMATION_MESSAGE));
 
         JLabel importText = new JLabel("Planned: validate CSV files and safely merge into the database.");
         importText.setFont(FontKit.regular(12f));
         importText.setForeground(TEXT_600);
 
-        rows.add(buildButtonRow(importBtn, importText));
+        // rows.add(buildButtonRow(importBtn, importText));
 
         card.add(rows, BorderLayout.CENTER);
 
