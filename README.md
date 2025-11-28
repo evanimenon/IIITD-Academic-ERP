@@ -87,7 +87,6 @@ erp.password=your_password
 Replace `your_password` with your MySQL password.
 If using a non-standard MySQL port, update the URLs accordingly.
 
----
 
 ### 3. Ensure MySQL is running before launching the app.
 
@@ -167,15 +166,15 @@ If using a non-standard MySQL port, update the URLs accordingly.
 
   * Weekly timetable grid by day/time.
   * Cells show **course acronym** + section.
-<img width="1496" height="934" alt="Screenshot 2025-11-27 at 17 23 49" src="https://github.com/user-attachments/assets/049963d9-8f52-4fdb-ade7-597f46f40d40" />
+<img width="1428" height="864" alt="Screenshot 2025-11-28 at 23 47 52" src="https://github.com/user-attachments/assets/0fa84f1e-68c6-4cc0-873a-e45908c03d94" />
 
    
 * **My Grades**
 
   * Per-course grade view using the `grades` table.
   * Read-only; driven directly from instructor entries.
-  
-<img width="1280" height="827" alt="image" src="https://github.com/user-attachments/assets/d8b22724-838f-47fb-8315-93b8b15c8a7f" />
+<img width="1279" height="770" alt="Screenshot 2025-11-28 at 23 48 12" src="https://github.com/user-attachments/assets/1cc88da0-022f-4aa4-8ecc-645a82a817a2" />
+
 
 ### 3. Instructor Portal
 
@@ -203,7 +202,7 @@ If using a non-standard MySQL port, update the URLs accordingly.
 
   * CRUD for **students**, **instructors**, and login accounts in `users_auth`.
   * Import helpers via CSV (e.g., `erp.tools.ImportUsersCsv`).
-<img width="1600" height="1034" alt="image" src="https://github.com/user-attachments/assets/50f21495-f503-43df-8094-28d512573d1e" />
+<img width="1376" height="832" alt="Screenshot 2025-11-28 at 23 48 25" src="https://github.com/user-attachments/assets/546d2fd8-ea86-47e5-96f3-6aebb2c97edd" />
 
 * **Manage Courses & Sections**
 
@@ -218,7 +217,7 @@ If using a non-standard MySQL port, update the URLs accordingly.
     * Add student to section, remove student from section.
     * Changes staged in memory and committed via a prominent **“Save Changes”**
       button anchored at the bottom-right of the panel.
-<img width="1600" height="1034" alt="image" src="https://github.com/user-attachments/assets/7054bad6-dcb6-46be-b615-47be414ba474" />
+<img width="1379" height="830" alt="Screenshot 2025-11-28 at 23 48 36" src="https://github.com/user-attachments/assets/0e735732-1455-4aec-a4a7-43d6e870eaec" />
 
 * **Global Settings**
 
@@ -249,7 +248,7 @@ If using a non-standard MySQL port, update the URLs accordingly.
   * Disables all actions that mutate data (registration, grading, edits).
 * The admin toggle provides confirmation dialogs and user feedback
   (“Maintenance mode is now ON/OFF”).
-<img width="1600" height="1034" alt="image" src="https://github.com/user-attachments/assets/02952de1-a060-4a00-bf86-07b42e335273" />
+<img width="1378" height="834" alt="Screenshot 2025-11-28 at 23 48 45" src="https://github.com/user-attachments/assets/912175f1-132a-45fe-bf1d-1c4134b6eff9" />
 
 ### 6. Tools & Utilities
 
