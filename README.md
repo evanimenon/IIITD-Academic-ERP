@@ -20,50 +20,78 @@ java -cp "out:lib/*:src:src/resources" erp.Main
 
 
 ### Windows (cmd.exe alternative)
-
 for /R src %f in (*.java) do @echo %f >> files.txt
-javac -cp ".;lib/*" -d bin @files.txt   
-java -cp "bin;lib/*" erp.ui.auth.LoginPage
+javac -cp ".;lib/*" -d bin @files.txt
+java -cp "bin;lib/*" erp.Main
 ```
 
 ---
 
 ## Database Setup (MySQL 8)
 
-1. **Create databases** (names can be adjusted in `resources/db.properties`):
-   ```sql
-   CREATE DATABASE auth_db;
-   CREATE DATABASE erp_db;
-   ```
+The project uses **two databases**:
 
-2. **Import schema + seed data** using the SQL files in the `data/` folder (exact filenames may differ slightly):
-   * Into `auth_db`: tables and seed data for `users_auth` (login accounts).
-   * Into `erp_db`: tables and seed data for
-     `students, instructors, courses, sections, enrollments, grades, settings`.
+* `auth_db` — login accounts
+* `erp_db` — students, instructors, courses, sections, components, enrollments, grades, settings
 
-   Example from MySQL CLI:
+Pre-seeded SQL dumps are located in the **`data/`** folder:
 
-   ```bash
-   mysql -u root -p auth_db < data/auth_db.sql
-   mysql -u root -p erp_db  < data/erp_db.sql
-   ```
+- `data/auth_seed.sql`
+- `data/erp_seed.sql`
+---
 
-3. **Configure DB credentials** in:
+### 1. Create and seed the databases
 
-   * `src/resources/db.properties` (copied into `out/` at runtime).
+From project root:
 
-   Typical keys:
-   ```properties
-   auth.url=jdbc:mysql://localhost:3306/auth_db
-   auth.user=root
-   auth.password=your_password
+```bash
 
-   erp.url=jdbc:mysql://localhost:3306/erp_db
-   erp.user=root
-   erp.password=your_password
-   ```
+# Seed authentication DB (auth_db)
+mysql -u root -p < data/auth_seed.sql
 
-4. Ensure MySQL is running before starting the app.
+# Seed main ERP DB (erp_db)
+mysql -u root -p < data/erp_seed.sql
+```
+
+Each script will:
+
+* Drop the database if it exists
+* Recreate tables
+* Load data from the CSV files in `/data`
+* Set up foreign keys & indexes
+
+---
+
+### 2. Configure database credentials
+
+Edit:
+
+```
+src/resources/db.properties
+```
+
+(This file is copied into `out/` automatically during compile.)
+
+Typical configuration:
+
+```properties
+auth.url=jdbc:mysql://localhost:3306/auth_db
+auth.user=root
+auth.password=your_password
+
+erp.url=jdbc:mysql://localhost:3306/erp_db
+erp.user=root
+erp.password=your_password
+```
+
+Replace `your_password` with your MySQL password.
+If using a non-standard MySQL port, update the URLs accordingly.
+
+---
+
+### 4. Ensure MySQL is running before launching the app.
+
+---
 
 ---
 

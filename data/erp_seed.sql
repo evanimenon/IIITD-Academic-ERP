@@ -18,6 +18,13 @@
 --
 -- Table structure for table `courses`
 --
+DROP DATABASE IF EXISTS erp_db;
+CREATE DATABASE erp_db;
+USE erp_db;
+
+SET GLOBAL local_infile = 1;
+
+SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS `courses`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

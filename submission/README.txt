@@ -46,7 +46,6 @@ Pre-seeded SQL dumps are located in the **`data/`** folder:
 From project root:
 
 ```bash
-cd data
 
 # Seed authentication DB (auth_db)
 mysql -u root -p < data/auth_seed.sql

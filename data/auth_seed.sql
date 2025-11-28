@@ -18,6 +18,13 @@
 --
 -- Table structure for table `users_auth`
 --
+DROP DATABASE IF EXISTS auth_db;
+CREATE DATABASE auth_db;
+USE auth_db;
+
+SET GLOBAL local_infile = 1;
+
+DROP TABLE IF EXISTS users_auth;
 
 DROP TABLE IF EXISTS `users_auth`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
