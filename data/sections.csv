@@ -1,5 +1,5 @@
 section_id,course_id,instructor_id,day_time,room,capacity,semester,year
-3,ABC101,1000001,"Wed 08:00-09:00",B210,2,Monsoon,2025
+3,ABC101,1000001,"Wed 08:00-09:00",B213,2,Monsoon,2025
 4,ABC102,1000002,"Thu 11:00-12:30",A204,2,Monsoon,2025
 5,COM101,1000004,"Mon 09:00-10:30",C101,80,Monsoon,2025
 7,COM101,1000004,"Wed 09:00-10:30",C102,80,Monsoon,2025
@@ -12,7 +12,7 @@ section_id,course_id,instructor_id,day_time,room,capacity,semester,year
 14,MTH100,1000011,"Mon 16:00-17:30",M101,120,Monsoon,2025
 15,MTH100,1000012,"Wed 16:00-17:30",M102,120,Monsoon,2025
 16,BIO213,1000013,"Tue 14:00-15:30",B201,60,Monsoon,2025
-17,BIO201,1000014,"Thu 14:00-15:30",B202,60,Monsoon,2025
+17,BIO201,1000014,"Thu 14:00-15:30",B203,60,Monsoon,2025
 18,CSE201,1000003,"Mon 11:00-12:30",Lab-203,120,Monsoon,2025
 19,CSE231,1000016,"Tue 16:00-17:30",C201,100,Monsoon,2025
 20,CSE231,1000017,"Thu 16:00-17:30",C202,100,Monsoon,2025
@@ -30,3 +30,4 @@ section_id,course_id,instructor_id,day_time,room,capacity,semester,year
 32,ENT201,1000029,"Thu 13:00-14:00",E101,60,Monsoon,2025
 33,SSH221,1000030,"Mon 13:00-14:00",S102,60,Monsoon,2025
 34,ENT202,1000031,"Wed 13:00-14:00",E102,60,Monsoon,2025
+37,BIO111,1000003,"Mon 09:00-10:30",TBA,60,Monsoon,2025

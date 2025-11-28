@@ -28,3 +28,4 @@ src/resources/db.properties
 *.tmp
 *.swp
 src/resources/db.example.properties
+.DS_Store

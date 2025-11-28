@@ -2,10 +2,31 @@ course_id,code,title,credits
 ABC101,ABC,"Course 1",4
 ABC102,XYZ,"Course 2",4
 BIO101,FOB-I,"Foundations of Biology-I",4
+BIO111,ABC,Biochemistry,4
 BIO201,FOB-II,"Foundations of Biology II",4
 BIO213,IQB,"Introduction to Quantitative Biology",4
 BIO221,PB,"Practical Bioinformatics",4
+BIO321,ABIN,"Algorithms in Bioinformatics",4
+BIO361,BioP,Biophysics,4
+BIO506,SSSBB,"Stochastic Simulations in Systems Biology and Biophysics",4
+BIO522,ACB,"Algorithms in Computational Biology",4
+BIO523,CHI,Chemoinformatics,4
+BIO524,BIP,"Biomedical Image processing",4
+BIO531,IMB,"Introduction to Mathematical Biology",4
+BIO532,NB,"Network Biology",4
+BIO533,S&SB,"Systems and Synthetic Biology",4
+BIO534,ICN,"Introduction to Computational Neuroscience",4
+BIO541,DSG,"Data Sciences for Genomics",4
+BIO542,MLBA,"Machine Learning for Biomedical Applications",4
+BIO543,BDMH,"Big Data Mining in Healthcare",4
+BIO544,CGAS,"Computational Gastronomy",4
+BIO545,BioStats,Biostatistics,4
+BIO546,CM,"Computing for Medicine",4
+BIO548,HMDS,"Human Microbiome Data Science",4
+BIO551A,PCB,"Programming for Computational Biology",4
+BIO561,CADD,"Computer Aided Drug Design",4
 COM101,COM,"Communication Skills",4
+COM301A,TCOM,"Technical Communication",4
 CSE101,IP,"Introduction to Programming",4
 CSE102,DSA,"Data Structures & Algorithms",4
 CSE112,CO,"Computer Organization",4
@@ -18,15 +39,33 @@ CSE223,ALD,"Algorithm Design and Analysis",4
 CSE231,OS,"Operating Systems",4
 CSE232,CN,"Computer Networks",4
 CSE233,NAD,"Network Administration",4
+CSE319,MAD,"Modern Algorithm Design",4
+CSE320,AA,"Advanced Algorithms",4
+CSE322,ToC,"Theory of Computation",4
+CSE333,CG,"Computer Graphics",4
+CSE340,DIP,"Digital Image Processing",4
+CSE342,SML,"Statistical Machine Learning",4
+CSE344,CV,"Computer Vision",4
+CSE345,FCS,"Foundations of Computer Security",4
+CSE347,UsS,"Usable Security and Privacy",4
+CSE350,NSC,"Network Security",4
+CSE354,NSS-II,"Networks and System Security II",4
+CSE421,CMPT,"Complexity Theory",4
+CSE441,BIOM,"Advanced Biometrics",4
 DES101,DDV,"Design Drawing & Visualization",4
 DES102,IHCI,"Introduction to HCI",4
 DES130,PIS,"Prototyping Interactive Systems",4
 DES201,DPP,"Design Processes and Perspectives",4
 DES202,VDC,"Visual Design & Communication",4
 DES204,HCI,"Human Computer Interaction",4
+DES205,DIS,"Design of Interactive Systems",4
 DES206,PIS,"Prototyping Interactive Systems",4
+DES302,IAG,"Introduction to Animation and Graphics",4
+DES303,FMRP,"Film Making and Radio Podcasting",4
+DES305,3DAF,"3D Animation filmmaking",4
 ECE111,DC,"Digital Circuits",4
 ECE113,BE,"Basic Electronics",4
+ECE210,PSD,"Physics of Semiconductor Devices",4
 ECE211,ESD,"Electronic System Design",4
 ECE214,IE,"Integrated Electronics",4
 ECE215,CTD,"Circuit Theory and Devices",4
@@ -34,8 +73,37 @@ ECE230,F&W,"Fields and Waves",4
 ECE240,PCS,"Principles of Communication Systems",4
 ECE250,S&S,"Signals and Systems",4
 ECE270,ELD,"Embedded Logic Design",4
+ECE314,DVD,"Digital VLSI Design",4
+ECE315,CMOS,"Analog CMOS Circuit Design",4
+ECE318,SSD,"Solid State Devices",4
+ECE321,RFCD,"RF Circuit Design",4
+ECE331,AFW,"Applied Fields and Waves",4
+ECE340,DCS,"Digital Communication Systems",4
+ECE343,MCOM,"Mobile Communications",4
+ECE351,DSP,"Digital Signal Processing",4
+ECE363,ML,"Machine Learning",4
+ECE366,NEID,"Neural Engineering and Implantable Devices",4
 ECO221,ECO,"Econometrics I",4
 ECO223,MB,"Money and Banking",4
+ECO301,IEA,"Introduction to Economic Analysis",4
+ECO311,GMT,"Game Theory",4
+ECO312,IO,"Industrial Organization",4
+ECO313,MD,"Market Design",4
+ECO314,BEco,"Behavioural Economics",4
+ECO331,FF,"Foundations of Finance",4
+ECO332,VPM,"Valuation and Portfolio Management",4
+ECO333,MA,Macroeconomics,4
+ENT302,DTI,"Design Thinking and Innovation",4
+ENT303A,EL,"Experiential Learning",4
+ENT304,DTSE,"Digital Technologies and Social Entrepreneurship",4
+ENT305,SICSRSD,"Social Innovation, Corporate Social Responsibility and Sustainable Development",4
+ENT411,EComm,"Entrepreneurial Communication",4
+ENT412,EK,"Entrepreneurial Khichadi",4
+ENT413,EF,"Entrepreneurial Finance",4
+ENT414,RIPS,"Relevance of Intellectual Property for Startups",4
+ENT415,NVP,"New Venture Planning",4
+ESC205,EVS,"Environmental Sciences",4
+ESC207A,EEE,"Ecology, Evolution, and Environment",4
 MTH100,M-I,"Linear Algebra",4
 MTH201,P&S,"Probability and Statistics",4
 MTH203,M-III,"Multivariate Calculus",4
@@ -45,3 +113,12 @@ MTH211,NT,"Number Theory",4
 MTH212,AA-I,"Abstract Algebra I",4
 MTH240,RA-I,"Real Analysis I",4
 MTH270,NM,"Numerical Methods",4
+MTH300,IML,"Introduction to Mathematical Logic",4
+MTH302,ALG,Algebra,4
+MTH310,GT,"Graph Theory",4
+MTH311,CIA,"Combinatorics and its Applications",4
+MTH340,RA-II,"Real Analysis-II",4
+MTH371,SPA,"Stochastic Processes and Applications",4
+MTH372,SI,"Statistical Inference",4
+MTH373,SC,"Scientific Computing",4
+MTH376,MB,"Mechanics of Bodies",4

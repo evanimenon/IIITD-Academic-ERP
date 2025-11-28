@@ -1,11 +1,20 @@
 id,section_id,component_name,weight
-40,3,Quizzes,30
-41,3,Midsem,20
-42,3,Endsem,30
 43,2,Assignments,20
-44,4,Quizzes,30
-45,4,Midsem,20
-46,4,Endsem,30
-47,4,Quizzes,30
-48,4,Midsem,20
-49,4,Endsem,30
+60,16,Midsem,30
+61,16,Endsem,30
+62,16,Assigments,20
+63,16,Quizzes,20
+68,4,Quizzes,30
+69,4,Midsem,20
+70,4,Endsem,30
+71,4,Labs,20
+72,18,Midsem,25
+73,18,Endsem,25
+74,18,"Assignment 1",10
+75,18,"Assignment 2",10
+76,18,Quizzes,10
+77,18,Project,20
+82,3,Quizzes,25
+83,3,Midsem,30
+84,3,Endsem,30
+85,3,Assignments,15
