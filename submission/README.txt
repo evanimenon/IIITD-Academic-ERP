@@ -35,32 +35,24 @@ The project uses **two databases**:
 * `auth_db` — login accounts
 * `erp_db` — students, instructors, courses, sections, components, enrollments, grades, settings
 
-Seed scripts + CSV data are located in the **`data/`** folder.
+Pre-seeded SQL dumps are located in the **`data/`** folder:
 
+- `data/auth_seed.sql`
+- `data/erp_seed.sql`
 ---
 
-### 1. Enable CSV imports
-
-Run inside MySQL:
-
-```sql
-SET GLOBAL local_infile = 1;
-```
-
----
-
-### 2. Run seed scripts
+### 1. Create and seed the databases
 
 From project root:
 
 ```bash
 cd data
 
-# Seed authentication DB
-mysql --local-infile=1 -u root -p < auth_db.sql
+# Seed authentication DB (auth_db)
+mysql -u root -p < data/auth_seed.sql
 
-# Seed main ERP DB
-mysql --locallocal-infile=1 -u root -p < erp_db.sql
+# Seed main ERP DB (erp_db)
+mysql -u root -p < data/erp_seed.sql
 ```
 
 Each script will:
@@ -72,7 +64,7 @@ Each script will:
 
 ---
 
-### 3. Configure database credentials
+### 2. Configure database credentials
 
 Edit:
 
