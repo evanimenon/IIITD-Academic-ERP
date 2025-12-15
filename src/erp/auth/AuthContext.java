@@ -23,8 +23,6 @@ public final class AuthContext {
         return s == null ? Role.UNKNOWN : Role.from(s.role());
     }
 
-    // --- NEW HELPERS ---
-
     public static Integer getUserId() {
         var s = session;
         if (s == null)
