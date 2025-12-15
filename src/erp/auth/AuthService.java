@@ -19,12 +19,7 @@ import java.util.logging.Logger;
 
 public class AuthService {
     private static final Logger LOGGER = Logger.getLogger(AuthService.class.getName());
-
-    /**
-     * Attempt to log in a user with username + plaintext password.
-     *
-     * @throws AuthException with a generic message on failure (avoids leaking whether username exists)
-     */
+    
     public Session login(String username, String password) throws AuthException {
         if (username == null || username.isBlank()) throw new AuthException("Incorrect username or password.");
         if (password == null) throw new AuthException("Incorrect username or password.");
