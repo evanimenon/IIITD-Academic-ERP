@@ -15,7 +15,6 @@ import erp.db.DatabaseConnection;
 import erp.db.Maintenance;
 import erp.ui.common.*;
 import erp.ui.auth.LoginPage;
-import erp.ui.common.FontKit;
 
 public class EditComponents extends InstructorFrameBase {
 
@@ -143,6 +142,8 @@ public class EditComponents extends InstructorFrameBase {
 
                 deletecomponent(sectionID, compName);
             });
+
+            
 
             rowNum++;
         }
@@ -277,49 +278,98 @@ public class EditComponents extends InstructorFrameBase {
 
     private void saveAll(String instrID) {
 
+    if (Maintenance.isOn()) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Maintenance Mode is ON. Changes are disabled right now.",
+                "Maintenance Mode",
+                JOptionPane.WARNING_MESSAGE
+        );
+        return;
+    }
+
     // Gather all fields (existing + new)
     List<RoundedTextField[]> allFields = new ArrayList<>();
-        allFields.addAll(fields);     // existing
-        allFields.addAll(newFields);  // newly added
+    allFields.addAll(fields);
+    allFields.addAll(newFields);
 
-        // Delete all existing components for this section
-        String deleteSQL = "DELETE FROM section_components WHERE section_id = ?";
-        try (Connection conn = DatabaseConnection.erp().getConnection();
-            PreparedStatement deleteStmt = conn.prepareStatement(deleteSQL)) {
-            deleteStmt.setInt(1, sectionID);
-            deleteStmt.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+    float total;
+    try {
+        total = computeTotalWeight(allFields);
 
-        // Insert everything freshly
-        String insertSQL = "INSERT INTO section_components (section_id, component_name, weight) VALUES (?, ?, ?)";
-        try (Connection conn = DatabaseConnection.erp().getConnection();
-            PreparedStatement insertStmt = conn.prepareStatement(insertSQL)) {
+        for (RoundedTextField[] row : allFields) {
+            String comp = row[0].getText().trim();
+            String wStr = row[1].getText().trim();
+            if (comp.isEmpty() || wStr.isEmpty()) continue;
 
-            for (RoundedTextField[] row : allFields) {
-                String comp = row[0].getText().trim();
-                String wStr = row[1].getText().trim();
-                if (comp.isEmpty() || wStr.isEmpty()) continue;
-
-                float weight = Float.parseFloat(wStr);
-                insertStmt.setInt(1, sectionID);
-                insertStmt.setString(2, comp);
-                insertStmt.setFloat(3, weight);
-                insertStmt.addBatch();
+            float w = Float.parseFloat(wStr);
+            if (w < 0f) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Weight cannot be negative for component: " + comp,
+                        "Invalid Weight",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
             }
-
-            insertStmt.executeBatch();
-            JOptionPane.showMessageDialog(this, "Changes saved!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-            new EditComponents(instrID, sectionID, displayName).setVisible(true);
-            dispose();
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error saving", "DB Error", JOptionPane.ERROR_MESSAGE);
-        }
+
+    } catch (NumberFormatException nfe) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Please enter valid numeric weights (e.g., 10, 12.5).",
+                "Invalid Input",
+                JOptionPane.ERROR_MESSAGE
+        );
+        return;
     }
+
+    if (!confirmIfTotalNot100(total)) {
+        return; // user chose NO
+    }
+
+    // Delete all existing components for this section
+    String deleteSQL = "DELETE FROM section_components WHERE section_id = ?";
+    try (Connection conn = DatabaseConnection.erp().getConnection();
+         PreparedStatement deleteStmt = conn.prepareStatement(deleteSQL)) {
+        deleteStmt.setInt(1, sectionID);
+        deleteStmt.executeUpdate();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error clearing old components", "DB Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // Insert everything freshly
+    String insertSQL = "INSERT INTO section_components (section_id, component_name, weight) VALUES (?, ?, ?)";
+    try (Connection conn = DatabaseConnection.erp().getConnection();
+         PreparedStatement insertStmt = conn.prepareStatement(insertSQL)) {
+
+        for (RoundedTextField[] row : allFields) {
+            String comp = row[0].getText().trim();
+            String wStr = row[1].getText().trim();
+            if (comp.isEmpty() || wStr.isEmpty()) continue;
+
+            float weight = Float.parseFloat(wStr);
+
+            insertStmt.setInt(1, sectionID);
+            insertStmt.setString(2, comp);
+            insertStmt.setFloat(3, weight);
+            insertStmt.addBatch();
+        }
+
+        insertStmt.executeBatch();
+        JOptionPane.showMessageDialog(this, "Changes saved!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+        new EditComponents(instrID, sectionID, displayName).setVisible(true);
+        dispose();
+
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error saving", "DB Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
 
 
     List<String[]> getComponents(int sectionId) {
@@ -385,5 +435,39 @@ public class EditComponents extends InstructorFrameBase {
         }
         return name;
     }
+
+    private float computeTotalWeight(List<RoundedTextField[]> rows) throws NumberFormatException {
+    float total = 0f;
+    for (RoundedTextField[] row : rows) {
+        String comp = row[0].getText().trim();
+        String wStr = row[1].getText().trim();
+        if (comp.isEmpty() || wStr.isEmpty()) continue;
+
+        float w = Float.parseFloat(wStr);
+        total += w;
+    }
+    return total;
+}
+
+private boolean confirmIfTotalNot100(float total) {
+    final float EPS = 0.0001f;
+
+    if (Math.abs(total - 100f) <= EPS) return true;
+
+    String where = (total > 100f) ? "above" : "less than";
+    String msg = "Error: components add to " + where + " 100 (Total = " + total + "%).\n"
+               + "Wish to continue?";
+
+    int choice = JOptionPane.showConfirmDialog(
+            this,
+            msg,
+            "Component Weight Warning",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+    );
+
+    return choice == JOptionPane.YES_OPTION;
+}
+
 
 }
