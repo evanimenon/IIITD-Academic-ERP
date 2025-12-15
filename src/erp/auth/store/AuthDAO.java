@@ -10,32 +10,19 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Data-access helpers for authentication-related queries.
- *
- * NOTE: This class intentionally uses PreparedStatement + try-with-resources everywhere to
- * prevent SQL injection and to ensure connections are always closed.
- */
+
 public final class AuthDAO {
     private static final Logger LOGGER = Logger.getLogger(AuthDAO.class.getName());
 
     // Query timeouts (seconds) to fail fast if DB is unresponsive.
     private static final int QUERY_TIMEOUT_SECONDS = 10;
 
-    // What we return from the DB lookup
     public static record AuthRow(long userId, String username, String role, String hash) {
     }
 
-    private AuthDAO() { /* no instances */ }
+    private AuthDAO() {}
 
-    /**
-     * Find a user by username (no status filter to avoid silent mismatches).
-     *
-     * @param username non-null, non-blank username (trimmed)
-     * @return AuthRow or null if not found
-     * @throws SQLException on DB errors
-     * @see #authenticate(String, String)
-     */
+
     public static AuthRow findByUsername(String username) throws SQLException {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("username must not be null or blank");
@@ -64,12 +51,7 @@ public final class AuthDAO {
         }
     }
 
-    /**
-     * Touch last_login on success (optional column; ignore if missing).
-     *
-     * @param userId database user id
-     * @throws SQLException on DB errors
-     */
+
     public static void updateLastLogin(long userId) throws SQLException {
         final String sql = "UPDATE users_auth SET last_login = NOW() WHERE user_id = ?";
         try (Connection c = DatabaseConnection.auth().getConnection();
@@ -83,15 +65,7 @@ public final class AuthDAO {
         }
     }
 
-    /**
-     * Authenticate a username + plaintext password.
-     * This method hides the password-hash handling from callers and uses bcrypt check.
-     *
-     * @param username username to authenticate (non-null, non-blank)
-     * @param passwordPlain plaintext password provided by user (non-null)
-     * @return true if authenticated, false otherwise
-     * @throws SQLException on DB errors
-     */
+
     public static boolean authenticate(String username, String passwordPlain) throws SQLException {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("username must not be null or blank");
@@ -120,12 +94,7 @@ public final class AuthDAO {
         }
     }
 
-    /**
-     * Register a new user with bcrypt-hashed password.
-     * Use cost factor appropriate for your environment (12 is a reasonable default).
-     *
-     * Note: callers must ensure username uniqueness at application or DB level.
-     */
+
     public static void createUser(String username, String passwordPlain, String role) throws SQLException {
         if (username == null || username.isBlank()) throw new IllegalArgumentException("username required");
         if (passwordPlain == null) throw new IllegalArgumentException("password required");
